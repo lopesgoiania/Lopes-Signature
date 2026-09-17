@@ -157,6 +157,50 @@ export default function HomePage() {
       />
     )}
 
-    <footer className="border-t border-white/10 bg-[#0d0d0d]"><div className="mx-auto grid max-w-[1280px] gap-12 px-5 py-14 md:grid-cols-[1.2fr_1fr_1fr] md:px-10"><div><PageLogo /><p className="mt-5 max-w-xs text-sm leading-6 text-[#7a7a7a]">Uma nova forma de encontrar lugares à altura da sua história.</p><div className="mt-6 flex gap-2"><a href="https://instagram.com" aria-label="Instagram" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-[#d4af37]" data-testid="link-instagram"><Instagram size={16} /></a><a href="https://linkedin.com" aria-label="LinkedIn" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-[#d4af37]" data-testid="link-linkedin"><Linkedin size={16} /></a><a href="mailto:curadoria@lopessignature.com.br" aria-label="Email" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-[#d4af37]" data-testid="link-email"><Mail size={16} /></a></div></div><div><p className="mono-label mb-5 text-[#d4af37]">Navegue</p><div className="flex flex-col gap-3 text-sm text-[#9a9a9a]"><a href="/#catalogo" data-testid="link-footer-imoveis">Imóveis</a><Link href="/especialistas" data-testid="link-footer-especialistas">Especialistas</Link><a href="/#blog" data-testid="link-footer-blog">Notícias</a><Link href="/contato" data-testid="link-footer-contato">Contato</Link></div></div><div><p className="mono-label mb-5 text-[#d4af37]">Contato</p><p className="text-sm text-[#9a9a9a]">+55 11 3081 4800<br />curadoria@lopessignature.com.br<br />São Paulo · Goiânia · Brasil</p></div></div><div className="border-t border-white/10 px-5 py-5 md:px-10"><div className="mx-auto flex max-w-[1280px] justify-between text-[10px] uppercase tracking-[.15em] text-[#5c5c5c]"><span>© 2026 Lopes Signature</span><span>Privacidade · Termos</span></div></div></footer>
+    <footer className="border-t border-white/10 bg-[#0d0d0d]">
+      <div className="mx-auto grid max-w-[1280px] gap-12 px-5 py-14 md:grid-cols-[1.2fr_1fr_1.5fr] md:px-10">
+        <div>
+          <PageLogo />
+          <p className="mt-5 max-w-xs text-sm leading-6 text-[#7a7a7a]">Uma nova forma de encontrar lugares à altura da sua história.</p>
+          <div className="mt-6 flex gap-2">
+            <a href="https://instagram.com" aria-label="Instagram" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-[#d4af37]" data-testid="link-instagram"><Instagram size={16} /></a>
+            <a href="https://linkedin.com" aria-label="LinkedIn" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-[#d4af37]" data-testid="link-linkedin"><Linkedin size={16} /></a>
+            <a href="mailto:contato@lopessignature.com.br" aria-label="Email" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-[#d4af37]" data-testid="link-email"><Mail size={16} /></a>
+          </div>
+        </div>
+        <div>
+          <p className="mono-label mb-5 text-[#d4af37]">Navegue</p>
+          <div className="flex flex-col gap-3 text-sm text-[#9a9a9a]">
+            <a href="/#catalogo" data-testid="link-footer-imoveis">Imóveis</a>
+            <Link href="/especialistas" data-testid="link-footer-especialistas">Especialistas</Link>
+            <a href="/#blog" data-testid="link-footer-blog">Notícias</a>
+            <Link href="/contato" data-testid="link-footer-contato">Contato</Link>
+          </div>
+        </div>
+        <div>
+          <p className="mono-label mb-5 text-[#d4af37]">Contato</p>
+          <div className="text-sm text-[#9a9a9a] space-y-4">
+            <p>
+              <strong>Telefone:</strong> (62) 3921 9800<br />
+              <strong>E-mail:</strong> contato@lopessignature.com.br
+            </p>
+            <div>
+              <strong>Endereços:</strong>
+              <ul className="mt-2 space-y-2 text-xs">
+                <li><span className="text-white">Lopes Marista:</span> R. 146, 495 - Marista, Goiânia - GO, 74170-090</li>
+                <li><span className="text-white">Lopes Bueno:</span> Avenida T-11 Qd. 117 Lt. 20 - Nº 503 - St. Bueno, Goiânia - GO, 74223-070</li>
+                <li><span className="text-white">Lopes Jardim Goiás:</span> R. 14, Térreo C-9 Lotes 02/05-15 - Jardim Goiás, Goiânia - GO, 74810-180</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="border-t border-white/10 px-5 py-5 md:px-10">
+        <div className="mx-auto flex max-w-[1280px] justify-between text-[10px] uppercase tracking-[.15em] text-[#5c5c5c]">
+          <span>© 2026 Lopes Signature</span>
+          <span>Privacidade · Termos</span>
+        </div>
+      </div>
+    </footer>
   </div>;
 }

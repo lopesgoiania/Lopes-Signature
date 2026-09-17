@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Bath, BedDouble, Car, Download, ExternalLink, MapPin, MessageSquare, Ruler, X } from 'lucide-react';
-import type { Property } from '@workspace/api-client-react';
+import { useCreateLead, type Property } from '@workspace/api-client-react';
 import { money } from '@/components/signature-ui';
 
 export interface LocalFloorplan {
@@ -41,6 +41,8 @@ export function RaioXModal({ property, onClose }: RaioXModalProps) {
 
   const [activeFloorplan, setActiveFloorplan] = useState<LocalFloorplan>(floorplans[0]);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const [showLeadForm, setShowLeadForm] = useState(false);
+  const createLead = useCreateLead();
 
   const gallery: string[] = (property as any).gallery && (property as any).gallery.length > 0
     ? (property as any).gallery
@@ -98,14 +100,48 @@ export function RaioXModal({ property, onClose }: RaioXModalProps) {
                   <Download size={15} /> Baixar material
                 </a>
               )}
-              <a
-                href={`https://wa.me/5511999991111?text=${whatsappMessage}`}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-2 rounded-xl bg-[#00a884] px-6 py-3 text-xs font-bold text-white hover:bg-[#008f70] transition shadow-lg"
-              >
-                <MessageSquare size={15} /> Receber material
-              </a>
+              
+              {showLeadForm ? (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const form = new FormData(e.currentTarget);
+                    createLead.mutate({
+                      data: {
+                        name: String(form.get('name') || ''),
+                        email: String(form.get('email') || ''),
+                        phone: String(form.get('phone') || ''),
+                        propertyId: property.id,
+                        propertyTitle: property.title,
+                        status: 'new',
+                        source: 'raio-x',
+                        note: 'Interesse gerado pelo Raio-X'
+                      }
+                    });
+                  }}
+                  className="flex flex-col gap-2 rounded-xl bg-[#161619] p-4 border border-white/10 shadow-lg min-w-[280px]"
+                >
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-xs font-bold text-white">Receber Informações</span>
+                    <button type="button" onClick={() => setShowLeadForm(false)} className="text-[#9a9a9a] hover:text-white"><X size={14} /></button>
+                  </div>
+                  <input name="name" required placeholder="Seu nome" className="h-10 rounded-lg border border-white/15 bg-black/20 px-3 text-xs text-white outline-none focus:border-[#d4af37]" />
+                  <input name="phone" required placeholder="Seu telefone" className="h-10 rounded-lg border border-white/15 bg-black/20 px-3 text-xs text-white outline-none focus:border-[#d4af37]" />
+                  <input name="email" type="email" required placeholder="seu@email.com" className="h-10 rounded-lg border border-white/15 bg-black/20 px-3 text-xs text-white outline-none focus:border-[#d4af37]" />
+                  <button type="submit" className="mt-1 flex items-center justify-center gap-2 rounded-lg bg-[#d4af37] px-4 py-2.5 text-xs font-bold text-black hover:bg-[#e8c766] transition">
+                    {createLead.isPending ? 'Enviando...' : 'Enviar Solicitação'}
+                  </button>
+                  {createLead.isSuccess && <p className="text-[10px] text-[#7acb8e] mt-1 text-center">Enviado com sucesso!</p>}
+                </form>
+              ) : (
+                <button
+                  onClick={() => setShowLeadForm(true)}
+                  className="flex items-center gap-2 rounded-xl bg-[#d4af37] px-6 py-3 text-xs font-bold text-black hover:bg-[#e8c766] transition shadow-lg"
+                >
+                  <MessageSquare size={15} /> Saiba mais
+                </button>
+              )}
+
               {property.lpUrl && (
                 <a
                   href={property.lpUrl}
