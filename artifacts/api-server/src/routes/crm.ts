@@ -122,8 +122,10 @@ router.post("/crm/ignore", async (req, res) => {
   }
 
   const { ids } = req.body;
-  if (!Array.isArray(ids) || ids.length === 0) return res.status(400).json({ error: "IDs inválidos" });
-
+  if (!Array.isArray(ids) || ids.length === 0) {
+    res.status(400).json({ error: "IDs inválidos" });
+    return;
+  }
   try {
     const { error } = await supabase
       .from("crm_sync_queue")
