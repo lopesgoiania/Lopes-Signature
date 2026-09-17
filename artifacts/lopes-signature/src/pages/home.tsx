@@ -11,7 +11,14 @@ const categories = [
 
 export default function HomePage() {
   const [search, setSearch] = useState('');
-  const [saved, setSaved] = useState<string[]>(() => JSON.parse(localStorage.getItem('lopes-saved') || '[]'));
+  const [saved, setSaved] = useState<string[]>(() => {
+    try {
+      const parsed = JSON.parse(localStorage.getItem('lopes-saved') || '[]');
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
   const [selectedRaioXProperty, setSelectedRaioXProperty] = useState<Property | null>(null);
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
   const [loadingBlog, setLoadingBlog] = useState(true);
