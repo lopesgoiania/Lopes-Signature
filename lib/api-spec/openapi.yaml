@@ -2,14 +2,24 @@ openapi: 3.1.0
 info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
-  version: 0.1.0
-  description: API specification
+  version: 0.2.0
+  description: Lopes Signature real estate portal and administration API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: properties
+    description: Property catalog operations
+  - name: analytics
+    description: Portal analytics
+  - name: tracking
+    description: Marketing pixel settings
+  - name: leads
+    description: Lead pipeline
+  - name: specialists
+    description: Signature specialists
 paths:
   /healthz:
     get:
@@ -24,7 +34,218 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /properties:
+    get:
+      operationId: listProperties
+      tags: [properties]
+      summary: List properties
+      parameters:
+        - name: search
+          in: query
+          schema: { type: string }
+        - name: category
+          in: query
+          schema: { type: string }
+        - name: region
+          in: query
+          schema: { type: string }
+        - name: featured
+          in: query
+          schema: { type: boolean }
+      responses:
+        "200":
+          description: Property list
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Property" }
+    post:
+      operationId: createProperty
+      tags: [properties]
+      summary: Create a property
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PropertyInput" }
+      responses:
+        "201":
+          description: Created property
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Property" }
+  /properties/{propertyId}:
+    get:
+      operationId: getProperty
+      tags: [properties]
+      summary: Get one property
+      parameters:
+        - $ref: "#/components/parameters/PropertyId"
+      responses:
+        "200":
+          description: Property
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Property" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    patch:
+      operationId: updateProperty
+      tags: [properties]
+      summary: Update a property
+      parameters:
+        - $ref: "#/components/parameters/PropertyId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PropertyInput" }
+      responses:
+        "200":
+          description: Updated property
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Property" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    delete:
+      operationId: deleteProperty
+      tags: [properties]
+      summary: Delete a property
+      parameters:
+        - $ref: "#/components/parameters/PropertyId"
+      responses:
+        "204": { description: Property deleted }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /analytics/summary:
+    get:
+      operationId: getAnalyticsSummary
+      tags: [analytics]
+      summary: Get dashboard summary metrics
+      responses:
+        "200":
+          description: Summary metrics
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AnalyticsSummary" }
+  /analytics/timeseries:
+    get:
+      operationId: getAnalyticsTimeseries
+      tags: [analytics]
+      summary: Get traffic and conversion time series
+      responses:
+        "200":
+          description: Analytics time series
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AnalyticsPoint" }
+  /tracking-settings:
+    get:
+      operationId: getTrackingSettings
+      tags: [tracking]
+      summary: Get tracking and pixel settings
+      responses:
+        "200":
+          description: Tracking settings
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TrackingSettings" }
+    patch:
+      operationId: updateTrackingSettings
+      tags: [tracking]
+      summary: Update tracking and pixel settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TrackingSettings" }
+      responses:
+        "200":
+          description: Updated tracking settings
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TrackingSettings" }
+  /leads:
+    get:
+      operationId: listLeads
+      tags: [leads]
+      summary: List leads
+      responses:
+        "200":
+          description: Lead list
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Lead" }
+    post:
+      operationId: createLead
+      tags: [leads]
+      summary: Create a lead
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LeadInput" }
+      responses:
+        "201":
+          description: Created lead
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Lead" }
+  /leads/{leadId}:
+    patch:
+      operationId: updateLead
+      tags: [leads]
+      summary: Update lead status or notes
+      parameters:
+        - name: leadId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LeadInput" }
+      responses:
+        "200":
+          description: Updated lead
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Lead" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /specialists:
+    get:
+      operationId: listSpecialists
+      tags: [specialists]
+      summary: List Signature specialists
+      responses:
+        "200":
+          description: Specialist list
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Specialist" }
 components:
+  parameters:
+    PropertyId:
+      name: propertyId
+      in: path
+      required: true
+      schema: { type: string }
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message: { type: string }
+            required: [message]
   schemas:
     HealthStatus:
       type: object
@@ -33,4 +254,122 @@ components:
           type: string
       required:
         - status
+    Property:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        location: { type: string }
+        neighborhood: { type: string }
+        category: { type: string }
+        price: { type: number }
+        area: { type: number }
+        bedrooms: { type: number }
+        suites: { type: number }
+        parking: { type: number }
+        description: { type: string }
+        images:
+          type: array
+          items: { type: string }
+        badges:
+          type: array
+          items: { type: string }
+        featured: { type: boolean }
+        lpUrl: { type: string }
+        status: { type: string }
+      required: [id, title, location, neighborhood, category, price, area, bedrooms, suites, parking, description, images, badges, featured, lpUrl, status]
+    PropertyInput:
+      type: object
+      properties:
+        title: { type: string }
+        location: { type: string }
+        neighborhood: { type: string }
+        category: { type: string }
+        price: { type: number }
+        area: { type: number }
+        bedrooms: { type: number }
+        suites: { type: number }
+        parking: { type: number }
+        description: { type: string }
+        images:
+          type: array
+          items: { type: string }
+        badges:
+          type: array
+          items: { type: string }
+        featured: { type: boolean }
+        lpUrl: { type: string }
+        status: { type: string }
+      required: [title, location, neighborhood, category, price, area, bedrooms, suites, parking, description, images, badges, featured, lpUrl, status]
+    AnalyticsSummary:
+      type: object
+      properties:
+        totalVisits: { type: number }
+        whatsappClicks: { type: number }
+        lpViews: { type: number }
+        formConversions: { type: number }
+        conversionRate: { type: number }
+        visitsChange: { type: number }
+        leadsChange: { type: number }
+      required: [totalVisits, whatsappClicks, lpViews, formConversions, conversionRate, visitsChange, leadsChange]
+    AnalyticsPoint:
+      type: object
+      properties:
+        label: { type: string }
+        visits: { type: number }
+        lpViews: { type: number }
+        leads: { type: number }
+      required: [label, visits, lpViews, leads]
+    TrackingSettings:
+      type: object
+      properties:
+        metaPixelId: { type: string }
+        metaEnabled: { type: boolean }
+        gtmContainerId: { type: string }
+        ga4MeasurementId: { type: string }
+        customHeadScript: { type: string }
+        customBodyScript: { type: string }
+      required: [metaPixelId, metaEnabled, gtmContainerId, ga4MeasurementId, customHeadScript, customBodyScript]
+    Lead:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        email: { type: string }
+        phone: { type: string }
+        propertyId: { type: string }
+        propertyTitle: { type: string }
+        status:
+          type: string
+          enum: [new, contacted, scheduled, negotiation, closed]
+        source: { type: string }
+        createdAt: { type: string }
+        note: { type: string }
+      required: [id, name, email, phone, propertyId, propertyTitle, status, source, createdAt, note]
+    LeadInput:
+      type: object
+      properties:
+        name: { type: string }
+        email: { type: string }
+        phone: { type: string }
+        propertyId: { type: string }
+        propertyTitle: { type: string }
+        status:
+          type: string
+          enum: [new, contacted, scheduled, negotiation, closed]
+        source: { type: string }
+        note: { type: string }
+      required: [name, email, phone, propertyId, propertyTitle, status, source, note]
+    Specialist:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        role: { type: string }
+        credential: { type: string }
+        bio: { type: string }
+        image: { type: string }
+        whatsapp: { type: string }
+        listings: { type: number }
+      required: [id, name, role, credential, bio, image, whatsapp, listings]
 

@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Lopes Signature"
+description = "An ultra-luxury real estate portal for discovering, managing, and measuring high-end properties, with a cinematic catalog experience and a dedicated admin hub for catalog, tracking, and leads."
+version = "1.0.0"
+id = "artifacts/lopes-signature"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25747
+
+[services.development]
+run = "pnpm --filter @workspace/lopes-signature run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/lopes-signature", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/lopes-signature/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25747"
+BASE_PATH = "/"

@@ -1,0 +1,70 @@
+# MISSION & CONTEXT
+Build a production-ready, ultra-luxury Real Estate Web Portal and Admin Management Platform for "Lopes Signature" (an exclusive high-end real estate brand).
+The user experience must balance cinematic dark-luxury aesthetics with high-performance UI components, interactive catalog filtering, individual landing page linking, and a tracking/metrics dashboard.
+
+Strictly adhere to the design tokens and layout specifications provided in the attached `design-tokens.json` and visual references.
+
+---
+
+# TECH STACK & SYSTEM ARCHITECTURE
+- Framework: React (TypeScript) + Vite / Next.js
+- Styling: Tailwind CSS configured with all tokens from the JSON (colors, border radiuses, hairpins, shadows, and fonts)
+- UI Library / Primitives: Radix UI / Shadcn UI / Lucide React (stroke width 1.5px)
+- Animations: Framer Motion (using the specified easing: cubic-bezier(0.16, 1, 0.3, 1))
+- State Management / Mock Data: Mock service simulating catalog data, LP URLs, analytics, and pixel tracking settings.
+
+---
+
+# KEY SECTIONS & PAGES TO IMPLEMENT
+
+### 1. Header & Navigation (Floating Pill Island)
+- Fixed at the top (centered), with `backdrop-blur(20px)`, rounded pill shape, hairline gold border (`rgba(212, 175, 55, 0.2)`).
+- Brand Logo ("Lopes Signature" with luxury serif accent).
+- Nav links: Início, Imóveis & Empreendimentos, Sobre a Signature, Especialistas, Contato.
+- CTA Button: Brushed metallic gradient "Agendar Consultoria".
+- Quick link/toggle to access the "/admin" area.
+
+### 2. Hero Section & Category Bar
+- Hero headline with dramatic typography and high-contrast editorial background with radial vignette overlay.
+- Floating Category Pill Bar at the bottom of the hero: Interactive pills (Apartamentos, Coberturas, Mansões, Terrenos, Lançamentos) with minimalist gold icons and active highlight states.
+
+### 3. Stacked Property Carousel (Signature Highlight)
+- Interactive 3D depth-layered card slider:
+  - Main active card in focus (rounded 24px, 16:10 aspect ratio, zoom on hover).
+  - Background stacked cards visibly cascading behind (`scale(0.96)`, `translateX/Y offsets`, decreasing opacity).
+  - Split right block: Property Title, Big Gold Price, specs (m², Quartos, Suítes, Vagas), brief editorial description, and "Conhecer Empreendimento" CTA.
+
+### 4. Search & Property Catalog
+- Sticky/Floating Search Bar: Address/Neighborhood input, Region select dropdown, Filter trigger button with numeric badge, and Gold "Buscar" action button.
+- Active filter pill tags (dismissible with 'x').
+- Split Horizontal Property Cards:
+  - Left: Image gallery with thumbnail counter (e.g. 1/35) and smooth hover zoom.
+  - Right: Typographic hierarchy with Title, Gold Price, technical specs icons, description excerpt, bookmark button, and "Ver Detalhes / Acessar LP" button linking to the dedicated LP route.
+
+### 5. Team of Specialists ("O Programa Lopes Signature")
+- Dark luxury grid presenting elite advisors, badge pins, credentials, direct WhatsApp scheduling, and bio.
+
+### 6. Admin Management & Tracking Hub (`/admin`)
+Implement a dedicated, responsive Dark Mode Dashboard with a collapsible 260px sidebar:
+- **Tab 1: Analytics & Metrics:**
+  - Metric cards: Visitas Totais, Cliques em Botões de WhatsApp, Visualizações de LPs, Conversões de Formulário.
+  - Charts showing lead traffic and page views over time.
+- **Tab 2: Gerenciador de Catálogo:**
+  - Table / Grid view of all properties.
+  - Modal to Add/Edit Property: Title, Description, Price, Specs, Category, Badges ("EXCLUSIVO", "NOVO"), Image Gallery URLs, and **"URL da Landing Page Dedicada"** (connecting the Antigravity-built LP to the institutional item).
+- **Tab 3: Tracking & Pixels Hub:**
+  - Direct input fields with test/save states for:
+    - Meta Pixel ID (`Pixel ID` input + toggle enable/disable)
+    - Google Tag Manager (GTM Container ID)
+    - Google Analytics 4 (Measurement ID `G-XXXXXXX`)
+    - Custom Head / Body script injection textareas for custom trackers.
+- **Tab 4: Gestão de Leads:**
+  - Simple Kanban board (Novo, Em Atendimento, Visita Agendada, Negociação, Concluído).
+
+---
+
+# DESIGN IMPLEMENTATION RULES
+1. **Dark Luxury Atmosphere:** Dominant background `#0A0A0A`, elevated cards `#1A1A1A`, gold hairline strokes (`rgba(212, 175, 55, 0.25)`). Never use generic flat blues or saturated grays.
+2. **Typography Hierarchy:** Clean geometric sans for body (`Plus Jakarta Sans` or `Inter`) + refined serif/display accents for titles (`Cormorant Garamond` or `Playfair Display`).
+3. **Motion:** Elegant micro-interactions (soft glow on hover, card lift `-4px`, stagger transitions on scroll reveal).
+4. **Modularity:** Keep components clean, typed, and well-separated into `/components`, `/pages`, `/types`, and `/mock` so they can be easily customized and imported into Antigravity IDE.

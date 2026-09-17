@@ -1,0 +1,462 @@
+{
+  "project": {
+    "name": "Lopes Signature - Luxury Real Estate Portal",
+    "version": "1.1.0",
+    "theme": "Dark Luxury & Brushed Metal",
+    "brand_pillars": ["Exclusividade", "Alto Padrão", "Confiança", "Sofisticação"],
+    "design_principles": [
+      "Contraste dramático: preto profundo como tela de fundo para o dourado respirar",
+      "Hairlines dourados translúcidos no lugar de bordas sólidas para sensação de joalheria",
+      "Hierarquia por peso tipográfico e não por cor excessiva",
+      "Movimento sutil e lento, nunca abrupto (luxo não tem pressa)",
+      "Fotografia de imóveis sempre em destaque máximo, UI nunca compete com a imagem"
+    ],
+    "reference_sources": {
+      "ui_structure": "Portal imobiliário 'HOME' (navbar em pílula, hero com filtros por categoria, slider em camadas, catálogo split horizontal)",
+      "visual_identity": "Lopes Signature Brand Book (dark luxury, dourado acetinado, metal escovado)"
+    }
+  },
+  "color_palette": {
+    "background": {
+      "primary": "#0A0A0A",
+      "secondary": "#121212",
+      "tertiary": "#161616",
+      "surface_elevated": "#1A1A1A",
+      "surface_elevated_hover": "#1F1F1F",
+      "surface_glass": "rgba(18, 18, 18, 0.72)",
+      "surface_glass_light": "rgba(255, 255, 255, 0.03)",
+      "overlay_scrim": "rgba(0, 0, 0, 0.65)",
+      "modal_backdrop": "rgba(10, 10, 10, 0.85)",
+      "gradient_hero_vignette": "radial-gradient(ellipse at 50% 0%, rgba(212,175,55,0.08) 0%, rgba(10,10,10,0) 60%)"
+    },
+    "brand_gold": {
+      "primary": "#D4AF37",
+      "light": "#E8C766",
+      "lighter": "#F4E5A8",
+      "dark": "#B8860B",
+      "darker": "#8A6C1F",
+      "muted": "rgba(212, 175, 55, 0.5)",
+      "metallic_gradient": "linear-gradient(135deg, #B8860B 0%, #D4AF37 35%, #F4E5A8 50%, #D4AF37 65%, #8A6C1F 100%)",
+      "metallic_gradient_vertical": "linear-gradient(180deg, #F4E5A8 0%, #D4AF37 45%, #8A6C1F 100%)",
+      "text_gradient": "linear-gradient(90deg, #D4AF37 0%, #F4E5A8 50%, #D4AF37 100%)",
+      "border_glow": "0 0 24px rgba(212, 175, 55, 0.35)",
+      "border_glow_strong": "0 0 40px rgba(212, 175, 55, 0.5)"
+    },
+    "brushed_metal": {
+      "base": "#3A3A3A",
+      "highlight": "#5C5C5C",
+      "shadow": "#1E1E1E",
+      "texture_gradient": "linear-gradient(115deg, #2A2A2A 0%, #4A4A4A 25%, #2A2A2A 50%, #4A4A4A 75%, #2A2A2A 100%)"
+    },
+    "text": {
+      "primary": "#FFFFFF",
+      "secondary": "#C9C9C9",
+      "tertiary": "#9A9A9A",
+      "muted": "#7A7A7A",
+      "disabled": "#4A4A4A",
+      "gold_accent": "#D4AF37",
+      "inverse": "#0A0A0A",
+      "link": "#E8C766",
+      "link_hover": "#F4E5A8"
+    },
+    "borders": {
+      "subtle": "rgba(255, 255, 255, 0.08)",
+      "default": "rgba(255, 255, 255, 0.12)",
+      "gold_hairline": "rgba(212, 175, 55, 0.25)",
+      "gold_hairline_strong": "rgba(212, 175, 55, 0.45)",
+      "active": "#D4AF37",
+      "focus_ring": "rgba(212, 175, 55, 0.5)",
+      "divider": "rgba(255, 255, 255, 0.06)"
+    },
+    "status_and_badges": {
+      "filter_pill_bg": "rgba(212, 175, 55, 0.08)",
+      "filter_pill_bg_hover": "rgba(212, 175, 55, 0.14)",
+      "tag_active": "rgba(212, 175, 55, 0.18)",
+      "tag_active_border": "#D4AF37",
+      "success": "#4CAF6D",
+      "success_bg": "rgba(76, 175, 109, 0.12)",
+      "warning": "#E0A93A",
+      "warning_bg": "rgba(224, 169, 58, 0.12)",
+      "error": "#E0554A",
+      "error_bg": "rgba(224, 85, 74, 0.12)",
+      "info": "#5B9BD5",
+      "info_bg": "rgba(91, 155, 213, 0.12)",
+      "exclusive_badge": {
+        "background": "linear-gradient(135deg, #D4AF37, #8A6C1F)",
+        "text": "#0A0A0A",
+        "label": "SIGNATURE EXCLUSIVE"
+      },
+      "new_badge": {
+        "background": "rgba(255, 255, 255, 0.08)",
+        "text": "#FFFFFF",
+        "label": "NOVO"
+      }
+    },
+    "interactive_states": {
+      "hover_overlay": "rgba(255, 255, 255, 0.04)",
+      "pressed_overlay": "rgba(0, 0, 0, 0.2)",
+      "disabled_overlay": "rgba(255, 255, 255, 0.02)",
+      "selected_bg": "rgba(212, 175, 55, 0.1)"
+    }
+  },
+  "typography": {
+    "font_families": {
+      "primary_sans": "'Neue Haas Grotesk', 'Plus Jakarta Sans', 'Inter', sans-serif",
+      "display_signature": "'Cormorant Garamond', 'Playfair Display', serif",
+      "display_script_fallback": "'Tangerine', 'Parisienne', cursive",
+      "mono_accent": "'Space Mono', monospace",
+      "google_fonts_import": "Plus+Jakarta+Sans:wght@300;400;500;600;700;800|Playfair+Display:wght@400;500;600;700|Cormorant+Garamond:wght@400;500;600&display=swap"
+    },
+    "font_weights": {
+      "light": 300,
+      "regular": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700,
+      "extrabold": 800
+    },
+    "scale": {
+      "display_xl": {
+        "size": "96px",
+        "weight": 600,
+        "line_height": "1.0",
+        "letter_spacing": "-0.03em",
+        "family": "display_signature",
+        "usage": "Splash / landing de campanha"
+      },
+      "hero_title": {
+        "size": "72px",
+        "size_tablet": "52px",
+        "size_mobile": "36px",
+        "weight": 600,
+        "line_height": "1.05",
+        "letter_spacing": "-0.02em",
+        "family": "primary_sans",
+        "color": "text.primary"
+      },
+      "section_title": {
+        "size": "36px",
+        "size_mobile": "26px",
+        "weight": 600,
+        "line_height": "1.2",
+        "letter_spacing": "-0.01em",
+        "color": "text.primary"
+      },
+      "subsection_title": {
+        "size": "24px",
+        "weight": 600,
+        "line_height": "1.3",
+        "color": "text.primary"
+      },
+      "card_title": {
+        "size": "20px",
+        "weight": 600,
+        "line_height": "1.4",
+        "color": "text.primary"
+      },
+      "property_price": {
+        "size": "32px",
+        "size_mobile": "24px",
+        "weight": 700,
+        "line_height": "1.1",
+        "letter_spacing": "-0.01em",
+        "color": "brand_gold.primary",
+        "family": "primary_sans"
+      },
+      "property_price_compact": {
+        "size": "20px",
+        "weight": 700,
+        "color": "brand_gold.primary"
+      },
+      "body_text": {
+        "size": "16px",
+        "weight": 400,
+        "line_height": "1.6",
+        "color": "text.secondary"
+      },
+      "body_text_small": {
+        "size": "14px",
+        "weight": 400,
+        "line_height": "1.5",
+        "color": "text.tertiary"
+      },
+      "button_label": {
+        "size": "15px",
+        "weight": 600,
+        "letter_spacing": "0.01em",
+        "line_height": "1"
+      },
+      "nav_link": {
+        "size": "14px",
+        "weight": 500,
+        "letter_spacing": "0.01em",
+        "color": "text.secondary",
+        "color_active": "brand_gold.primary"
+      },
+      "caption_uppercase": {
+        "size": "12px",
+        "letter_spacing": "0.2em",
+        "transform": "uppercase",
+        "weight": 500,
+        "color": "text.muted"
+      },
+      "micro_label": {
+        "size": "11px",
+        "letter_spacing": "0.08em",
+        "transform": "uppercase",
+        "weight": 500,
+        "color": "text.muted"
+      }
+    },
+    "responsive_breakpoints_note": "Escalas abaixo de 'lg' (1024px) reduzem hero_title e section_title em ~30%, mantendo letter_spacing proporcional"
+  },
+  "layout_and_geometry": {
+    "container_max_width": "1440px",
+    "container_padding_desktop": "80px",
+    "container_padding_tablet": "40px",
+    "container_padding_mobile": "20px",
+    "grid": {
+      "columns_desktop": 12,
+      "columns_tablet": 8,
+      "columns_mobile": 4,
+      "gutter": "24px",
+      "gutter_mobile": "16px"
+    },
+    "breakpoints": {
+      "mobile": "0px",
+      "tablet": "768px",
+      "laptop": "1024px",
+      "desktop": "1280px",
+      "wide": "1440px"
+    },
+    "border_radius": {
+      "pill": "9999px",
+      "card_main": "24px",
+      "card_small": "16px",
+      "card_image": "20px",
+      "input": "12px",
+      "button": "9999px",
+      "badge": "9999px",
+      "modal": "28px",
+      "avatar": "50%"
+    },
+    "spacing_scale": {
+      "0": "0px",
+      "1": "4px",
+      "2": "8px",
+      "3": "12px",
+      "4": "16px",
+      "5": "20px",
+      "6": "24px",
+      "8": "32px",
+      "10": "40px",
+      "12": "48px",
+      "16": "64px",
+      "20": "80px",
+      "24": "96px",
+      "30": "120px",
+      "section_gap": "120px",
+      "section_gap_mobile": "64px",
+      "card_padding": "32px",
+      "card_padding_mobile": "20px",
+      "component_gap": "24px",
+      "micro_gap": "8px"
+    },
+    "elevation_shadows": {
+      "sm": "0 2px 8px rgba(0, 0, 0, 0.24)",
+      "md": "0 8px 24px rgba(0, 0, 0, 0.32)",
+      "lg": "0 16px 48px rgba(0, 0, 0, 0.4)",
+      "xl": "0 24px 64px rgba(0, 0, 0, 0.5)",
+      "gold_ambient": "0 8px 32px rgba(212, 175, 55, 0.15)",
+      "navbar_float": "0 12px 40px rgba(0, 0, 0, 0.45)",
+      "card_hover": "0 20px 48px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(212, 175, 55, 0.2)"
+    },
+    "z_index": {
+      "base": 0,
+      "sticky_elements": 10,
+      "floating_navbar": 100,
+      "dropdown": 200,
+      "modal_backdrop": 900,
+      "modal": 1000,
+      "toast": 1100,
+      "tooltip": 1200
+    }
+  },
+  "ui_components": {
+    "floating_navbar": {
+      "type": "Floating Pill Island",
+      "position": "fixed, top: 24px, centralizada horizontalmente",
+      "height": "72px",
+      "background": "rgba(18, 18, 18, 0.75) with backdrop-blur(20px) saturate(140%)",
+      "border": "1px solid rgba(212, 175, 55, 0.2)",
+      "border_radius": "layout_and_geometry.border_radius.pill",
+      "shadow": "elevation_shadows.navbar_float",
+      "elements": ["Logo Signature (dourado, serif)", "Nav Links com indicador ativo dourado (underline ou dot)", "CTA button brushed metal 'Agendar Visita'"],
+      "scroll_behavior": "Reduz padding vertical em 20% e intensifica blur ao rolar além de 80px",
+      "states": {
+        "default": "border-color: borders.gold_hairline",
+        "scrolled": "background: rgba(10,10,10,0.9); shadow: elevation_shadows.lg"
+      }
+    },
+    "hero_section": {
+      "headline_structure": "Texto de alto impacto em branco (hero_title) + linha de suporte em cinza claro (body_text) + CTA duplo (primário dourado + secundário outline)",
+      "background_treatment": "Imagem de arquitetura em preto e branco ou dessaturada a 20%, com gradient_hero_vignette sobreposto",
+      "category_filter_pill_bar": {
+        "description": "Barra flutuante inferior com ícones de categorias (Apartamento, Cobertura, Casa, Terreno, Loft, Terreno)",
+        "style": "Cards ovais em vidro escuro (surface_glass) com ícones dourados minimalistas em stroke 1.5px e hover com glow sutil",
+        "active_state": "Ícone e label em brand_gold.primary, fundo status_and_badges.tag_active"
+      }
+    },
+    "stacked_property_slider": {
+      "description": "Carrossel com efeito de profundidade/camadas visto na referência",
+      "card_stack_offsets": "transform: translateX(16px) translateY(8px) scale(0.96) para camada -1; translateX(32px) translateY(16px) scale(0.92) para camada -2; opacity decrescente 1 / 0.6 / 0.3",
+      "content_layout": "Split: Imagem em destaque com cantos arredondados 24px + Bloco direito com Título, Preço imponente em Dourado, Metragem, Quartos, Vagas e Descrição",
+      "navigation_controls": "Setas circulares brushed metal com ícone dourado, posicionadas nas laterais da imagem principal",
+      "autoplay": "8s por slide, pausa no hover, indicadores em dashes dourados finos"
+    },
+    "catalog_search_bar": {
+      "structure": "Input de busca por localização, select dropdown de região, botão de filtros com badge numérica dourada e botão 'Buscar' estilo Signature (fundo dourado metálico, texto preto)",
+      "height": "64px",
+      "background": "background.surface_elevated",
+      "border": "1px solid borders.subtle",
+      "border_radius": "layout_and_geometry.border_radius.pill",
+      "active_filters_pills": "Tags removíveis com cantos pill e border dourada translúcida, ícone 'x' em text.muted que vira gold no hover"
+    },
+    "property_catalog_cards": {
+      "card_split_horizontal": {
+        "image_ratio": "16:10 com carousel de miniaturas e contador de fotos (ex: 1/35)",
+        "info_panel": "Preço em destaque dourado, tipo de imóvel, especificações com ícones técnicos discretos dourados, parágrafo resumo e botão de salvar/favorito",
+        "hover_effects": "Zoom suave na imagem scale(1.03) e brilho de borda dourada (elevation_shadows.card_hover)",
+        "save_button": "Círculo 40px, fundo surface_glass, ícone bookmark outline branco; ao ativar preenche em brand_gold.primary"
+      },
+      "card_grid_compact": {
+        "description": "Cards menores para seção 'Destaques / Populares' e card de Newsletter premium em fundo dourado metálico",
+        "columns": "4 desktop / 2 tablet / 1 mobile"
+      }
+    },
+    "buttons": {
+      "primary": {
+        "background": "brand_gold.metallic_gradient",
+        "text_color": "text.inverse",
+        "height": "52px",
+        "padding_x": "32px",
+        "border_radius": "layout_and_geometry.border_radius.button",
+        "hover": "brightness(1.08) + shadow: elevation_shadows.gold_ambient",
+        "active": "brightness(0.95) scale(0.98)",
+        "disabled": "opacity: 0.4, background: brushed_metal.base"
+      },
+      "secondary_outline": {
+        "background": "transparent",
+        "border": "1px solid borders.gold_hairline_strong",
+        "text_color": "brand_gold.primary",
+        "height": "52px",
+        "hover": "background: status_and_badges.filter_pill_bg, border-color: brand_gold.primary"
+      },
+      "ghost": {
+        "background": "transparent",
+        "text_color": "text.secondary",
+        "hover": "text_color: text.primary"
+      },
+      "icon_button": {
+        "size": "44px",
+        "background": "surface_glass",
+        "border_radius": "50%",
+        "hover": "background: rgba(212,175,55,0.12)"
+      }
+    },
+    "inputs_and_forms": {
+      "text_input": {
+        "height": "52px",
+        "background": "background.surface_elevated",
+        "border": "1px solid borders.subtle",
+        "border_radius": "layout_and_geometry.border_radius.input",
+        "placeholder_color": "text.muted",
+        "focus_state": "border-color: brand_gold.primary; box-shadow: 0 0 0 3px borders.focus_ring"
+      },
+      "select_dropdown": {
+        "chevron_color": "brand_gold.primary",
+        "menu_background": "background.surface_elevated",
+        "menu_border": "1px solid borders.gold_hairline",
+        "option_hover": "background: status_and_badges.filter_pill_bg_hover"
+      },
+      "checkbox_radio": {
+        "unchecked_border": "borders.default",
+        "checked_background": "brand_gold.primary",
+        "checked_icon_color": "text.inverse"
+      }
+    },
+    "footer": {
+      "background": "background.secondary",
+      "border_top": "1px solid borders.gold_hairline",
+      "structure": ["Logo Signature + tagline", "Colunas de navegação (Imóveis, Serviços, Sobre, Contato)", "Redes sociais em ícones outline dourados", "Linha de copyright em caption_uppercase"],
+      "newsletter_block": "Fundo metallic_gradient sutil (opacity 0.06), input inline + botão dourado"
+    },
+    "property_detail_page": {
+      "gallery": "Grid assimétrico com imagem hero grande + 4 thumbnails, lightbox em modal_backdrop",
+      "info_sidebar": "Card sticky com preço, CTA 'Agendar Visita', botão WhatsApp, corretor responsável (avatar + nome + selo Signature)",
+      "amenities_grid": "Ícones dourados outline 24px em grid 3 colunas com label body_text_small",
+      "map_block": "Mapa com tema dark customizado (ruas em brushed_metal.base, marcador dourado pulsante)"
+    },
+    "admin_dashboard_spec": {
+      "theme": "Dark dashboard clean, mesma paleta do site público porém com densidade de informação maior",
+      "sidebar": "Fixa, 260px, background.secondary, item ativo com barra lateral dourada de 3px",
+      "modules": [
+        "Analytics Overview (Visitas, Cliques no WhatsApp, Conversões de LP) com charts em linha dourada sobre grid escuro",
+        "Gerenciador de Catálogo de Imóveis (Cadastro manual e vínculo com URL da Landing Page)",
+        "Pixel & Tracking Hub (Campos para Meta Pixel ID, Google Tag Manager ID, GA4 Measurement ID, TikTok Pixel e scripts customizados em Header/Body)",
+        "Gestão de Leads (Kanban com colunas: Novo, Em Contato, Visita Agendada, Fechado)",
+        "Gerenciador de Corretores (perfil, selo de performance, imóveis vinculados)"
+      ],
+      "data_viz_colors": ["#D4AF37", "#5B9BD5", "#4CAF6D", "#7A7A7A"]
+    }
+  },
+  "iconography": {
+    "style": "Outline / stroke, peso 1.5px, cantos levemente arredondados",
+    "default_color": "text.secondary",
+    "active_color": "brand_gold.primary",
+    "size_scale": {
+      "sm": "16px",
+      "md": "20px",
+      "lg": "24px",
+      "xl": "32px"
+    },
+    "library_suggestion": "Lucide Icons ou Phosphor Icons (peso 'thin'/'light')"
+  },
+  "micro_interactions": {
+    "easing": {
+      "default": "cubic-bezier(0.16, 1, 0.3, 1)",
+      "entrance": "cubic-bezier(0.22, 1, 0.36, 1)",
+      "exit": "cubic-bezier(0.4, 0, 1, 1)"
+    },
+    "durations": {
+      "fast": "150ms",
+      "base": "300ms",
+      "slow": "500ms",
+      "slider_transition": "700ms"
+    },
+    "hover_glow": "box-shadow: 0 0 24px rgba(212, 175, 55, 0.35)",
+    "image_scale_on_hover": "scale(1.03)",
+    "card_lift_on_hover": "translateY(-4px) + elevation_shadows.card_hover",
+    "button_press": "scale(0.97) em 100ms",
+    "page_transition": "fade + translateY(12px) na entrada dos blocos de conteúdo, stagger de 60ms entre cards",
+    "skeleton_loading": "shimmer diagonal sutil em brushed_metal.texture_gradient sobre background.surface_elevated",
+    "scroll_reveal": "opacity 0→1 + translateY(24px→0) ao entrar 20% no viewport"
+  },
+  "imagery_guidelines": {
+    "treatment": "Fotografia arquitetônica editorial, alto contraste, evitar filtros saturados",
+    "overlay_on_dark_sections": "linear-gradient(180deg, rgba(10,10,10,0) 40%, rgba(10,10,10,0.8) 100%) para legibilidade de texto sobre imagem",
+    "aspect_ratios": {
+      "hero_banner": "21:9",
+      "property_card": "16:10",
+      "gallery_thumbnail": "1:1",
+      "agent_avatar": "1:1"
+    },
+    "corner_radius_on_images": "layout_and_geometry.border_radius.card_image"
+  },
+  "accessibility": {
+    "min_contrast_text_on_bg": "4.5:1 (validar text.secondary sobre background.primary)",
+    "focus_visible": "outline: 2px solid brand_gold.primary; outline-offset: 2px",
+    "reduced_motion": "Respeitar prefers-reduced-motion: desativar scroll_reveal, autoplay e card_lift, manter apenas fade",
+    "touch_target_min": "44px x 44px"
+  }
+}
