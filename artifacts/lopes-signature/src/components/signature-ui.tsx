@@ -3,7 +3,7 @@ import { Link, useLocation } from 'wouter';
 import { ArrowRight, BedDouble, Bookmark, ChevronLeft, ChevronRight, Eye, ExternalLink, Home, MapPin, Menu, Ruler, Search, SlidersHorizontal, Sparkles, X } from 'lucide-react';
 import type { Property, Specialist } from '@workspace/api-client-react';
 import casaAurora from '@assets/generated_images/casa_aurora.jpg';
-import villaMare from '@assets/generated_images/villa_maré.jpg';
+import villaMare from '@assets/generated_images/villa_mare.jpg';
 import penthouseIbirapuera from '@assets/generated_images/penthouse_ibirapuera.jpg';
 import quintaLume from '@assets/generated_images/quinta_lume.jpg';
 import homeReference from '@assets/image_1788303912918.png';
