@@ -25,7 +25,7 @@ export default function HomePage() {
 
   const propertyQuery = useListProperties(search ? { search } : undefined);
   const createLead = useCreateLead();
-  const properties = propertyQuery.data || [];
+  const properties = Array.isArray(propertyQuery.data) ? propertyQuery.data : [];
 
   // Buscar posts dinâmicos da API /api/blog e registrar visita real
   useEffect(() => {

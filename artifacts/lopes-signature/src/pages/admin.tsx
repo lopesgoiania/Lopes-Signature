@@ -94,8 +94,8 @@ function Overview() {
   const leadsQuery = useListLeads();
 
   const summary = summaryQuery.data;
-  const points = seriesQuery.data || [];
-  const leads = leadsQuery.data || [];
+  const points = Array.isArray(seriesQuery.data) ? seriesQuery.data : [];
+  const leads = Array.isArray(leadsQuery.data) ? leadsQuery.data : [];
 
   const values = points;
   const max = Math.max(...values.map((point) => point.visits), 1);
@@ -461,7 +461,7 @@ function Catalog() {
       .finally(() => setSyncLoading(false));
   }
 
-  const properties = query.data || [];
+  const properties = Array.isArray(query.data) ? query.data : [];
 
   return (
     <div className="space-y-7">
@@ -807,7 +807,7 @@ function Leads() {
   const queryClient = useQueryClient();
   const query = useListLeads();
   const update = useUpdateLead();
-  const leads = query.data || [];
+  const leads = Array.isArray(query.data) ? query.data : [];
 
   function moveLead(lead: Lead, status: Lead['status']) {
     const data: LeadInput = {
