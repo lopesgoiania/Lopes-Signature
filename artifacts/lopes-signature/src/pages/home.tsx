@@ -64,10 +64,10 @@ export default function HomePage() {
         <div className="hero-vignette absolute inset-0 pointer-events-none" />
         <div className="relative mx-auto flex w-full max-w-[1280px] items-end justify-between">
           <div className="max-w-2xl reveal rounded-3xl border border-white/10 bg-black/40 p-6 md:p-8 backdrop-blur-md">
-            <p className="mono-label mb-3 text-[#e8c766]">Imóveis para uma vida extraordinária</p>
-            <h1 className="serif text-4xl leading-[.95] tracking-[-.03em] text-white md:text-6xl">A casa certa<br /><em className="font-normal text-[#e8c766]">não é encontrada.</em></h1>
-            <p className="mt-4 max-w-lg text-sm leading-6 text-[#c9c9c9]">É reconhecida. Uma seleção privada de endereços com arquitetura, história e espaço para o que realmente importa.</p>
-            <div className="mt-6 flex flex-wrap gap-3"><a href="#catalogo" className="metal-button flex items-center gap-2 rounded-full px-6 py-3.5 text-xs font-bold" data-testid="link-hero-explorar">Explorar seleção <ArrowUpRight size={15} /></a><a href="#manifesto" className="flex items-center gap-2 rounded-full border border-white/25 px-6 py-3.5 text-xs text-white hover:border-[#d4af37] hover:text-[#e8c766]" data-testid="link-hero-manifesto"><Play size={14} /> Nosso olhar</a></div>
+            <p className="mono-label mb-3 text-[#e8c766]">O alto padrão de Goiânia</p>
+            <h1 className="serif text-4xl leading-[.95] tracking-[-.03em] text-white md:text-6xl">Residências exclusivas,<br /><em className="font-normal text-[#e8c766]">nos bairros mais desejados.</em></h1>
+            <p className="mt-4 max-w-lg text-sm leading-6 text-[#c9c9c9]">Uma seleção de imóveis de luxo apresentada por especialistas que conhecem os empreendimentos, suas particularidades e o mercado de Goiânia.</p>
+            <div className="mt-6 flex flex-wrap gap-3"><a href="#catalogo" className="metal-button flex items-center gap-2 rounded-full px-6 py-3.5 text-xs font-bold" data-testid="link-hero-explorar">Explore os imóveis <ArrowUpRight size={15} /></a><a href="/contato" className="flex items-center gap-2 rounded-full border border-white/25 px-6 py-3.5 text-xs text-white hover:border-[#d4af37] hover:text-[#e8c766]" data-testid="link-hero-manifesto">Fale com um especialista</a></div>
           </div>
         </div>
       </section>
@@ -84,8 +84,8 @@ export default function HomePage() {
 
       <section id="manifesto" className="border-y border-[#d4af37]/20 bg-[#121212]">
         <div className="mx-auto grid max-w-[1280px] items-center gap-12 px-5 py-24 md:grid-cols-[.9fr_1.1fr] md:px-10 md:py-32">
-          <div><SectionLabel>O nosso olhar</SectionLabel><h2 className="serif text-5xl leading-[.95] text-white md:text-6xl">Menos imóveis.<br /><em className="font-normal text-[#e8c766]">Mais significado.</em></h2></div>
-          <div className="max-w-xl"><p className="text-lg leading-8 text-[#c9c9c9]">Não acreditamos em listas intermináveis. Acreditamos em contexto: a luz que atravessa uma sala às quatro da tarde, a proporção certa entre casa e jardim, o bairro que combina com seu próximo capítulo.</p><p className="mt-6 text-sm leading-7 text-[#7a7a7a]">Cada endereço é visitado, entendido e apresentado por uma equipe que trata sua busca como uma conversa — não como uma transação.</p><Link href="/especialistas" className="mt-8 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.15em] text-[#e8c766]" data-testid="link-manifesto-especialistas">Conheça nossa equipe de especialistas <ArrowRight size={15} /></Link></div>
+          <div><SectionLabel>Experiência Lopes</SectionLabel><h2 className="serif text-5xl leading-[.95] text-white md:text-6xl">Especialistas em<br /><em className="font-normal text-[#e8c766]">alto padrão.</em></h2></div>
+          <div className="max-w-xl"><p className="text-lg leading-8 text-[#c9c9c9]">Conhecer o mercado de luxo de Goiânia é compreender o que distingue cada empreendimento: arquitetura, localização, qualidade dos espaços e acabamentos.</p><p className="mt-6 text-sm leading-7 text-[#7a7a7a]">A Lopes Signature reúne essa especialização à experiência da Lopes, com atendimento próximo e orientação em cada etapa da aquisição.</p><Link href="/especialistas" className="mt-8 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.15em] text-[#e8c766]" data-testid="link-manifesto-especialistas">Conheça nossa equipe de especialistas <ArrowRight size={15} /></Link></div>
         </div>
       </section>
 
@@ -93,13 +93,13 @@ export default function HomePage() {
       <section id="blog" className="mx-auto max-w-[1280px] px-5 py-24 md:px-10 md:py-32">
         <div className="mb-12 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
-            <SectionLabel>Notícias & Tendências</SectionLabel>
+            <SectionLabel>Journal Signature</SectionLabel>
             <h2 className="serif text-4xl text-white md:text-5xl">
-              Perspectivas do <em className="font-normal text-[#d4af37]">Mercado de Luxo.</em>
+              Um olhar estendido sobre<br /><em className="font-normal text-[#d4af37]">o mercado de luxo.</em>
             </h2>
           </div>
           <p className="max-w-xs text-xs leading-5 text-[#7a7a7a]">
-            Artigos pesquisados e gerados via Inteligência Artificial sobre o mercado imobiliário.
+            Arquitetura, endereços e movimentos do mercado de Goiânia, sob a perspectiva de quem conhece o alto luxo.
           </p>
         </div>
 
@@ -111,7 +111,7 @@ export default function HomePage() {
           </div>
         ) : blogPosts.length === 0 ? (
           <div className="rounded-3xl border border-dashed border-[#d4af37]/30 bg-[#121212] p-12 text-center">
-            <p className="text-[#9a9a9a]">Nenhum artigo publicado no momento. Acesse o Painel de Gestão para gerar artigos com IA.</p>
+            <p className="text-[#9a9a9a]">Em breve, novas leituras do Journal Signature.</p>
           </div>
         ) : (
           <div className="grid gap-8 md:grid-cols-3">
@@ -146,7 +146,7 @@ export default function HomePage() {
         )}
       </section>
 
-      <section id="contato" className="mx-auto max-w-[1280px] px-5 pb-24 md:px-10 md:pb-32"><div className="relative overflow-hidden rounded-[2rem] border border-[#d4af37]/40 bg-[#1a1a1a] p-8 md:p-14"><div className="absolute -right-20 -top-20 h-72 w-72 rounded-full border border-[#d4af37]/20" /><div className="relative grid gap-10 md:grid-cols-[1fr_1fr] md:items-center"><div><SectionLabel>Receba a curadoria</SectionLabel><h2 className="serif text-4xl text-white md:text-5xl">Alguns endereços<br /><em className="font-normal text-[#e8c766]">merecem ser vistos primeiro.</em></h2></div><form onSubmit={submitNewsletter} className="flex flex-col gap-3" data-testid="form-newsletter"><input name="name" required placeholder="Seu nome" className="h-12 rounded-xl border border-white/15 bg-black/20 px-4 text-sm text-white outline-none focus:border-[#d4af37]" data-testid="input-newsletter-name" /><div className="flex gap-2"><input name="email" type="email" required placeholder="seu@email.com" className="h-12 min-w-0 flex-1 rounded-xl border border-white/15 bg-black/20 px-4 text-sm text-white outline-none focus:border-[#d4af37]" data-testid="input-newsletter-email" /><button type="submit" className="metal-button rounded-xl px-5 text-xs font-bold" data-testid="button-newsletter-submit">{createLead.isPending ? 'Enviando' : 'Entrar na lista'}</button></div>{createLead.isSuccess && <p className="text-xs text-[#7acb8e]" data-testid="status-newsletter-success">Sua curadoria começa agora.</p>}</form></div></div></section>
+      <section id="contato" className="mx-auto max-w-[1280px] px-5 pb-24 md:px-10 md:pb-32"><div className="relative overflow-hidden rounded-[2rem] border border-[#d4af37]/40 bg-[#1a1a1a] p-8 md:p-14"><div className="absolute -right-20 -top-20 h-72 w-72 rounded-full border border-[#d4af37]/20" /><div className="relative grid gap-10 md:grid-cols-[1fr_1fr] md:items-center"><div><SectionLabel>Assine o Journal Signature</SectionLabel><h2 className="serif text-4xl text-white md:text-5xl">Um olhar sobre o luxo.<br /><em className="font-normal text-[#e8c766]">Uma leitura só sua.</em></h2></div><form onSubmit={submitNewsletter} className="flex flex-col gap-3" data-testid="form-newsletter"><input name="name" required placeholder="Seu nome" className="h-12 rounded-xl border border-white/15 bg-black/20 px-4 text-sm text-white outline-none focus:border-[#d4af37]" data-testid="input-newsletter-name" /><div className="flex gap-2"><input name="email" type="email" required placeholder="seu@email.com" className="h-12 min-w-0 flex-1 rounded-xl border border-white/15 bg-black/20 px-4 text-sm text-white outline-none focus:border-[#d4af37]" data-testid="input-newsletter-email" /><button type="submit" className="metal-button rounded-xl px-5 text-xs font-bold" data-testid="button-newsletter-submit">{createLead.isPending ? 'Enviando' : 'Quero receber'}</button></div>{createLead.isSuccess && <p className="text-xs text-[#7acb8e]" data-testid="status-newsletter-success">Sua inscrição no Journal Signature foi recebida.</p>}</form></div></div></section>
     </main>
 
     {/* Modal do Raio-X */}
@@ -173,7 +173,7 @@ export default function HomePage() {
           <div className="flex flex-col gap-3 text-sm text-[#9a9a9a]">
             <a href="/#catalogo" data-testid="link-footer-imoveis">Imóveis</a>
             <Link href="/especialistas" data-testid="link-footer-especialistas">Especialistas</Link>
-            <a href="/#blog" data-testid="link-footer-blog">Notícias</a>
+            <a href="/#blog" data-testid="link-footer-blog">Journal Signature</a>
             <Link href="/contato" data-testid="link-footer-contato">Contato</Link>
           </div>
         </div>
