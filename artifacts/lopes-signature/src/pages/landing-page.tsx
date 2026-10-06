@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useRoute, Link } from 'wouter';
 import { ArrowUpRight, Bath, BedDouble, Building2, Car, CheckCircle2, Download, ExternalLink, MapPin, MessageSquare, Phone, Ruler, Send, ShieldCheck, Sparkles, Waves } from 'lucide-react';
 import { useGetProperty, useCreateLead } from '@workspace/api-client-react';
-import { PageLogo, PublicNav, SectionLabel, money } from '@/components/signature-ui';
+import { PageLogo, SectionLabel, money } from '@/components/signature-ui';
 import { RaioXModal } from '@/components/raio-x-modal';
 
 export default function LandingPage() {
@@ -75,7 +75,6 @@ export default function LandingPage() {
 
   return (
     <div className="signature-shell noise min-h-[100dvh] text-[#f5f2e9]">
-      <PublicNav />
 
       {/* Hero Comercial da LP */}
       <section className="relative min-h-[90vh] flex items-end overflow-hidden pt-28 pb-16 px-5 md:px-10">
