@@ -6,7 +6,7 @@ import { PageLogo, PublicNav, SectionLabel } from '@/components/signature-ui';
 
 export default function SpecialistsPage() {
   const { data: specialistsFromQuery } = useListSpecialists();
-  const specialists = specialistsFromQuery || [];
+  const specialists: Specialist[] = Array.isArray(specialistsFromQuery) ? specialistsFromQuery : [];
   const [selectedRole, setSelectedRole] = useState<string>('todos');
 
   const filteredSpecialists = selectedRole === 'todos' 
