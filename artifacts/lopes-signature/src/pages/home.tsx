@@ -60,7 +60,7 @@ export default function HomePage() {
     <PublicNav />
     <main>
       <section className="relative flex min-h-[550px] md:min-h-[680px] lg:min-h-[760px] items-end overflow-hidden border-b border-white/10 px-5 pb-12 pt-28 md:px-10 md:pb-16 bg-[#090909]">
-        <img src="/images/epic-signature-hero.png" alt="Fachada do Epic City Home, em Goiânia" className="absolute inset-0 h-full w-full object-cover object-center opacity-100" />
+        <img src="/images/epic-signature-hero.jpg" alt="Fachada do Epic City Home, em Goiânia" className="absolute inset-0 h-full w-full object-cover object-center opacity-100" />
         <div className="hero-vignette absolute inset-0 pointer-events-none" />
         <div className="relative mx-auto flex w-full max-w-[1280px] items-end justify-between">
           <div className="max-w-2xl reveal rounded-3xl border border-white/10 bg-black/40 p-6 md:p-8 backdrop-blur-md">
