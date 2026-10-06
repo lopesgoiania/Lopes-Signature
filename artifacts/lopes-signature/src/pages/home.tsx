@@ -115,8 +115,8 @@ export default function HomePage() {
           </div>
         ) : (
           <div className="grid gap-8 md:grid-cols-3">
-            {blogPosts.map((post) => (
-              <article key={post.id} className="group cursor-pointer overflow-hidden rounded-3xl border border-white/10 bg-[#121212] transition duration-300 hover:border-[#d4af37]/50 hover:bg-[#161616]">
+            {blogPosts.slice(0, 3).map((post) => (
+              <Link href={`/journal/${encodeURIComponent(post.id)}`} key={post.id} className="group cursor-pointer overflow-hidden rounded-3xl border border-white/10 bg-[#121212] transition duration-300 hover:border-[#d4af37]/50 hover:bg-[#161616]">
                 <div className="overflow-hidden">
                   <img
                     src={post.image || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'}
@@ -140,10 +140,11 @@ export default function HomePage() {
                     <span className="text-[10px] text-[#7a7a7a] font-mono">{post.readTime}</span>
                   </div>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
         )}
+        <Link href="/journal" className="mt-10 inline-flex items-center gap-2 rounded-full border border-[#d4af37]/40 px-6 py-3 text-xs font-bold text-[#e8c766]">Ver todos os artigos <ArrowRight size={15} /></Link>
       </section>
 
       <section id="contato" className="mx-auto max-w-[1280px] px-5 pb-24 md:px-10 md:pb-32"><div className="relative overflow-hidden rounded-[2rem] border border-[#d4af37]/40 bg-[#1a1a1a] p-8 md:p-14"><div className="absolute -right-20 -top-20 h-72 w-72 rounded-full border border-[#d4af37]/20" /><div className="relative grid gap-10 md:grid-cols-[1fr_1fr] md:items-center"><div><SectionLabel>Assine o Journal Signature</SectionLabel><h2 className="serif text-4xl text-white md:text-5xl">Um olhar sobre o luxo.<br /><em className="font-normal text-[#e8c766]">Uma leitura só sua.</em></h2></div><form onSubmit={submitNewsletter} className="flex flex-col gap-3" data-testid="form-newsletter"><input name="name" required placeholder="Seu nome" className="h-12 rounded-xl border border-white/15 bg-black/20 px-4 text-sm text-white outline-none focus:border-[#d4af37]" data-testid="input-newsletter-name" /><div className="flex gap-2"><input name="email" type="email" required placeholder="seu@email.com" className="h-12 min-w-0 flex-1 rounded-xl border border-white/15 bg-black/20 px-4 text-sm text-white outline-none focus:border-[#d4af37]" data-testid="input-newsletter-email" /><button type="submit" className="metal-button rounded-xl px-5 text-xs font-bold" data-testid="button-newsletter-submit">{createLead.isPending ? 'Enviando' : 'Quero receber'}</button></div>{createLead.isSuccess && <p className="text-xs text-[#7acb8e]" data-testid="status-newsletter-success">Sua inscrição no Journal Signature foi recebida.</p>}</form></div></div></section>
@@ -172,8 +173,9 @@ export default function HomePage() {
           <p className="mono-label mb-5 text-[#d4af37]">Navegue</p>
           <div className="flex flex-col gap-3 text-sm text-[#9a9a9a]">
             <a href="/#catalogo" data-testid="link-footer-imoveis">Imóveis</a>
+            <Link href="/sobre">Sobre nós</Link>
             <Link href="/especialistas" data-testid="link-footer-especialistas">Especialistas</Link>
-            <a href="/#blog" data-testid="link-footer-blog">Journal Signature</a>
+            <a href="/#blog" data-testid="link-footer-blog">Journal</a>
             <Link href="/contato" data-testid="link-footer-contato">Contato</Link>
           </div>
         </div>

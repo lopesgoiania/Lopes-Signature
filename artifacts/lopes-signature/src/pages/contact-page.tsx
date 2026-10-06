@@ -233,7 +233,7 @@ export default function ContactPage() {
               <Link href="/">Início</Link>
               <a href="/#catalogo">Imóveis</a>
               <Link href="/especialistas">Especialistas</Link>
-              <a href="/#blog">Notícias</a>
+              <a href="/#blog">Journal</a>
               <Link href="/contato" className="text-[#e8c766]">Contato</Link>
             </div>
           </div>

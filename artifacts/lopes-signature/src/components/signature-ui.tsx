@@ -44,8 +44,9 @@ export function PublicNav() {
       <nav className="hidden items-center gap-7 lg:flex" aria-label="Navegação principal">
         <Link href="/" className={`text-xs tracking-wide ${location === '/' ? 'text-[#d4af37]' : 'text-[#c9c9c9] hover:text-white'}`} data-testid="link-nav-inicio">Início</Link>
         <a href="/#catalogo" className="text-xs tracking-wide text-[#c9c9c9] hover:text-white" data-testid="link-nav-imoveis">Imóveis</a>
-        <Link href="/especialistas" className={`text-xs tracking-wide ${location === '/especialistas' || location === '/sobre' ? 'text-[#d4af37]' : 'text-[#c9c9c9] hover:text-white'}`} data-testid="link-nav-especialistas">Sobre Nós & Especialistas</Link>
-        <a href="/#blog" className="text-xs tracking-wide text-[#c9c9c9] hover:text-white" data-testid="link-nav-blog">Notícias</a>
+        <Link href="/sobre" className="text-xs text-[#c9c9c9] hover:text-white" data-testid="link-nav-sobre">Sobre nós</Link>
+        <Link href="/especialistas" className={`text-xs tracking-wide ${location === '/especialistas' ? 'text-[#d4af37]' : 'text-[#c9c9c9] hover:text-white'}`} data-testid="link-nav-especialistas">Especialistas</Link>
+        <a href="/#blog" className="text-xs tracking-wide text-[#c9c9c9] hover:text-white" data-testid="link-nav-blog">Journal</a>
         <Link href="/contato" className={`text-xs tracking-wide ${location === '/contato' ? 'text-[#d4af37]' : 'text-[#c9c9c9] hover:text-white'}`} data-testid="link-nav-contato">Contato</Link>
       </nav>
       <div className="flex items-center gap-2">
@@ -56,8 +57,9 @@ export function PublicNav() {
     {open && <nav className="glass-panel mx-auto mt-2 max-w-[1280px] rounded-3xl p-4 lg:hidden" aria-label="Menu mobile">
       <Link onClick={() => setOpen(false)} href="/" className="block rounded-xl px-4 py-3 text-sm text-white hover:bg-white/5" data-testid="link-mobile-inicio">Início</Link>
       <a onClick={() => setOpen(false)} href="/#catalogo" className="block rounded-xl px-4 py-3 text-sm text-white hover:bg-white/5" data-testid="link-mobile-imoveis">Imóveis</a>
-      <Link onClick={() => setOpen(false)} href="/especialistas" className="block rounded-xl px-4 py-3 text-sm text-white hover:bg-white/5" data-testid="link-mobile-especialistas">Sobre Nós & Especialistas</Link>
-      <a onClick={() => setOpen(false)} href="/#blog" className="block rounded-xl px-4 py-3 text-sm text-white hover:bg-white/5" data-testid="link-mobile-blog">Notícias</a>
+      <Link onClick={() => setOpen(false)} href="/sobre" className="block rounded-xl px-4 py-3 text-sm text-white" data-testid="link-mobile-sobre">Sobre nós</Link>
+      <Link onClick={() => setOpen(false)} href="/especialistas" className="block rounded-xl px-4 py-3 text-sm text-white hover:bg-white/5" data-testid="link-mobile-especialistas">Especialistas</Link>
+      <a onClick={() => setOpen(false)} href="/#blog" className="block rounded-xl px-4 py-3 text-sm text-white hover:bg-white/5" data-testid="link-mobile-blog">Journal</a>
       <Link onClick={() => setOpen(false)} href="/contato" className="block rounded-xl px-4 py-3 text-sm text-white hover:bg-white/5" data-testid="link-mobile-contato">Contato</Link>
     </nav>}
   </header>;
