@@ -60,7 +60,7 @@ export default function HomePage() {
     <PublicNav />
     <main>
       <section className="relative flex min-h-[550px] md:min-h-[680px] lg:min-h-[760px] items-end overflow-hidden border-b border-white/10 px-5 pb-12 pt-28 md:px-10 md:pb-16 bg-[#090909]">
-        <img src="/images/banner-hero-3.png" alt="Lopes Signature Banner Hero" className="absolute inset-0 h-full w-full object-cover object-center opacity-100" />
+        <img src="/images/epic-signature-hero.png" alt="Fachada do Epic City Home, em Goiânia" className="absolute inset-0 h-full w-full object-cover object-center opacity-100" />
         <div className="hero-vignette absolute inset-0 pointer-events-none" />
         <div className="relative mx-auto flex w-full max-w-[1280px] items-end justify-between">
           <div className="max-w-2xl reveal rounded-3xl border border-white/10 bg-black/40 p-6 md:p-8 backdrop-blur-md">
@@ -78,7 +78,7 @@ export default function HomePage() {
       </section>
 
       <section className="mx-auto max-w-[1280px] px-5 py-24 md:px-10 md:py-32">
-        <div className="mb-10 flex items-end justify-between"><div><SectionLabel>Seleção Signature</SectionLabel><h2 className="serif text-4xl text-white md:text-5xl">Endereços com <em className="font-normal text-[#d4af37]">alma.</em></h2></div><span className="hidden text-right text-xs leading-5 text-[#7a7a7a] md:block">Uma curadoria que privilegia<br />o extraordinário sobre o óbvio.</span></div>
+        <div className="mb-10 flex items-end justify-between"><div><SectionLabel>Lopes Signature</SectionLabel><h2 className="serif text-4xl text-white md:text-5xl">Imóveis de alto luxo<br /><em className="font-normal text-[#d4af37]">em Goiânia.</em></h2></div><span className="hidden text-right text-xs leading-5 text-[#7a7a7a] md:block">Uma seleção à altura<br />da sua exigência.</span></div>
         {propertyQuery.isLoading ? <SkeletonGrid /> : propertyQuery.isError ? <ErrorState onRetry={() => propertyQuery.refetch()} /> : properties.length === 0 ? <EmptyState title="Nenhum empreendimento cadastrado no momento" description="Cadastre novos produtos no Painel de Gestão para exibi-los no catálogo com Raio-X e Landing Page." onReset={() => setSearch('')} /> : <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">{properties.map((property) => <PropertyCard key={property.id} property={property} saved={saved.includes(property.id)} onSave={() => toggleSave(property.id)} onOpenRaioX={(prop) => setSelectedRaioXProperty(prop)} />)}</div>}
       </section>
 
