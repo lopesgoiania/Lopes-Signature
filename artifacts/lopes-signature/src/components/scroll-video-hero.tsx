@@ -41,25 +41,21 @@ export function ScrollVideoHero() {
       <div className="relative z-10 flex min-h-[100svh] items-center justify-center pb-28 pt-40 md:pt-44">
           <div className="max-w-4xl text-center px-6">
             <p className="mono-label mb-5 text-primary drop-shadow-md">
-              LOPES SIGNATURE · ESPECIALISTAS EM ALTO PADRÃO
+              O alto padrão de Goiânia
             </p>
             <h1 className="serif text-5xl leading-[1.1] tracking-[-.03em] text-[#F7F5F0] md:text-7xl drop-shadow-xl">
-              Imóveis de alto padrão<br />
-              <em className="font-normal text-primary">em Goiânia.</em>
+              Residências exclusivas,<br />
+              <em className="font-normal text-primary">nos bairros mais desejados.</em>
             </h1>
-            <p className="mt-4 text-lg font-medium text-[#F7F5F0] drop-shadow-md">
-              O próximo endereço da sua história começa aqui.
-            </p>
             <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-[#D0D0D0] drop-shadow-md">
-              Explore casas, apartamentos, coberturas e empreendimentos de luxo em Goiânia,
-              com a seleção e o atendimento dos especialistas Lopes Signature.
+              Uma seleção de imóveis de luxo apresentada por especialistas que conhecem os empreendimentos, suas particularidades e o mercado de Goiânia.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-4 pointer-events-auto">
               <a href="#catalogo" className="metal-button flex items-center gap-2 rounded-full px-7 py-3.5 text-xs font-bold" data-testid="link-hero-explorar">
-                Explorar imóveis
+                Explore os imóveis
               </a>
               <a href="/contato" className="flex items-center gap-2 rounded-full border border-white/25 px-7 py-3.5 text-xs text-[#F7F5F0] hover:border-primary hover:text-primary transition" data-testid="link-hero-falar">
-                Falar com um especialista
+                Fale com um especialista
               </a>
             </div>
           </div>

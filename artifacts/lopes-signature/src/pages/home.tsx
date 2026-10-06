@@ -71,9 +71,9 @@ export default function HomePage() {
       <section className="mx-auto max-w-[1280px] px-5 py-24 md:px-10 md:py-32">
         <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="max-w-2xl">
-            <SectionLabel>SELEÇÃO SIGNATURE</SectionLabel>
-            <h2 className="serif text-3xl text-foreground md:text-5xl mt-2 mb-4">Imóveis de alto padrão em destaque</h2>
-            <p className="text-sm leading-6 text-muted-foreground">Endereços com alma, arquitetura e espaço para viver bem. Conheça uma seleção de casas e apartamentos em Goiânia e encontre o que combina com você.</p>
+            <SectionLabel>Lopes Signature</SectionLabel>
+            <h2 className="serif text-3xl text-foreground md:text-5xl mt-2 mb-4">Imóveis de alto luxo<br /><em className="font-normal text-[#876526]">em Goiânia.</em></h2>
+            <p className="text-sm leading-6 text-muted-foreground">Uma seleção à altura da sua exigência.</p>
           </div>
           <Link href="/imoveis" className="shrink-0 text-sm font-semibold text-primary hover:underline">Ver catálogo de imóveis</Link>
         </div>
@@ -107,18 +107,18 @@ export default function HomePage() {
       <section id="manifesto" className="bg-secondary text-secondary-foreground">
         <div className="mx-auto grid max-w-[1280px] gap-12 px-5 py-24 md:grid-cols-[1fr_1fr] md:px-10 md:py-32 items-center">
           <div>
-            <p className="mono-label mb-4 text-primary">O OLHAR SIGNATURE. A EXPERIÊNCIA LOPES.</p>
-            <h2 className="serif text-4xl leading-[1.1] md:text-5xl mb-6">Mais possibilidades.<br />Uma escolha com significado.</h2>
+            <p className="mono-label mb-4 text-primary">Experiência Lopes</p>
+            <h2 className="serif text-4xl leading-[1.1] md:text-5xl mb-6">Especialistas em<br /><em className="font-normal text-primary">alto padrão.</em></h2>
             <Link href="/especialistas" className="metal-button inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-xs font-bold mt-2">
-              Conheça os especialistas Signature
+              Conheça nossa equipe de especialistas
             </Link>
           </div>
           <div>
             <p className="text-lg leading-8 mb-6 text-[#D0D0D0]">
-              Um catálogo amplo ganha valor quando você encontra o que realmente faz sentido para sua vida. A Lopes Signature conecta imóveis de alto padrão em Goiânia a uma busca orientada pelo seu perfil, pelas suas prioridades e pela forma como você deseja morar.
+              Conhecer o mercado de luxo de Goiânia é compreender o que distingue cada empreendimento: arquitetura, localização, qualidade dos espaços e acabamentos.
             </p>
             <p className="text-sm leading-6 text-[#D0D0D0] mb-8">
-              Nossa equipe ajuda a comparar localizações, plantas e diferenciais para transformar possibilidades em uma seleção mais precisa.
+              A Lopes Signature reúne essa especialização à experiência da Lopes, com atendimento próximo e orientação em cada etapa da aquisição.
             </p>
             <ul className="flex flex-wrap gap-4 text-xs font-bold uppercase tracking-wider text-primary">
               <li className="flex items-center gap-2"><div className="h-1 w-1 rounded-full bg-primary" /> Especialistas em alto padrão</li>
