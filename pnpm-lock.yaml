@@ -146,10 +146,16 @@ importers:
 
   artifacts/lopes-signature:
     dependencies:
+      express:
+        specifier: ^5.2.1
+        version: 5.2.1
       '@supabase/supabase-js':
         specifier: ^2.116.0
         version: 2.116.0
     devDependencies:
+      '@types/express':
+        specifier: ^5.0.6
+        version: 5.0.6
       '@hookform/resolvers':
         specifier: ^3.10.0
         version: 3.10.0(react-hook-form@7.83.0(react@19.1.0))

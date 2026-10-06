@@ -1,7 +1,7 @@
 import express from 'express';
-import properties from '../../api-server/src/routes/properties';
-import specialists from '../../api-server/src/routes/specialists';
-import blog from '../../api-server/src/routes/blog';
+import properties from '../../api-server/src/routes/properties.js';
+import specialists from '../../api-server/src/routes/specialists.js';
+import blog from '../../api-server/src/routes/blog.js';
 
 const app = express();
 // This public function exposes only catalog/editorial reads. CRM, leads,
