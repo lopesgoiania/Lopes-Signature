@@ -7,6 +7,8 @@ import NotFound from '@/pages/not-found';
 import HomePage from '@/pages/home';
 import PropertyDetailPage from '@/pages/property-detail';
 import AdminPage from '@/pages/admin';
+import AboutPage from '@/pages/about-page';
+import JournalPage from '@/pages/journal-page';
 import SpecialistsPage from '@/pages/specialists-page';
 import ContactPage from '@/pages/contact-page';
 import LandingPage from '@/pages/landing-page';
@@ -33,7 +35,9 @@ function Router() {
         <Route path="/lp/bauhaus" component={BauhausPage} />
         <Route path="/lp/:id" component={LandingPage} />
         <Route path="/especialistas" component={SpecialistsPage} />
-        <Route path="/sobre" component={SpecialistsPage} />
+        <Route path="/sobre" component={AboutPage} />
+        <Route path="/journal" component={JournalPage} />
+        <Route path="/journal/:id" component={JournalPage} />
         <Route path="/contato" component={ContactPage} />
         <Route path="/admin" component={AdminPage} />
         <Route path="/imoveis">
@@ -51,10 +55,7 @@ function Router() {
         <Route path="/coberturas-goiania">
           <CatalogPage category="cobertura" title="Coberturas em Goiânia" description="Explore coberturas com espaços amplos e áreas externas privativas." />
         </Route>
-        <Route path="/conteudos">
-          {/* Fallback to Home's blog section for now */}
-          <HomePage />
-        </Route>
+        <Route path="/conteudos" component={JournalPage} />
         <Route component={NotFound} />
       </Switch>
     </RoutedErrorBoundary>

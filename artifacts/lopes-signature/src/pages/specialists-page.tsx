@@ -1,55 +1,12 @@
 import { useState } from 'react';
-import { Award, Mail, ShieldCheck, UserCheck } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import { Link } from 'wouter';
 import { useListSpecialists, type Specialist } from '@workspace/api-client-react';
 import { PageLogo, PublicNav } from '@/components/signature-ui';
 
-const defaultSpecialists: Specialist[] = [
-  {
-    id: 'marina-lopes',
-    name: 'Marina Lopes',
-    role: 'Diretora de Curadoria & Private Client',
-    credential: 'CRECI 188.420-F · 15 anos',
-    bio: 'Especialista em patrimônios residenciais de altíssimo padrão, com consultoria personalizada para famílias e investidores globais.',
-    image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80',
-    whatsapp: '5511999991111',
-    listings: 24,
-  },
-  {
-    id: 'rafael-amaral',
-    name: 'Rafael Amaral',
-    role: 'Head de Empreendimentos Autorais - Goiânia & SP',
-    credential: 'CRECI 204.118-F · 12 anos',
-    bio: 'Foco exclusivo em residências suspensas, coberturas e arquitetura de prestígio (Opus, Cyrela, JFA).',
-    image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800&q=80',
-    whatsapp: '5562999992222',
-    listings: 18,
-  },
-  {
-    id: 'camila-prado',
-    name: 'Camila Prado',
-    role: 'Private Client Advisor - Coberturas & Penthouses',
-    credential: 'CRECI 176.904-F · 10 anos',
-    bio: 'Atendimento estritamente confidencial para negociações off-market e propriedades ícones do mercado imobiliário.',
-    image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=800&q=80',
-    whatsapp: '5511977773333',
-    listings: 15,
-  },
-  {
-    id: 'carlos-almeida',
-    name: 'Carlos Almeida',
-    role: 'Consultor Sênior de Investimentos Imobiliários',
-    credential: 'CRECI 195.302-F · 14 anos',
-    bio: 'Especializado na estruturação de carteiras imobiliárias de alto rendimento e preservação de capital familiar.',
-    image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80',
-    whatsapp: '5562988884444',
-    listings: 16,
-  },
-];
-
 export default function SpecialistsPage() {
-  const { data: specialistsFromQuery } = useListSpecialists();
-  const specialists = specialistsFromQuery && specialistsFromQuery.length > 0 ? specialistsFromQuery : defaultSpecialists;
+  const { data: specialistsFromQuery, isLoading, isError, refetch } = useListSpecialists();
+  const specialists: Specialist[] = Array.isArray(specialistsFromQuery) ? specialistsFromQuery : [];
   const [selectedRole, setSelectedRole] = useState<string>('todos');
 
   const roleFilters = Array.from(new Set(specialists.map(person => person.role.split(' - ').pop()?.trim()).filter((role): role is string => Boolean(role))));
@@ -68,34 +25,12 @@ export default function SpecialistsPage() {
           <div className="mx-auto max-w-[1280px]">
 
             <h1 className="serif specialist-heading text-5xl leading-[1.08] text-foreground md:text-7xl">
-              Relações construídas sobre <br />
-              <em className="font-normal text-[#876526]">confiança, discrição e visão.</em>
+              Especialistas em <br />
+              <em className="font-normal text-[#876526]">alto padrão.</em>
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-7 text-[#59564e]">
-              Conheça a equipe de especialistas da <strong>Lopes Signature</strong>. Profissionais com anos de repertório no mercado imobiliário de altíssimo padrão, preparados para conduzir a sua jornada de compra ou venda com excelência absoluta.
+              Conheça a equipe de especialistas da <strong>Lopes Signature</strong>. Conhecimento do mercado de Goiânia e atendimento próximo para orientar sua escolha.
             </p>
-          </div>
-        </section>
-
-        {/* Estatísticas e Diferenciais */}
-        <section className="border-b border-white/10 bg-[#121212] py-12 px-5 md:px-10">
-          <div className="mx-auto grid max-w-[1280px] grid-cols-2 gap-8 md:grid-cols-4">
-            <div>
-              <p className="serif text-4xl text-[#e8c766] md:text-5xl">+R$ 2.4B</p>
-              <p className="mt-2 text-xs uppercase tracking-wider text-[#bcb8af]">Em imóveis geridos</p>
-            </div>
-            <div>
-              <p className="serif text-4xl text-[#e8c766] md:text-5xl">100%</p>
-              <p className="mt-2 text-xs uppercase tracking-wider text-[#bcb8af]">Atendimento exclusivo</p>
-            </div>
-            <div>
-              <p className="serif text-4xl text-[#e8c766] md:text-5xl">15+ Anos</p>
-              <p className="mt-2 text-xs uppercase tracking-wider text-[#bcb8af]">Liderança em Alto Padrão</p>
-            </div>
-            <div>
-              <p className="serif text-4xl text-[#e8c766] md:text-5xl">Off-Market</p>
-              <p className="mt-2 text-xs uppercase tracking-wider text-[#bcb8af]">Oportunidades privadas</p>
-            </div>
           </div>
         </section>
 
@@ -144,63 +79,35 @@ export default function SpecialistsPage() {
                 <p className="text-xs leading-5 tracking-wide text-[#d8bc7c]">{person.role}</p>
                 <h3 className="serif mt-2 text-3xl text-white">{person.name}</h3>
                 <p className="mt-2 text-xs text-[#bcb8af]">
-                  {person.credential}{person.listings != null ? ` · ${person.listings} portfólios ativos` : ''}
+                  {person.credential}
                 </p>
                 <p className="mt-4 flex-1 text-sm leading-6 text-[#bcb8af]">{person.bio}</p>
 
                 <div className="mt-8 flex gap-3 border-t border-white/10 pt-5">
-                  <a
-                    href={`https://wa.me/${person.whatsapp || '5511999991111'}?text=Olá%20${encodeURIComponent(person.name)},%20gostaria%20de%20falar%20sobre%20os%20imóveis%20Lopes%20Signature.`}
+                  {person.whatsapp && <a
+                    href={`https://wa.me/${person.whatsapp}?text=Olá%20${encodeURIComponent(person.name)},%20gostaria%20de%20falar%20sobre%20os%20imóveis%20Lopes%20Signature.`}
                     target="_blank"
                     rel="noreferrer"
                     className="specialist-contact flex min-h-11 flex-1 items-center justify-center rounded-lg px-3 py-3 text-center text-sm font-semibold"
                   >
                     Falar via WhatsApp
-                  </a>
+                  </a>}
                   <Link
                     href="/contato"
-                    className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/15 text-[#d4af37] hover:border-[#d4af37] hover:bg-[#d4af37]/10"
+                    className={`flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/15 text-[#d4af37] hover:border-[#d4af37] hover:bg-[#d4af37]/10 ${person.whatsapp ? "w-11" : "flex-1 px-3 py-3 text-sm"}`}
                     title="Agendar reunião"
                     aria-label={`Agendar reunião com ${person.name}`}
                   >
-                    <Mail size={18} />
+                    <Mail size={18} />{!person.whatsapp && "Agendar conversa"}
                   </Link>
                 </div>
                 </div>
               </article>
             ))}
           </div>
-          {filteredSpecialists.length === 0 && <p role="status" className="py-12 text-muted-foreground">Nenhum especialista encontrado neste filtro. Selecione Todos para ver a equipe.</p>}
+          {isLoading ? <p role="status" className="py-12 text-muted-foreground">Carregando especialistas…</p> : isError ? <div role="alert" className="py-12 text-muted-foreground"><p>Não foi possível carregar a equipe.</p><button onClick={() => refetch()} className="mt-3 min-h-11 underline">Tentar novamente</button></div> : filteredSpecialists.length === 0 && <p role="status" className="py-12 text-muted-foreground">Nossa equipe será apresentada aqui. <Link href="/contato" className="underline">Fale com a Lopes Signature.</Link></p>}
         </section>
 
-        {/* Seção de Compromisso Signature */}
-        <section className="border-t border-white/10 bg-[#0d0d0d] py-20 px-5 md:px-10">
-          <div className="mx-auto max-w-[1280px]">
-            <div className="grid gap-12 md:grid-cols-3">
-              <div className="rounded-3xl border border-white/10 bg-[#141414] p-8">
-                <ShieldCheck size={32} className="text-[#d4af37]" />
-                <h4 className="serif mt-5 text-2xl text-white">Privacidade e Sigilo</h4>
-                <p className="mt-3 text-sm leading-6 text-[#bcb8af]">
-                  Tratamos cada atendimento com estrita confidencialidade, garantindo a proteção da sua privacidade em todas as etapas da negociação.
-                </p>
-              </div>
-              <div className="rounded-3xl border border-white/10 bg-[#141414] p-8">
-                <Award size={32} className="text-[#d4af37]" />
-                <h4 className="serif mt-5 text-2xl text-white">Curadoria Autoral</h4>
-                <p className="mt-3 text-sm leading-6 text-[#bcb8af]">
-                  Apenas imóveis que atendem a critérios rigorosos de arquitetura, localização e potencial de valorização entram no nosso portfólio.
-                </p>
-              </div>
-              <div className="rounded-3xl border border-white/10 bg-[#141414] p-8">
-                <UserCheck size={32} className="text-[#d4af37]" />
-                <h4 className="serif mt-5 text-2xl text-white">Consultoria Jurídica & Financeira</h4>
-                <p className="mt-3 text-sm leading-6 text-[#bcb8af]">
-                  Suporte completo com especialistas em direito imobiliário, estruturação tributária e avaliação patrimonial.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
 
       <footer className="border-t border-border bg-secondary text-secondary-foreground">
@@ -215,7 +122,7 @@ export default function SpecialistsPage() {
               <Link href="/imoveis" className="hover:text-primary">Imóveis</Link>
               <Link href="/empreendimentos" className="hover:text-primary">Empreendimentos</Link>
               <Link href="/especialistas" className="text-primary hover:text-primary">Especialistas</Link>
-              <Link href="/conteudos" className="hover:text-primary">Conteúdos</Link>
+              <Link href="/journal" className="hover:text-primary">Journal</Link>
               <Link href="/contato" className="hover:text-primary">Contato</Link>
             </div>
           </div>

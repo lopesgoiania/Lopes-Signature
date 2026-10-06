@@ -39,7 +39,7 @@ export default function HomePage() {
     fetch('/api/blog')
       .then((res) => res.json())
       .then((data) => {
-        if (Array.isArray(data)) setBlogPosts(data);
+        if (Array.isArray(data)) setBlogPosts(data.filter(post => post.published !== false));
       })
       .catch(() => {})
       .finally(() => setLoadingBlog(false));
@@ -52,9 +52,10 @@ export default function HomePage() {
 
   function submitNewsletter(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    createLead.mutate({ data: { name: String(form.get('name') || 'Interesse Signature'), email: String(form.get('email') || ''), phone: '', propertyId: '', propertyTitle: 'Newsletter Lopes Signature', status: 'new', source: 'newsletter', note: 'Inscrição na curadoria Lopes Signature.' } });
-    event.currentTarget.reset();
+    if (createLead.isPending) return;
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
+    createLead.mutate({ data: { name: String(form.get('name') || 'Interesse Signature'), email: String(form.get('email') || ''), phone: '', propertyId: '', propertyTitle: 'Newsletter Lopes Signature', status: 'new', source: 'newsletter', note: 'Inscrição no Journal Signature.' } }, { onSuccess: () => formElement.reset() });
   }
 
   return <div className="signature-shell noise min-h-[100dvh] text-foreground">
@@ -132,13 +133,13 @@ export default function HomePage() {
       <section id="blog" className="mx-auto max-w-[1280px] px-5 py-24 md:px-10 md:py-32">
         <div className="mb-12 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
-            <SectionLabel>CONTEÚDO SIGNATURE</SectionLabel>
+            <SectionLabel>Journal Signature</SectionLabel>
             <h2 className="serif text-3xl text-foreground md:text-4xl">
-              Perspectivas sobre o mercado imobiliário de alto padrão
+              Um olhar estendido sobre o mercado de luxo.
             </h2>
           </div>
           <p className="max-w-xs text-xs leading-5 text-muted-foreground">
-            Arquitetura, formas de morar e informações para quem busca um imóvel de alto padrão em Goiânia.
+            Arquitetura, endereços e movimentos do mercado de Goiânia, sob a perspectiva de quem conhece o alto luxo.
           </p>
         </div>
 
@@ -148,10 +149,10 @@ export default function HomePage() {
               <div key={i} className="skeleton h-80 rounded-3xl" />
             ))}
           </div>
-        ) : blogPosts.length === 0 ? null : (
+        ) : blogPosts.length === 0 ? <p className="text-muted-foreground">Em breve, novas leituras do Journal Signature.</p> : (
           <div className="grid gap-8 md:grid-cols-3">
             {blogPosts.slice(0, 3).map((post) => (
-              <article key={post.id} className="group cursor-pointer overflow-hidden rounded-3xl border border-border bg-card transition duration-300 hover:border-primary/50 hover:bg-muted">
+              <Link href={`/journal/${encodeURIComponent(post.id)}`} key={post.id} className="group cursor-pointer overflow-hidden rounded-3xl border border-border bg-card transition duration-300 hover:border-primary/50 hover:bg-muted">
                 <div className="overflow-hidden">
                   <img
                     src={post.image || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'}
@@ -175,10 +176,11 @@ export default function HomePage() {
                     <span className="text-[10px] text-muted-foreground font-mono">{post.readTime}</span>
                   </div>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
         )}
+        <Link href="/journal" className="mt-10 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#876526] hover:underline">Ver todos os artigos <ArrowRight size={15} /></Link>
       </section>
 
       {/* FAQ */}
@@ -210,18 +212,19 @@ export default function HomePage() {
         <div className="relative overflow-hidden rounded-[2rem] border border-primary/20 bg-accent p-8 md:p-14">
           <div className="relative grid gap-10 md:grid-cols-[1fr_1fr] md:items-center">
             <div>
-              <SectionLabel>Receba a curadoria</SectionLabel>
-              <h2 className="serif text-3xl text-foreground md:text-4xl mt-2">Sua próxima escolha pode começar com uma seleção.</h2>
-              <p className="mt-4 text-sm text-foreground/80">Receba novidades do catálogo, lançamentos e conteúdos selecionados pela Lopes Signature.</p>
+              <SectionLabel>Assine o Journal Signature</SectionLabel>
+              <h2 className="serif text-3xl text-foreground md:text-4xl mt-2">Um olhar sobre o luxo. Uma leitura só sua.</h2>
+              <p className="mt-4 text-sm text-foreground/80">Receba as leituras do Journal Signature sobre arquitetura, endereços e o mercado de Goiânia.</p>
             </div>
             <form onSubmit={submitNewsletter} className="flex flex-col gap-3" data-testid="form-newsletter">
               <input name="name" required placeholder="Seu nome" className="h-12 rounded-xl border border-border bg-card px-4 text-sm text-foreground outline-none focus:border-primary" data-testid="input-newsletter-name" />
               <div className="flex flex-col gap-2 md:flex-row">
                 <input name="email" type="email" required placeholder="seu@email.com" className="h-12 min-w-0 flex-1 rounded-xl border border-border bg-card px-4 text-sm text-foreground outline-none focus:border-primary" data-testid="input-newsletter-email" />
-                <button type="submit" className="metal-button rounded-xl px-5 py-3 text-xs font-bold whitespace-nowrap" data-testid="button-newsletter-submit">{createLead.isPending ? 'Enviando...' : 'Receber seleção Signature'}</button>
+                <button type="submit" disabled={createLead.isPending} className="metal-button disabled:opacity-60 rounded-xl px-5 py-3 text-xs font-bold whitespace-nowrap" data-testid="button-newsletter-submit">{createLead.isPending ? 'Enviando...' : 'Quero receber'}</button>
               </div>
               <p className="text-[10px] text-muted-foreground mt-2">Ao se inscrever, você concorda com nossa Política de Privacidade.</p>
-              {createLead.isSuccess && <p className="text-xs text-[#168b41] mt-2" data-testid="status-newsletter-success">Inscrição realizada com sucesso.</p>}
+              {createLead.isError && <p role="alert" className="text-sm text-red-800">Não foi possível registrar sua inscrição. Tente novamente.</p>}
+              {createLead.isSuccess && <p className="text-xs text-[#168b41] mt-2" data-testid="status-newsletter-success">Sua inscrição no Journal Signature foi recebida.</p>}
             </form>
           </div>
         </div>
@@ -252,8 +255,9 @@ export default function HomePage() {
           <div className="flex flex-col gap-3 text-sm text-[#D0D0D0]">
             <a href="/imoveis" className="hover:text-primary">Imóveis</a>
             <Link href="/empreendimentos" className="hover:text-primary">Empreendimentos</Link>
+            <Link href="/sobre" className="hover:text-primary">Sobre nós</Link>
             <Link href="/especialistas" className="hover:text-primary">Especialistas</Link>
-            <a href="/conteudos" className="hover:text-primary">Conteúdos</a>
+            <a href="/journal" className="hover:text-primary">Journal</a>
             <Link href="/contato" className="hover:text-primary">Contato</Link>
           </div>
         </div>

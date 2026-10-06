@@ -243,7 +243,7 @@ export default function ContactPage() {
               <Link href="/imoveis" className="hover:text-primary">Imóveis</Link>
               <Link href="/empreendimentos" className="hover:text-primary">Empreendimentos</Link>
               <Link href="/especialistas" className="hover:text-primary">Especialistas</Link>
-              <Link href="/conteudos" className="hover:text-primary">Conteúdos</Link>
+              <Link href="/journal" className="hover:text-primary">Journal</Link>
               <Link href="/contato" className="hover:text-primary text-primary">Contato</Link>
             </div>
           </div>

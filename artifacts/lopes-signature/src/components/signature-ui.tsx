@@ -41,23 +41,25 @@ export function PublicNav() {
   return <header className="fixed left-0 right-0 top-0 z-40 px-4 pt-4 md:px-8 md:pt-6">
     <div className="glass-panel mx-auto flex h-[62px] max-w-[1280px] items-center justify-between rounded-full px-4 md:h-[72px] md:px-7">
       <PageLogo />
-      <nav className="hidden items-center gap-7 lg:flex" aria-label="Navegação principal">
+      <nav className="hidden items-center gap-5 xl:flex" aria-label="Navegação principal">
         <Link href="/imoveis" className={`text-xs tracking-wide ${location === '/imoveis' ? 'text-primary' : 'text-[#D0D0D0] hover:text-[#F7F5F0]'}`} data-testid="link-nav-imoveis">Imóveis</Link>
         <Link href="/empreendimentos" className={`text-xs tracking-wide ${location === '/empreendimentos' ? 'text-primary' : 'text-[#D0D0D0] hover:text-[#F7F5F0]'}`} data-testid="link-nav-empreendimentos">Empreendimentos</Link>
+        <Link href="/sobre" className={`text-xs tracking-wide ${location === '/sobre' ? 'text-primary' : 'text-[#D0D0D0] hover:text-[#F7F5F0]'}`} data-testid="link-nav-sobre">Sobre nós</Link>
         <Link href="/especialistas" className={`text-xs tracking-wide ${location === '/especialistas' ? 'text-primary' : 'text-[#D0D0D0] hover:text-[#F7F5F0]'}`} data-testid="link-nav-especialistas">Especialistas</Link>
-        <Link href="/conteudos" className={`text-xs tracking-wide ${location === '/conteudos' ? 'text-primary' : 'text-[#D0D0D0] hover:text-[#F7F5F0]'}`} data-testid="link-nav-conteudos">Conteúdos</Link>
+        <Link href="/journal" className={`text-xs tracking-wide ${(location === '/conteudos' || location.startsWith('/journal')) ? 'text-primary' : 'text-[#D0D0D0] hover:text-[#F7F5F0]'}`} data-testid="link-nav-conteudos">Journal</Link>
         <Link href="/contato" className={`text-xs tracking-wide ${location === '/contato' ? 'text-primary' : 'text-[#D0D0D0] hover:text-[#F7F5F0]'}`} data-testid="link-nav-contato">Contato</Link>
       </nav>
       <div className="flex items-center gap-2">
         <Link href="/contato" className="metal-button hidden rounded-full px-5 py-3 text-[11px] font-bold tracking-wide md:block" data-testid="link-nav-falar">Falar com um especialista</Link>
-        <button onClick={() => setOpen(!open)} className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-primary lg:hidden" aria-label="Abrir menu" data-testid="button-open-menu">{open ? <X size={18} /> : <Menu size={18} />}</button>
+        <button onClick={() => setOpen(!open)} className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-primary xl:hidden" aria-label="Abrir menu" data-testid="button-open-menu">{open ? <X size={18} /> : <Menu size={18} />}</button>
       </div>
     </div>
-    {open && <nav className="glass-panel mx-auto mt-2 max-w-[1280px] rounded-3xl p-4 lg:hidden" aria-label="Menu mobile">
+    {open && <nav className="glass-panel mx-auto mt-2 max-w-[1280px] rounded-3xl p-4 xl:hidden" aria-label="Menu mobile">
       <Link onClick={() => setOpen(false)} href="/imoveis" className="block rounded-xl px-4 py-3 text-sm text-[#D0D0D0] hover:bg-white/5" data-testid="link-mobile-imoveis">Imóveis</Link>
       <Link onClick={() => setOpen(false)} href="/empreendimentos" className="block rounded-xl px-4 py-3 text-sm text-[#D0D0D0] hover:bg-white/5" data-testid="link-mobile-empreendimentos">Empreendimentos</Link>
+      <Link onClick={() => setOpen(false)} href="/sobre" className="block rounded-xl px-4 py-3 text-sm text-[#D0D0D0] hover:bg-white/5" data-testid="link-mobile-sobre">Sobre nós</Link>
       <Link onClick={() => setOpen(false)} href="/especialistas" className="block rounded-xl px-4 py-3 text-sm text-[#D0D0D0] hover:bg-white/5" data-testid="link-mobile-especialistas">Especialistas</Link>
-      <Link onClick={() => setOpen(false)} href="/conteudos" className="block rounded-xl px-4 py-3 text-sm text-[#D0D0D0] hover:bg-white/5" data-testid="link-mobile-conteudos">Conteúdos</Link>
+      <Link onClick={() => setOpen(false)} href="/journal" className="block rounded-xl px-4 py-3 text-sm text-[#D0D0D0] hover:bg-white/5" data-testid="link-mobile-conteudos">Journal</Link>
       <Link onClick={() => setOpen(false)} href="/contato" className="block rounded-xl px-4 py-3 text-sm text-[#D0D0D0] hover:bg-white/5" data-testid="link-mobile-contato">Contato</Link>
     </nav>}
   </header>;
