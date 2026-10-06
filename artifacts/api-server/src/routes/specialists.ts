@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { ListSpecialistsResponse } from "@workspace/api-zod";
+
 
 const specialists = [
   // Bueno
@@ -28,7 +28,7 @@ const specialists = [
 const router: IRouter = Router();
 
 router.get("/specialists", (_req, res) => {
-  res.json(ListSpecialistsResponse.parse(specialists));
+  res.json(specialists);
 });
 
 export default router;
