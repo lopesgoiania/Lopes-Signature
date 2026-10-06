@@ -19,3 +19,4 @@ app.use((req: { method: string; path: string }, res: { status: (code: number) =>
 });
 app.use('/api', properties, specialists, blog);
 export default app;
+// Specialist directory has no runtime dependency on workspace source schemas.
