@@ -161,11 +161,9 @@ router.post("/admin/catalog/properties", async (req: any, res: any) => {
       .json({ message: "Informe uma URL válida do YouTube." });
   const id = p.id || slug(p.title);
   if (!id || !slug(p.slug || p.title))
-    return res
-      .status(400)
-      .json({
-        message: "Nome e endereço da página precisam conter letras ou números.",
-      });
+    return res.status(400).json({
+      message: "Nome e endereço da página precisam conter letras ou números.",
+    });
   const meta = {
     slug: slug(p.slug || p.title),
     category: p.category,
@@ -263,12 +261,10 @@ router.post("/admin/catalog/taxonomies", async (req: any, res: any) => {
                 (t.kind === "city" ? r.location : "")) === old.label,
         )
       )
-        return res
-          .status(409)
-          .json({
-            message:
-              "Este nome está em uso. Crie outro termo e atualize os imóveis antes de renomeá-lo.",
-          });
+        return res.status(409).json({
+          message:
+            "Este nome está em uso. Crie outro termo e atualize os imóveis antes de renomeá-lo.",
+        });
     }
   }
   const row = {
@@ -346,7 +342,11 @@ router.post("/leads", async (req: any, res: any) => {
     property_id: property?.id || "",
     property_title: property?.title || "",
     status: "new",
-    source: property ? "property" : "newsletter",
+    source: property
+      ? "property"
+      : b.source === "pagina-contato"
+        ? "pagina-contato"
+        : "newsletter",
     note: [b.note || "", crmId ? `100bug_id_lanc=${crmId}` : ""]
       .filter(Boolean)
       .join("\n"),

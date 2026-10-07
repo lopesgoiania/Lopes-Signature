@@ -39,30 +39,68 @@ export default function CatalogPropertyPage() {
   useEffect(() => {
     if (!p) return;
     const previous = document.title;
-    document.title = p.seoTitle || `${p.title} | Imóveis Lopes Signature`;
-    const nodes: HTMLElement[] = [];
-    for (const [name, value] of [
-      [
-        "description",
-        p.seoDescription ||
-          `${p.title}: ${p.area} m², ${p.suites} suítes em ${propertyLocation(p)}.`,
-      ],
-      ["robots", p.indexable === false ? "noindex,follow" : "index,follow"],
-    ]) {
-      const el = document.createElement("meta");
-      el.name = name;
+    const title = p.seoTitle || `${p.title} | Imóveis Lopes Signature`;
+    const description =
+      p.seoDescription ||
+      `${p.title}: ${p.area} m², ${p.suites} suítes em ${propertyLocation(p)}.`;
+    const url = window.location.origin + propertyHref(p);
+    document.title = title;
+    const restore: (() => void)[] = [];
+    const setMeta = (name: string, value: string, property = false) => {
+      const selector = property ? "property" : "name";
+      let el = document.querySelector<HTMLMetaElement>(
+        `meta[${selector}="${name}"]`,
+      );
+      if (el) {
+        const old = el.content;
+        restore.push(() => {
+          el!.content = old;
+        });
+      } else {
+        el = document.createElement("meta");
+        el.setAttribute(selector, name);
+        document.head.appendChild(el);
+        restore.push(() => el!.remove());
+      }
       el.content = value;
-      document.head.appendChild(el);
-      nodes.push(el);
+    };
+    setMeta("description", description);
+    setMeta(
+      "robots",
+      p.indexable === false ? "noindex,follow" : "index,follow",
+    );
+    for (const [name, value] of [
+      ["og:title", title],
+      ["og:description", description],
+      ["og:url", url],
+    ])
+      setMeta(name, value, true);
+    setMeta("twitter:title", title);
+    setMeta("twitter:description", description);
+    if (p.images?.[0]) {
+      const image = new URL(p.images[0], window.location.origin).href;
+      setMeta("og:image", image, true);
+      setMeta("og:image:alt", p.title, true);
+      setMeta("twitter:image", image);
     }
-    const canonical = document.createElement("link");
-    canonical.rel = "canonical";
-    canonical.href = window.location.origin + propertyHref(p);
-    document.head.appendChild(canonical);
-    nodes.push(canonical);
+    let canonical = document.querySelector<HTMLLinkElement>(
+      'link[rel="canonical"]',
+    );
+    if (canonical) {
+      const old = canonical.href;
+      restore.push(() => {
+        canonical!.href = old;
+      });
+    } else {
+      canonical = document.createElement("link");
+      canonical.rel = "canonical";
+      document.head.appendChild(canonical);
+      restore.push(() => canonical!.remove());
+    }
+    canonical.href = url;
     return () => {
       document.title = previous;
-      nodes.forEach((n) => n.remove());
+      restore.forEach((f) => f());
     };
   }, [p]);
   const vid = videoId(p?.youtube || "");
