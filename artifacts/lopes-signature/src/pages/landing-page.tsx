@@ -1,3 +1,4 @@
+import { PropertyPlans } from '@/components/property-plans';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useRoute, Link } from 'wouter';
 import { ArrowUpRight, Bath, BedDouble, Building2, Car, CheckCircle2, Download, ExternalLink, MapPin, MessageSquare, Phone, Ruler, Send, ShieldCheck, Sparkles, Waves } from 'lucide-react';
@@ -5,10 +6,10 @@ import { useGetProperty, useCreateLead } from '@workspace/api-client-react';
 import { PageLogo, SectionLabel, money } from '@/components/signature-ui';
 import { RaioXModal } from '@/components/raio-x-modal';
 
-export default function LandingPage() {
+export default function LandingPage({property: suppliedProperty}: {property?:any}) {
   const [, params] = useRoute('/lp/:id');
-  const id = params?.id || 'bauhaus-vaca-brava';
-  const { data: property, isLoading } = useGetProperty(id);
+  const id = suppliedProperty?.id || params?.id || '';
+  const { data: property, isLoading } = useGetProperty(id, {query:{queryKey:["/api/properties",id],enabled:!suppliedProperty}});
   const createLead = useCreateLead();
 
   const [showRaioX, setShowRaioX] = useState(false);
@@ -33,30 +34,13 @@ export default function LandingPage() {
     );
   }
 
-  const p = property || {
-    id: 'bauhaus-vaca-brava',
-    title: 'Bauhaus',
-    builder: 'Sousa Andrade',
-    location: 'Goiânia, GO',
-    neighborhood: 'T 3, Setor Bueno',
-    address: 'Avenida T-3, Setor Bueno, em frente ao Parque Vaca Brava',
-    category: 'Apartamentos',
-    price: 8136691,
-    area: 398,
-    bedrooms: 4,
-    suites: 4,
-    parking: 4,
-    description: 'O Bauhaus oferece apartamentos de altíssimo padrão na orla do Parque Vaca Brava com vista 180° definitiva.',
-    images: ['https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80'],
-    badges: ['EXCLUSIVO', 'FRENTE AO PARQUE'],
-    featured: true,
-    lpUrl: '/lp/bauhaus-vaca-brava',
-    status: 'Disponível',
-  };
+  const p = suppliedProperty || property;
+  if(!p)return <div className="signature-shell min-h-screen p-10"><Link href="/imoveis">Voltar ao catálogo</Link><p>Imóvel não encontrado.</p></div>;
 
   function handleLeadSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
+    const formElement=e.currentTarget;
     createLead.mutate({
       data: {
         name: String(form.get('name') || ''),
@@ -69,12 +53,11 @@ export default function LandingPage() {
         note: `Interesse cadastrado na LP oficial do ${p.title}`,
       },
     });
-    setSubmitted(true);
-    e.currentTarget.reset();
+
   }
 
   return (
-    <div className="signature-shell noise min-h-[100dvh] text-[#f5f2e9]">
+    <div className="signature-shell property-presentation noise min-h-[100dvh] text-[#f5f2e9]">
 
       {/* Hero Comercial da LP */}
       <section className="relative min-h-[90vh] flex items-end overflow-hidden pt-28 pb-16 px-5 md:px-10">
@@ -140,6 +123,7 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {p.floorplans?.length>0&&<section id="plantas" className="mx-auto max-w-[1280px] px-5 py-20 md:px-10"><SectionLabel>Plantas disponíveis</SectionLabel><h2 className="serif mb-8 text-4xl text-white">Escolha a sua planta</h2><PropertyPlans property={p}/></section>}
       {/* Destaques e Atributos */}
       <section className="mx-auto max-w-[1280px] px-5 py-24 md:px-10 md:py-32">
         <div className="grid gap-12 lg:grid-cols-2 items-center">
@@ -163,7 +147,7 @@ export default function LandingPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            {p.images?.slice(0, 4).map((img, i) => (
+            {p.images?.slice(0, 4).map((img:string, i:number) => (
               <img
                 key={i}
                 src={img}

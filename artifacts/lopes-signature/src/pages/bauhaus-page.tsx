@@ -4,7 +4,7 @@ import { useCreateLead } from "@workspace/api-client-react";
 import "./bauhaus-page.css";
 
 const image = (id: string) => `/images/bauhaus/${id}.webp`;
-const plans = [
+const originalPlans = [
   { area: "398", file: "PLANTA 398M2.jpg", label: "Planta de 398 m²" },
   { area: "547", file: "PLANTA 547.jpg", label: "Planta de 547 m²" },
 ];
@@ -35,7 +35,8 @@ const leisure = [
   },
 ];
 
-export default function BauhausPage() {
+export default function BauhausPage({property}: {property?:any}) {
+  const plans=property?.floorplans?.length?property.floorplans.map((p:any)=>({...p,label:p.title,image:p.image})):originalPlans.map(p=>({...p,image:`/images/bauhaus/${p.file}`,suites:undefined,parking:undefined,price:undefined}));
   const [plan, setPlan] = useState(0);
   const [space, setSpace] = useState(0);
   const [submitted, setSubmitted] = useState(false);
@@ -345,17 +346,20 @@ export default function BauhausPage() {
             </p>
             <div
               className="bh-plan-controls"
-              role="group"
-              aria-label="Escolha a planta"
+              role="tablist"
+              aria-label="Plantas disponíveis"
             >
-              {plans.map((p, index) => (
+              {plans.map((p:any, index:number) => (
                 <button
                   key={p.area}
                   type="button"
-                  aria-pressed={plan === index}
+                  role="tab"
+                  aria-selected={plan === index}
+                  aria-controls="bauhaus-plan-panel"
+                  id={`bauhaus-plan-tab-${index}`}
                   onClick={() => setPlan(index)}
                 >
-                  {p.area} <span>m²</span>
+                  <span>{p.suites ? `${p.suites} suítes · ` : ""}</span>{new Intl.NumberFormat('pt-BR',{maximumFractionDigits:2}).format(Number(p.area))} <span>m²</span>
                 </button>
               ))}
             </div>
@@ -367,22 +371,23 @@ export default function BauhausPage() {
               Conversar sobre esta planta <ArrowRight size={18} />
             </a>
           </div>
-          <figure className="bh-plan-image">
+          <figure className="bh-plan-image" role="tabpanel" id="bauhaus-plan-panel" aria-labelledby={`bauhaus-plan-tab-${plan}`}>
             <img
-              src={`/images/bauhaus/${plans[plan].file}`}
+              src={plans[plan].image}
               alt={`Planta humanizada do apartamento Bauhaus de aproximadamente ${plans[plan].area} metros quadrados`}
               loading="lazy"
             />
             <figcaption>
               <span>{plans[plan].label} · ilustração</span>
               <a
-                href={`/images/bauhaus/${plans[plan].file}`}
+                href={plans[plan].image}
                 target="_blank"
                 rel="noreferrer"
               >
                 Ampliar planta <ArrowUpRight size={16} />
               </a>
             </figcaption>
+            <div className="bh-plan-details">{plans[plan].suites&&<span>{plans[plan].suites} suítes</span>}{plans[plan].parking&&<span>{plans[plan].parking} vagas</span>}{plans[plan].price>0&&<strong>{new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}).format(plans[plan].price)}</strong>}</div>
           </figure>
         </section>
 

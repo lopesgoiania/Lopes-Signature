@@ -887,3 +887,5 @@
     scroll-behavior: auto !important;
   }
 }
+
+.bh-plan-details { display: flex; flex-wrap: wrap; gap: 12px 24px; padding: 20px 0; color: var(--bh-ink); font-size: 14px; }

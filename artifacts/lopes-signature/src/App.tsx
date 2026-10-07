@@ -33,9 +33,9 @@ function Router() {
         <Route path="/" component={HomePage} />
         <Route path="/imoveis/:id" component={CatalogPropertyPage} />
         <Route path="/property/:id" component={CatalogPropertyPage} />
-        <Route path="/lp/bauhaus-vaca-brava" component={BauhausPage} />
-        <Route path="/lp/bauhaus" component={BauhausPage} />
-        <Route path="/lp/:id" component={LandingPage} />
+        <Route path="/lp/bauhaus-vaca-brava" component={()=><BauhausPage/>} />
+        <Route path="/lp/bauhaus" component={()=><BauhausPage/>} />
+        <Route path="/lp/:id" component={()=><LandingPage/>} />
         <Route path="/especialistas" component={SpecialistsPage} />
         <Route path="/sobre" component={AboutPage} />
         <Route path="/journal" component={JournalPage} />
@@ -83,3 +83,4 @@ function App() {
 }
 
 export default App;
+
