@@ -1,3 +1,4 @@
+import { AddressLocationEditor } from "./address-location-editor";
 import { TaxonomyWorkspace } from "./taxonomy-workspace";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -26,6 +27,16 @@ const blank = () => ({
   city: "Goiânia",
   neighborhood: "",
   address: "",
+  postalCode: "",
+  street: "",
+  addressNumber: "",
+  addressComplement: "",
+  stateCode: "",
+  latitude: null,
+  longitude: null,
+  placeId: "",
+  addressSource: "",
+  locationPrecision: "",
   price: 0,
   area: 0,
   suites: 0,
@@ -478,26 +489,10 @@ export function CatalogWorkspace() {
               </div>
             )}
             {section === "Localização" && (
-              <div className="grid gap-5 md:grid-cols-2">
-                {select(
-                  "city",
-                  "Cidade *",
-                  list("city").map((t) => t.label),
-                )}
-                {select(
-                  "neighborhood",
-                  "Bairro",
-                  list("neighborhood")
-                    .filter(
-                      (t) =>
-                        !t.parent_id ||
-                        list("city").find((c) => c.id === t.parent_id)
-                          ?.label === p.city,
-                    )
-                    .map((t) => t.label),
-                )}
-                {field("address", "Endereço")}
-              </div>
+              <AddressLocationEditor
+                value={p}
+                onChange={(patch) => setP((old: any) => ({ ...old, ...patch }))}
+              />
             )}
             {section === "Fotos e galeria" && (
               <div className="space-y-8">

@@ -7,13 +7,15 @@ app.use(express.json({ limit: "4mb" }));
 app.use((req: any, res: any, next: any) => {
   const publicRead =
     req.method === "GET" &&
-    /^\/api\/(properties(?:\/[^/]+)?|taxonomies|specialists|blog(?:\/[^/]+)?)\/?$/.test(
+    /^\/api\/(properties(?:\/[^/]+)?|taxonomies|maps-config|specialists|blog(?:\/[^/]+)?)\/?$/.test(
       req.path,
     );
   const lead = req.method === "POST" && req.path === "/api/leads";
   const admin =
     ["GET", "POST"].includes(req.method) &&
-    /^\/api\/admin\/catalog\/(properties|taxonomies|media)$/.test(req.path);
+    /^\/api\/admin\/catalog\/(properties|taxonomies|media|maps)$/.test(
+      req.path,
+    );
   if (!publicRead && !lead && !admin)
     return res.status(404).json({ message: "Rota não encontrada." });
   next();

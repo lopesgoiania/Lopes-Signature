@@ -93,6 +93,27 @@ router.get("/properties/:id", async (req: any, res: any) => {
     return res.status(404).json({ message: "Imóvel não encontrado." });
   res.json(publicProperty(row));
 });
+
+const mapsValue = (value: any) => ({
+  enabled: value?.enabled === true,
+  apiKey: String(value?.apiKey || ""),
+  mapId: String(value?.mapId || ""),
+});
+router.get("/maps-config", async (_req: any, res: any) => {
+  const { data, error } = await supabase!
+    .from("signature_settings")
+    .select("value")
+    .eq("id", "google_maps")
+    .single();
+  if (error)
+    return res
+      .status(503)
+      .json({ message: "Integração de mapas indisponível." });
+  const config = mapsValue(data?.value);
+  res.setHeader("Cache-Control", "no-store");
+  res.json(config.enabled ? config : { ...config, apiKey: "", mapId: "" });
+});
+
 router.get("/taxonomies", async (_req: any, res: any) => {
   const { data, error } = await supabase!
     .from("signature_taxonomies")
@@ -119,6 +140,45 @@ router.use("/admin/catalog", async (req: any, res: any, next: any) => {
     return res.status(403).json({ message: "Acesso restrito à gestão." });
   next();
 });
+
+router.get("/admin/catalog/maps", async (_req: any, res: any) => {
+  const { data, error } = await supabase!
+    .from("signature_settings")
+    .select("value")
+    .eq("id", "google_maps")
+    .single();
+  if (error)
+    return res
+      .status(503)
+      .json({ message: "Não foi possível carregar o Google Maps." });
+  res.setHeader("Cache-Control", "no-store");
+  res.json(mapsValue(data?.value));
+});
+router.post("/admin/catalog/maps", async (req: any, res: any) => {
+  const config = mapsValue(req.body);
+  config.apiKey = config.apiKey.trim();
+  config.mapId = config.mapId.trim();
+  if (
+    ((config.enabled || config.apiKey) &&
+      !/^AIza[0-9A-Za-z_-]{35}$/.test(config.apiKey)) ||
+    config.mapId.length > 100 ||
+    config.apiKey.length > 100
+  )
+    return res.status(400).json({
+      message: "Informe uma chave de navegador válida do Google Maps.",
+    });
+  const { error } = await supabase!.from("signature_settings").upsert({
+    id: "google_maps",
+    value: config,
+    updated_at: new Date().toISOString(),
+  });
+  if (error)
+    return res
+      .status(503)
+      .json({ message: "Não foi possível salvar o Google Maps." });
+  res.json(config);
+});
+
 router.get("/admin/catalog/properties", async (_req: any, res: any) => {
   const { data, error } = await supabase!
     .from("properties")
@@ -177,6 +237,48 @@ router.post("/admin/catalog/properties", async (req: any, res: any) => {
     .eq("id", id)
     .single();
   const previousProperty = previous ? mapProperty(previous) : null;
+
+  const autoLocation = p.addressSource === "google";
+  const located =
+    p.latitude !== null &&
+    p.latitude !== undefined &&
+    p.latitude !== "" &&
+    p.longitude !== null &&
+    p.longitude !== undefined &&
+    p.longitude !== "";
+  if (
+    autoLocation &&
+    (!/^\d{8}$/.test(String(p.postalCode || "")) ||
+      !/^(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO)$/.test(
+        p.stateCode || "",
+      ) ||
+      !p.neighborhood?.trim() ||
+      !located ||
+      !Number.isFinite(Number(p.latitude)) ||
+      !Number.isFinite(Number(p.longitude)) ||
+      Math.abs(Number(p.latitude)) > 90 ||
+      Math.abs(Number(p.longitude)) > 180)
+  )
+    return res.status(400).json({
+      message:
+        "Consulte o CEP e confirme cidade, bairro, UF e localização antes de salvar.",
+    });
+  for (const key of [
+    "city",
+    "neighborhood",
+    "street",
+    "addressNumber",
+    "addressComplement",
+    "placeId",
+  ])
+    if (
+      p[key] !== undefined &&
+      (typeof p[key] !== "string" || p[key].length > 180)
+    )
+      return res
+        .status(400)
+        .json({ message: "Campo de endereço inválido: " + key });
+
   const selections = [
     ["type", "category"],
     ["city", "city"],
@@ -184,7 +286,8 @@ router.post("/admin/catalog/properties", async (req: any, res: any) => {
     ["status", "condition"],
   ];
   for (const [kind, key] of selections) {
-    if (!p[key]) continue;
+    if (!p[key] || (autoLocation && ["city", "neighborhood"].includes(kind)))
+      continue;
     const term = registered?.find(
       (t: any) =>
         t.kind === kind &&
@@ -213,11 +316,9 @@ router.post("/admin/catalog/properties", async (req: any, res: any) => {
       ) &&
       !previousProperty?.features?.includes(feature)
     )
-      return res
-        .status(400)
-        .json({
-          message: "Característica não cadastrada ou inativa: " + feature,
-        });
+      return res.status(400).json({
+        message: "Característica não cadastrada ou inativa: " + feature,
+      });
   }
   for (const plan of Array.isArray(p.floorplans) ? p.floorplans : [])
     for (const feature of plan.features || []) {
@@ -233,17 +334,38 @@ router.post("/admin/catalog/properties", async (req: any, res: any) => {
           (old.features || []).includes(feature),
         )
       )
-        return res
-          .status(400)
-          .json({
-            message: "Característica de planta não cadastrada: " + feature,
-          });
+        return res.status(400).json({
+          message: "Característica de planta não cadastrada: " + feature,
+        });
     }
   const meta = {
     slug: slug(p.slug || p.title),
     category: p.category,
     city: p.city,
     neighborhood: p.neighborhood || "",
+    postalCode: String(p.postalCode || "").replace(/\D/g, ""),
+    street: p.street || "",
+    addressNumber: p.addressNumber || "",
+    addressComplement: p.addressComplement || "",
+    stateCode: p.stateCode || "",
+    latitude: autoLocation ? Number(p.latitude) : null,
+    longitude: autoLocation ? Number(p.longitude) : null,
+    placeId: autoLocation ? p.placeId || "" : "",
+    addressSource: autoLocation ? "google" : "",
+    locationPrecision:
+      autoLocation &&
+      ["postal_code", "address", "manual_pin"].includes(p.locationPrecision)
+        ? p.locationPrecision
+        : "",
+    cityTermId:
+      previousProperty?.city === p.city
+        ? previousProperty?.cityTermId || ""
+        : "",
+    neighborhoodTermId:
+      previousProperty?.city === p.city &&
+      previousProperty?.neighborhood === p.neighborhood
+        ? previousProperty?.neighborhoodTermId || ""
+        : "",
     condition: p.condition || "",
     delivery: p.condition === "Pronto" ? "" : p.delivery || "",
     youtube: p.youtube || "",
@@ -284,11 +406,11 @@ router.post("/admin/catalog/properties", async (req: any, res: any) => {
     floorplans: p.floorplans || [],
     signature_meta: meta,
   };
-  const { data, error } = await supabase!
-    .from("properties")
-    .upsert(row)
-    .select()
-    .single();
+  const { data, error } = autoLocation
+    ? await supabase!.rpc("signature_save_located_property", {
+        property_row: row,
+      })
+    : await supabase!.from("properties").upsert(row).select().single();
   if (error) return res.status(400).json({ message: error.message });
   res.json(mapProperty(data));
 });
@@ -350,11 +472,9 @@ router.post("/admin/catalog/taxonomies", async (req: any, res: any) => {
             (t.kind !== "neighborhood" || x.parent_id === t.parent_id))),
     )
   )
-    return res
-      .status(409)
-      .json({
-        message: "Já existe um termo com este nome ou slug neste grupo.",
-      });
+    return res.status(409).json({
+      message: "Já existe um termo com este nome ou slug neste grupo.",
+    });
   if (!Number.isInteger(Number(t.sort_order || 0)))
     return res
       .status(400)
@@ -369,12 +489,10 @@ router.post("/admin/catalog/taxonomies", async (req: any, res: any) => {
           (p.signature_meta?.city || p.location) === oldCity,
       )
     )
-      return res
-        .status(409)
-        .json({
-          message:
-            "Este bairro tem imóveis vinculados. Atualize a localização deles antes de mudar a cidade.",
-        });
+      return res.status(409).json({
+        message:
+          "Este bairro tem imóveis vinculados. Atualize a localização deles antes de mudar a cidade.",
+      });
   }
   if (
     old?.kind === "feature" &&
@@ -390,12 +508,10 @@ router.post("/admin/catalog/taxonomies", async (req: any, res: any) => {
           ),
       )
     )
-      return res
-        .status(409)
-        .json({
-          message:
-            "Esta característica está em uso. Mantenha sua aplicação ou crie outro termo.",
-        });
+      return res.status(409).json({
+        message:
+          "Esta característica está em uso. Mantenha sua aplicação ou crie outro termo.",
+      });
   }
   const row = {
     id: t.id || t.kind + "-" + randomUUID(),
@@ -409,6 +525,8 @@ router.post("/admin/catalog/taxonomies", async (req: any, res: any) => {
     active: t.active !== false,
     sort_order: Number(t.sort_order) || 0,
     meta: {
+      stateCode: old?.meta?.stateCode || "",
+      origin: old?.meta?.origin || "manual",
       description: String(t.meta?.description || "").slice(0, 3000),
       seoTitle: String(t.meta?.seoTitle || "").slice(0, 160),
       seoDescription: String(t.meta?.seoDescription || "").slice(0, 320),
@@ -423,14 +541,12 @@ router.post("/admin/catalog/taxonomies", async (req: any, res: any) => {
     term: row,
   });
   if (error)
-    return res
-      .status(400)
-      .json({
-        message:
-          error.code === "23505"
-            ? "Este slug já está cadastrado."
-            : "Não foi possível salvar a taxonomia.",
-      });
+    return res.status(400).json({
+      message:
+        error.code === "23505"
+          ? "Este slug já está cadastrado."
+          : "Não foi possível salvar a taxonomia.",
+    });
   res.json(data);
 });
 router.post("/admin/catalog/media", async (req: any, res: any) => {

@@ -1,3 +1,4 @@
+import { GooglePropertyMap } from "@/components/google-property-map";
 function youtubeEmbed(url: string) {
   try {
     const u = new URL(url);
@@ -289,18 +290,7 @@ export default function PropertyDetailPage({
                 </div>
               </div>
             )}
-            <div className="map-grid relative mt-12 h-56 overflow-hidden rounded-3xl border border-border">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_55%_45%,transparent_0,rgba(10,10,10,.2)_60%,rgba(10,10,10,.7)_100%)]" />
-              <div className="absolute left-[56%] top-[43%]">
-                <span className="absolute -inset-3 animate-ping rounded-full bg-[#d4af37]/30" />
-                <span className="relative flex h-8 w-8 items-center justify-center rounded-full border border-[#f4e5a8] bg-[#d4af37] text-black">
-                  <MapPin size={15} />
-                </span>
-              </div>
-              <p className="absolute bottom-4 left-4 mono-label text-muted-foreground">
-                Localização aproximada · {property.neighborhood}
-              </p>
-            </div>
+            <GooglePropertyMap property={property} />
           </div>
           <aside className="lg:sticky lg:top-28 lg:self-start">
             <div className="rounded-3xl border border-[#d4af37]/30 bg-card p-6 md:p-8">

@@ -20,6 +20,8 @@ export type Taxonomy = {
     indexable?: boolean;
     filterable?: boolean;
     scope?: string;
+    stateCode?: string;
+    origin?: string;
   };
 };
 export const slugify = (s: string) =>
@@ -113,12 +115,22 @@ export function taxonomyMatches(
         (plan.features || []).includes(t.label),
       )
     );
-  if (t.kind === "city") return (p.city || p.location) === t.label;
+  if (t.kind === "city")
+    return p.cityTermId
+      ? p.cityTermId === t.id
+      : (p.city || p.location) === t.label &&
+          (!t.meta?.stateCode ||
+            !p.stateCode ||
+            p.stateCode === t.meta.stateCode);
   if (t.kind === "neighborhood")
-    return (
-      p.neighborhood === t.label &&
-      (p.city || p.location) === terms.find((c) => c.id === t.parent_id)?.label
-    );
+    return p.neighborhoodTermId
+      ? p.neighborhoodTermId === t.id
+      : p.neighborhood === t.label &&
+          (p.city || p.location) ===
+            terms.find((c) => c.id === t.parent_id)?.label &&
+          (!t.meta?.stateCode ||
+            !p.stateCode ||
+            p.stateCode === t.meta.stateCode);
   if (t.kind === "status") return p.condition === t.label;
   if (t.kind === "type")
     return (

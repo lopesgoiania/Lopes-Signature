@@ -1,3 +1,4 @@
+import { MapsWorkspace } from "@/components/maps-workspace";
 import { TaxonomyWorkspace } from "@/components/taxonomy-workspace";
 import { CatalogWorkspace } from "@/components/catalog-workspace";
 import { useState, useEffect, type FormEvent } from "react";
@@ -62,7 +63,13 @@ import { RaioXModal } from "@/components/raio-x-modal";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 type Tab =
-  "overview" | "catalog" | "taxonomies" | "blog" | "leads" | "tracking";
+  | "overview"
+  | "catalog"
+  | "taxonomies"
+  | "blog"
+  | "leads"
+  | "tracking"
+  | "integrations";
 
 const leadColumns: { key: Lead["status"]; label: string; color: string }[] = [
   { key: "new", label: "Novos", color: "#d4af37" },
@@ -90,6 +97,7 @@ function AdminSidebar({
     ["blog", "Blog & Agente de IA", Bot],
     ["leads", "Pipeline de Leads", Users],
     ["tracking", "Tracking & Pixels", Code2],
+    ["integrations", "Integrações", Globe2],
   ];
 
   return (
@@ -1665,6 +1673,7 @@ export default function AdminPage() {
       "blog",
       "leads",
       "tracking",
+      "integrations",
     ].includes(value || "")
       ? (value as Tab)
       : "overview";
@@ -1762,6 +1771,7 @@ export default function AdminPage() {
           {tab === "blog" && <BlogAgent />}
           {tab === "leads" && <Leads />}
           {tab === "tracking" && <Tracking />}
+          {tab === "integrations" && <MapsWorkspace />}
         </main>
       </div>
     </div>

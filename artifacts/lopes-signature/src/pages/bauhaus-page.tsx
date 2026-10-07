@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ArrowRight, ArrowUpRight, Check, MapPin } from "lucide-react";
+import { GooglePropertyMap } from "@/components/google-property-map";
 import { useCreateLead } from "@workspace/api-client-react";
 import "./bauhaus-page.css";
 
@@ -255,6 +256,7 @@ export default function BauhausPage({property}: {property?:any}) {
             >
               Ver localização no mapa <ArrowUpRight size={18} />
             </a>
+            {property && <GooglePropertyMap property={property} />}
           </div>
           <figure>
             <img
