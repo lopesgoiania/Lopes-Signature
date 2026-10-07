@@ -1,3 +1,4 @@
+import { getFeatureIcon } from "@/lib/feature-icons";
 import { AddressLocationEditor } from "./address-location-editor";
 import { CatalogImport } from "./catalog-import";
 import { TaxonomyWorkspace } from "./taxonomy-workspace";
@@ -478,30 +479,9 @@ export function CatalogWorkspace() {
                   {check("featured", "Destaque no catálogo")}
                 </div>
                 <div className="md:col-span-2">
-                  <h3 className="mb-3">Características e diferenciais</h3>
-                  <div className="flex flex-wrap gap-4">
-                    {list("feature")
-                      .filter((t) => t.meta?.scope !== "unit")
-                      .map((t) => (
-                        <label key={t.id} className="flex gap-2 text-sm">
-                          <input
-                            type="checkbox"
-                            checked={p.features.includes(t.label)}
-                            onChange={(e) =>
-                              change(
-                                "features",
-                                e.target.checked
-                                  ? [...p.features, t.label]
-                                  : p.features.filter(
-                                      (f: string) => f !== t.label,
-                                    ),
-                              )
-                            }
-                          />
-                          {t.label}
-                        </label>
-                      ))}
-                  </div>
+                  {[{scope:"property",label:"Características do imóvel"},{scope:"condominium",label:"Características do condomínio"}].map(group=><div key={group.scope} className="mb-6"><h3 className="mb-3">{group.label}</h3><div className="flex flex-wrap gap-4">{list("feature").filter(t=>(t.meta?.scope||"property")===group.scope).map(t=>{const Icon=getFeatureIcon(t.meta?.icon);return <label key={t.id} className="flex items-center gap-2 text-sm"><input type="checkbox" checked={(p.features||[]).includes(t.label)} onChange={e=>change("features",e.target.checked?[...p.features,t.label]:p.features.filter((f:string)=>f!==t.label))}/><Icon size={17} className="text-primary"/>{t.label}</label>;})}</div></div>)}
+                  <a className="text-sm text-primary underline" href="/admin?tab=taxonomies">Cadastrar características e escolher ícones</a>
+                  <label className="mt-5 block text-sm">Foto de apresentação do condomínio<select className={input+" mt-2"} value={p.condominiumImage||""} onChange={e=>change("condominiumImage",e.target.value)}><option value="">Sem foto selecionada</option>{[...new Set<string>([...(p.images||[]),...(p.gallery||[])])].map((src,i)=><option key={src} value={src}>Foto {i+1}</option>)}</select></label>
                 </div>
               </div>
             )}

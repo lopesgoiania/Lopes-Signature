@@ -22,6 +22,7 @@ export type Taxonomy = {
     scope?: string;
     stateCode?: string;
     origin?: string;
+    icon?: string;
   };
 };
 export const slugify = (s: string) =>

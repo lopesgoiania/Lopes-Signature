@@ -1,5 +1,6 @@
 import TaxonomyCatalogPage from "@/pages/taxonomy-catalog-page";
 import CatalogPropertyPage from "@/pages/catalog-property-page";
+import PropertyDesignPreview from "@/pages/property-design-preview";
 import { type ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ErrorBoundary } from "@/components/error-boundary";
@@ -26,6 +27,7 @@ function Router() {
     // survives a page crash.
     <RoutedErrorBoundary>
       <Switch>
+        <Route path="/previa/imoveis/:id" component={PropertyDesignPreview} />
         <Route path="/" component={HomePage} />
         <Route
           path="/imoveis/taxonomia/:kind/:slug"

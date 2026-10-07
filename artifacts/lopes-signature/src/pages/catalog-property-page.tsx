@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, Link } from "wouter";
 import { catalogRequest, propertyHref, propertyLocation } from "@/lib/catalog";
-import PropertyPresentation from "./property-presentation";
+import { Presentation as PropertyPresentation } from "./property-presentation";
 export default function CatalogPropertyPage() {
   const { id } = useParams();
   const {

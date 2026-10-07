@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FeatureIconPicker, getFeatureIcon } from "@/lib/feature-icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   catalogRequest,
@@ -32,6 +33,7 @@ const empty = (kind: string) => ({
     indexable: false,
     filterable: true,
     scope: "property",
+    icon: "check",
   },
 });
 export function TaxonomyWorkspace() {
@@ -216,6 +218,7 @@ export function TaxonomyWorkspace() {
               </select>
             </label>
           )}
+          {kind === "feature" && <FeatureIconPicker value={item.meta.icon || "check"} onChange={value=>meta("icon",value)}/>}
           <label className="block text-sm">
             Ordem
             <input
@@ -357,7 +360,7 @@ export function TaxonomyWorkspace() {
                         className="text-left text-primary"
                         onClick={() => edit(t)}
                       >
-                        {t.label}
+                        {t.kind === "feature" && (()=>{const Icon=getFeatureIcon(t.meta?.icon);return <Icon className="mr-2 inline" size={18}/>;})()}{t.label}
                       </button>
                       <p className="mt-1 break-all text-xs text-white/60">
                         /{t.slug}
