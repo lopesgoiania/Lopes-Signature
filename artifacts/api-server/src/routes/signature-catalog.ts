@@ -367,7 +367,7 @@ router.post("/admin/catalog/properties", async (req: any, res: any) => {
         ? previousProperty?.neighborhoodTermId || ""
         : "",
     condition: p.condition || "",
-    delivery: p.condition === "Pronto" ? "" : p.delivery || "",
+    delivery: p.delivery || "",
     youtube: p.youtube || "",
     features: Array.isArray(p.features) ? p.features : [],
     "100bug_id_lanc": String(p["100bug_id_lanc"] || ""),

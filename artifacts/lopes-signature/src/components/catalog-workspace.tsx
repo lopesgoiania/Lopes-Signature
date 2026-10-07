@@ -1,4 +1,5 @@
 import { AddressLocationEditor } from "./address-location-editor";
+import { CatalogImport } from "./catalog-import";
 import { TaxonomyWorkspace } from "./taxonomy-workspace";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -322,12 +323,23 @@ export function CatalogWorkspace() {
           <button className={button} onClick={() => navigate("taxonomies")}>
             Taxonomias
           </button>
+          <button className={button} onClick={() => navigate("import")}>
+            Importar catálogo
+          </button>
         </div>
       </div>
       <p role="status" className="mb-4 text-sm text-primary">
         {message}
       </p>
-      {mode === "taxonomies" ? (
+      {mode === "import" ? (
+        <CatalogImport
+          onComplete={() => {
+            qc.invalidateQueries({ queryKey: ["admin-catalog"] });
+            qc.invalidateQueries({ queryKey: ["taxonomies"] });
+            qc.invalidateQueries({ queryKey: ["/api/properties"] });
+          }}
+        />
+      ) : mode === "taxonomies" ? (
         <TaxonomyWorkspace />
       ) : mode === "list" ? (
         <>
@@ -435,8 +447,13 @@ export function CatalogWorkspace() {
                   "Condição",
                   list("status").map((t) => t.label),
                 )}
-                {p.condition !== "Pronto" &&
-                  field("delivery", "Previsão de entrega", "month")}
+                {field(
+                  "delivery",
+                  p.condition === "Pronto"
+                    ? "Data de entrega"
+                    : "Previsão de entrega",
+                  "month",
+                )}
                 {[
                   ["price", "Preço em R$"],
                   ["area", "Área em m²"],
