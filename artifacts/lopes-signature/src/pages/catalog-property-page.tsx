@@ -2,8 +2,7 @@ import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, Link } from "wouter";
 import { catalogRequest, propertyHref, propertyLocation } from "@/lib/catalog";
-import PropertyDetailPage from "./property-detail";
-import BauhausPage from "./bauhaus-page";
+import PropertyPresentation from "./property-presentation";
 export default function CatalogPropertyPage() {
   const { id } = useParams();
   const {
@@ -95,9 +94,5 @@ export default function CatalogPropertyPage() {
         <p>Imóvel não encontrado.</p>
       </div>
     );
-  return p.id === "bauhaus" ? (
-    <BauhausPage property={p} />
-  ) : (
-    <PropertyDetailPage suppliedProperty={p} />
-  );
+  return <PropertyPresentation key={p.id} property={p} />;
 }
