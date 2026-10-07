@@ -107,11 +107,12 @@ export default function TaxonomyCatalogPage() {
     <CatalogPage
       key={term.id}
       taxonomy={term}
-      title={term.meta?.seoTitle || term.label}
+      title={term.label}
       description={
         term.meta?.description ||
-        `Explore os imóveis Lopes Signature em ${term.label}.`
+        "Uma seleção à altura da sua exigência."
       }
     />
   );
 }
+
