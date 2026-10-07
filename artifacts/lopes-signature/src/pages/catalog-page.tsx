@@ -1,3 +1,5 @@
+import { CatalogSearch } from '@/components/catalog-search';
+const EMPTY_PROPERTIES: any[] = [];
 import { useState } from 'react';
 import { useListProperties } from '@workspace/api-client-react';
 import { PublicNav, SearchBar, PropertyCard, SkeletonGrid, ErrorState, EmptyState, SectionLabel, PageLogo } from '@/components/signature-ui';
@@ -18,8 +20,10 @@ export default function CatalogPage({ category, title, description }: { category
   });
   const [selectedRaioXProperty, setSelectedRaioXProperty] = useState<Property | null>(null);
 
-  const propertyQuery = useListProperties(search ? { search } : undefined);
-  const properties = Array.isArray(propertyQuery.data) ? propertyQuery.data : [];
+  const propertyQuery = useListProperties();
+  const allProperties = Array.isArray(propertyQuery.data) ? propertyQuery.data : EMPTY_PROPERTIES;
+  const [filteredProperties,setFilteredProperties] = useState<any[] | null>(null);
+  const properties = filteredProperties ?? allProperties;
 
   function toggleSave(id: string) {
     const next = saved.includes(id) ? saved.filter((item) => item !== id) : [...saved, id];
@@ -37,7 +41,7 @@ export default function CatalogPage({ category, title, description }: { category
         </div>
 
         <div className="mb-12 max-w-[800px]">
-          <SearchBar onSearch={setSearch} initial={search} />
+          <CatalogSearch properties={allProperties} onResults={setFilteredProperties} initialType={category === "empreendimento" ? "" : category || ""}/>
         </div>
 
         {propertyQuery.isLoading ? <SkeletonGrid /> : propertyQuery.isError ? <ErrorState onRetry={() => propertyQuery.refetch()} /> : properties.length === 0 ? <EmptyState title="Nenhum imóvel encontrado" description="Refine sua busca ou fale com a equipe para mapear opções no mercado." onReset={() => setSearch('')} /> : <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">{properties.map((property) => <PropertyCard key={property.id} property={property} saved={saved.includes(property.id)} onSave={() => toggleSave(property.id)} onOpenRaioX={(prop) => setSelectedRaioXProperty(prop)} />)}</div>}

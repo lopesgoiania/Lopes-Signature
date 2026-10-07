@@ -1,3 +1,4 @@
+import { deliveryLabel, propertyHref, propertyLocation } from '@/lib/catalog';
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { ArrowRight, BedDouble, Bookmark, ChevronLeft, ChevronRight, Eye, ExternalLink, Home, MapPin, Menu, Ruler, Search, SlidersHorizontal, Sparkles, X } from 'lucide-react';
@@ -69,92 +70,11 @@ export function SectionLabel({ children }: { children: string }) {
   return <p className="mono-label mb-4 text-[#d4af37]" data-testid={`label-${children.toLowerCase().replaceAll(' ', '-')}`}>{children}</p>;
 }
 
-export function PropertyCard({
-  property,
-  saved,
-  onSave,
-  onOpenRaioX,
-  featured = false,
-}: {
-  property: Property;
-  saved: boolean;
-  onSave: () => void;
-  onOpenRaioX?: (p: Property) => void;
-  featured?: boolean;
-}) {
-  return (
-    <article className="property-card group overflow-hidden rounded-3xl border border-border bg-card" data-testid={`card-property-${property.id}`}>
-      <div className={`relative overflow-hidden ${featured ? 'aspect-[16/10]' : 'aspect-[16/10]'}`}>
-        <img src={imageFor(property)} alt={property.title} className="property-image h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/10" />
-        <div className="absolute left-4 top-4 flex flex-wrap gap-2">
-          {(property.badges || []).slice(0, 2).map((badge) => (
-            <span key={badge} className="rounded-full bg-[#d4af37] px-3 py-1 text-[9px] font-bold uppercase tracking-[.12em] text-[#0a0a0a]">
-              {badge}
-            </span>
-          ))}
-          {property.featured && (
-            <span className="rounded-full border border-[#d4af37]/60 bg-black/45 px-3 py-1 text-[9px] font-bold uppercase tracking-[.12em] text-[#f4e5a8]">
-              Signature
-            </span>
-          )}
-        </div>
-        <button
-          onClick={onSave}
-          className={`absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md ${saved ? 'border-[#d4af37] bg-[#d4af37] text-[#0a0a0a]' : 'border-white/20 bg-black/30 text-white hover:border-[#d4af37]'
-            }`}
-          aria-label={saved ? 'Remover dos salvos' : 'Salvar imóvel'}
-          data-testid={`button-save-${property.id}`}
-        >
-          <Bookmark size={17} fill={saved ? 'currentColor' : 'none'} />
-        </button>
-        <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
-          <div>
-            <p className="text-xs text-white/90">{(property as any).builder || property.category}</p>
-            <h3 className="serif text-2xl text-white drop-shadow-md">{property.title}</h3>
-            <p className="flex items-center gap-1 text-xs text-white/90">
-              <MapPin size={12} className="text-[#d4af37]" />
-              {property.neighborhood}, {property.location}
-            </p>
-          </div>
-          <p className="text-right text-lg font-bold text-[#e8c766]">{money(property.price)}</p>
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between px-5 py-4 text-xs text-muted-foreground">
-        <span className="flex items-center gap-1">
-          <Ruler size={14} className="text-[#d4af37]" />
-          {property.area} m²
-        </span>
-        <span className="flex items-center gap-1">
-          <BedDouble size={14} className="text-[#d4af37]" />
-          {property.suites || property.bedrooms} suítes
-        </span>
-        <span className="flex items-center gap-1">
-          <Home size={14} className="text-[#d4af37]" />
-          {property.parking} vagas
-        </span>
-      </div>
-
-      {/* Ações de Raio-X (Ícone de Olho) e Visitar o site (Landing Page) */}
-      <div className="flex items-center gap-2 border-t border-white/10 px-5 py-3">
-        <button
-          onClick={() => onOpenRaioX && onOpenRaioX(property)}
-          className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-muted py-2.5 text-xs text-foreground hover:border-[#00a884] hover:bg-[#00a884]/10 hover:text-[#00a884] transition"
-          title="Ver Raio-X completo com plantas e especificações"
-        >
-          <Eye size={15} /> Raio-X
-        </button>
-
-        <Link
-          href={(property as any).lpUrl || `/property/${property.id}`}
-          className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-[#d4af37]/40 bg-[#d4af37]/10 py-2.5 text-xs font-semibold text-[#e8c766] hover:bg-[#d4af37]/20 transition"
-        >
-          Visitar o site <ExternalLink size={13} />
-        </Link>
-      </div>
-    </article>
-  );
+export function PropertyCard({property,saved,onSave}: {property:Property;saved:boolean;onSave:()=>void;onOpenRaioX?:(p:Property)=>void;featured?:boolean}) {
+ const p=property as any;const delivery=deliveryLabel(p);
+ return <article className="property-card group overflow-hidden rounded-3xl border border-border bg-card" data-testid={`card-property-${p.id}`}>
+ <div className="relative aspect-[16/10] overflow-hidden"><Link href={propertyHref(p)}><img src={imageFor(property)} alt={p.title} className="property-image h-full w-full object-cover" loading="lazy"/></Link><div className="absolute left-4 top-4 flex max-w-[75%] flex-wrap gap-2">{p.condition&&<span className="rounded-full bg-primary px-3 py-1 text-[10px] font-bold text-primary-foreground">{p.condition}</span>}{delivery&&<span className="rounded-full border border-primary/50 bg-black/65 px-3 py-1 text-[10px] font-semibold text-white">{delivery}</span>}</div><button onClick={onSave} aria-label={saved?'Remover dos salvos':'Salvar imóvel'} aria-pressed={saved} className={`absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md ${saved?'bg-primary text-black':'bg-black/40 text-white'}`}><Bookmark size={17} fill={saved?'currentColor':'none'}/></button></div>
+ <div className="p-5"><h3 className="serif text-2xl"><Link href={propertyHref(p)}>{p.title}</Link></h3><p className="mt-2 flex items-center gap-1 text-xs text-muted-foreground"><MapPin size={12} className="text-primary"/>{propertyLocation(p)}</p><p className="mt-4 text-lg font-semibold text-primary">{p.price>0?money(p.price):'Valor sob consulta'}</p><div className="my-5 flex flex-wrap justify-between gap-3 text-xs text-muted-foreground"><span className="flex items-center gap-1"><Ruler size={14} className="text-primary"/>{p.area} m²</span><span className="flex items-center gap-1"><BedDouble size={14} className="text-primary"/>{p.suites} suítes</span><span className="flex items-center gap-1"><Home size={14} className="text-primary"/>{p.parking} vagas</span></div><Link href={propertyHref(p)} className="metal-button flex items-center justify-center gap-2 rounded-xl py-3 text-xs font-bold">Ver imóvel <ArrowRight size={14}/></Link></div></article>;
 }
 
 export function SearchBar({ onSearch, initial = '' }: { onSearch: (value: string) => void; initial?: string }) {

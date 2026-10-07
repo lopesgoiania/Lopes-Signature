@@ -1,3 +1,4 @@
+import { CatalogWorkspace } from '@/components/catalog-workspace';
 import { useState, useEffect, type FormEvent } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Activity, BarChart3, Bell, Bot, Building2, Check, ChevronDown, CircleDollarSign, Code2, ExternalLink, Eye, FileText, Globe2, LayoutDashboard, LogOut, Menu, MoreHorizontal, Pencil, Plus, RefreshCw, Save, Sparkles, Trash2, Users, X } from 'lucide-react';
@@ -1131,7 +1132,7 @@ export default function AdminPage() {
 
         <main className="mx-auto max-w-[1500px] p-5 md:p-10">
           {tab === 'overview' && <Overview />}
-          {tab === 'catalog' && <Catalog />}
+          {tab === 'catalog' && <CatalogWorkspace />}
           {tab === 'blog' && <BlogAgent />}
           {tab === 'leads' && <Leads />}
           {tab === 'tracking' && <Tracking />}

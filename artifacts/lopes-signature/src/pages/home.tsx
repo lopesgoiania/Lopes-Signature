@@ -1,3 +1,5 @@
+import { CatalogSearch } from '@/components/catalog-search';
+const EMPTY_PROPERTIES: any[] = [];
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { ArrowRight, ArrowUpRight, Building2, ChevronLeft, ChevronRight, Instagram, Linkedin, Mail, MapPin, Play, Waves } from 'lucide-react';
 import { Link } from 'wouter';
@@ -24,9 +26,11 @@ export default function HomePage() {
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
   const [loadingBlog, setLoadingBlog] = useState(true);
 
-  const propertyQuery = useListProperties(search ? { search } : undefined);
+  const propertyQuery = useListProperties();
   const createLead = useCreateLead();
-  const properties = Array.isArray(propertyQuery.data) ? propertyQuery.data : [];
+  const allProperties = Array.isArray(propertyQuery.data) ? propertyQuery.data : EMPTY_PROPERTIES;
+  const [filteredProperties,setFilteredProperties] = useState<any[] | null>(null);
+  const properties = filteredProperties ?? allProperties;
 
   // Buscar posts dinâmicos da API /api/blog e registrar visita real
   useEffect(() => {
@@ -64,8 +68,7 @@ export default function HomePage() {
       <ScrollVideoHero />
 
       <section className="relative z-10 mx-auto -mt-8 max-w-[1180px] px-5 md:px-10" id="catalogo">
-        <SearchBar onSearch={setSearch} initial={search} />
-        <div className="mt-4 flex gap-2 overflow-x-auto pb-2">{categories.map(({ label, icon: Icon }) => <button key={label} onClick={() => setSearch(label === 'Casas' ? 'casa' : label.slice(0, -1))} className="flex shrink-0 items-center gap-2 rounded-full border bg-card px-4 py-3 text-xs text-muted-foreground hover:border-[#d4af37]/60 hover:text-[#d4af37]" data-testid={`button-category-${label.toLowerCase()}`}><Icon size={15} className="text-[#d4af37]" />{label}</button>)}</div>
+        <CatalogSearch properties={allProperties} onResults={setFilteredProperties} home/>
       </section>
 
       <section className="mx-auto max-w-[1280px] px-5 py-24 md:px-10 md:py-32">

@@ -8,5 +8,22 @@
       "source": "/(.*)",
       "destination": "/index.html"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/lp/bauhaus-vaca-brava",
+      "destination": "/imoveis/bauhaus",
+      "permanent": true
+    },
+    {
+      "source": "/lp/:id",
+      "destination": "/imoveis/:id",
+      "permanent": true
+    },
+    {
+      "source": "/property/:id",
+      "destination": "/imoveis/:id",
+      "permanent": true
+    }
   ]
 }

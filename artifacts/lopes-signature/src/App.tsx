@@ -1,3 +1,4 @@
+import CatalogPropertyPage from '@/pages/catalog-property-page';
 import { type ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/error-boundary';
@@ -30,7 +31,8 @@ function Router() {
     <RoutedErrorBoundary>
       <Switch>
         <Route path="/" component={HomePage} />
-        <Route path="/property/:id" component={PropertyDetailPage} />
+        <Route path="/imoveis/:id" component={CatalogPropertyPage} />
+        <Route path="/property/:id" component={CatalogPropertyPage} />
         <Route path="/lp/bauhaus-vaca-brava" component={BauhausPage} />
         <Route path="/lp/bauhaus" component={BauhausPage} />
         <Route path="/lp/:id" component={LandingPage} />
