@@ -85,6 +85,7 @@ export function CatalogWorkspace() {
           ...blank(),
           ...item,
           city: item.city || item.location,
+          published: item.published !== false,
           neighborhood: item.neighborhood || "",
           gallery: item.gallery || [],
           floorplans: item.floorplans || [],
@@ -800,3 +801,4 @@ function TaxonomyWorkspace() {
     </div>
   );
 }
+
