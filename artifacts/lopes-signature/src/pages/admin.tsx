@@ -114,6 +114,7 @@ function AdminSidebar({
             key={key}
             onClick={() => {
               setTab(key);
+              window.history.replaceState(null, "", "/admin?tab=" + key);
               setMobileOpen(false);
             }}
             className={`relative mb-1 flex h-12 w-full items-center gap-3 rounded-xl px-4 text-left text-sm ${
@@ -1655,7 +1656,19 @@ function AdminLoginPage() {
 }
 
 export default function AdminPage() {
-  const [tab, setTab] = useState<Tab>("overview");
+  const [tab, setTab] = useState<Tab>(() => {
+    const value = new URLSearchParams(window.location.search).get("tab");
+    return [
+      "overview",
+      "catalog",
+      "taxonomies",
+      "blog",
+      "leads",
+      "tracking",
+    ].includes(value || "")
+      ? (value as Tab)
+      : "overview";
+  });
   const [mobileOpen, setMobileOpen] = useState(false);
   const [session, setSession] = useState<any>(null);
   const [authLoading, setAuthLoading] = useState(true);
