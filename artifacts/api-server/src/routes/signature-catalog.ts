@@ -164,6 +164,81 @@ router.post("/admin/catalog/properties", async (req: any, res: any) => {
     return res.status(400).json({
       message: "Nome e endereço da página precisam conter letras ou números.",
     });
+  const { data: registered, error: taxonomyError } = await supabase!
+    .from("signature_taxonomies")
+    .select("*");
+  if (taxonomyError)
+    return res
+      .status(503)
+      .json({ message: "Não foi possível validar as taxonomias." });
+  const { data: previous } = await supabase!
+    .from("properties")
+    .select("*")
+    .eq("id", id)
+    .single();
+  const previousProperty = previous ? mapProperty(previous) : null;
+  const selections = [
+    ["type", "category"],
+    ["city", "city"],
+    ["neighborhood", "neighborhood"],
+    ["status", "condition"],
+  ];
+  for (const [kind, key] of selections) {
+    if (!p[key]) continue;
+    const term = registered?.find(
+      (t: any) =>
+        t.kind === kind &&
+        t.label === p[key] &&
+        (kind !== "neighborhood" ||
+          registered?.find((c: any) => c.id === t.parent_id)?.label === p.city),
+    );
+    const unchanged =
+      previousProperty &&
+      (previousProperty[key] ||
+        (key === "city" ? previousProperty.location : "")) === p[key] &&
+      (kind !== "neighborhood" || previousProperty.location === p.city);
+    if ((!term || !term.active) && !unchanged)
+      return res
+        .status(400)
+        .json({ message: "Selecione uma taxonomia ativa para " + key + "." });
+  }
+  for (const feature of Array.isArray(p.features) ? p.features : []) {
+    if (
+      !registered?.some(
+        (t: any) =>
+          t.kind === "feature" &&
+          t.label === feature &&
+          t.active &&
+          t.meta?.scope !== "unit",
+      ) &&
+      !previousProperty?.features?.includes(feature)
+    )
+      return res
+        .status(400)
+        .json({
+          message: "Característica não cadastrada ou inativa: " + feature,
+        });
+  }
+  for (const plan of Array.isArray(p.floorplans) ? p.floorplans : [])
+    for (const feature of plan.features || []) {
+      if (
+        !registered?.some(
+          (t: any) =>
+            t.kind === "feature" &&
+            t.label === feature &&
+            t.active &&
+            t.meta?.scope === "unit",
+        ) &&
+        !previousProperty?.floorplans?.some((old: any) =>
+          (old.features || []).includes(feature),
+        )
+      )
+        return res
+          .status(400)
+          .json({
+            message: "Característica de planta não cadastrada: " + feature,
+          });
+    }
   const meta = {
     slug: slug(p.slug || p.title),
     category: p.category,
@@ -221,68 +296,141 @@ router.post("/admin/catalog/taxonomies", async (req: any, res: any) => {
   const t = req.body;
   if (
     !["type", "status", "city", "neighborhood", "feature"].includes(t.kind) ||
-    !t.label?.trim()
+    typeof t.label !== "string" ||
+    !t.label.trim() ||
+    t.label.length > 120 ||
+    !slug(t.slug || t.label)
   )
-    return res.status(400).json({ message: "Taxonomia inválida." });
+    return res.status(400).json({ message: "Informe um nome e slug válidos." });
   if (
     t.kind === "status" &&
-    !["Pronto", "Na planta", "Lançamento"].includes(t.label)
+    !["Pronto", "Na planta", "Lançamento"].includes(t.label.trim())
   )
     return res
       .status(400)
       .json({ message: "Use Pronto, Na planta ou Lançamento." });
-  if (t.id) {
-    const { data: old } = await supabase!
-      .from("signature_taxonomies")
-      .select("*")
-      .eq("id", t.id)
-      .single();
-    if (old && old.kind !== t.kind)
-      return res
-        .status(400)
-        .json({ message: "O grupo da taxonomia não pode ser alterado." });
-    if (old && old.label !== t.label) {
-      const { data: props } = await supabase!
-        .from("properties")
-        .select("signature_meta,location");
-      const key = (
-        {
-          type: "category",
-          status: "condition",
-          city: "city",
-          neighborhood: "neighborhood",
-        } as any
-      )[t.kind];
-      if (
-        props?.some((r: any) =>
-          t.kind === "feature"
-            ? (r.signature_meta?.features || []).includes(old.label)
-            : (r.signature_meta?.[key] ||
-                (t.kind === "city" ? r.location : "")) === old.label,
-        )
-      )
-        return res.status(409).json({
-          message:
-            "Este nome está em uso. Crie outro termo e atualize os imóveis antes de renomeá-lo.",
-        });
+  const { data: terms, error: readError } = await supabase!
+    .from("signature_taxonomies")
+    .select("*");
+  if (readError)
+    return res
+      .status(503)
+      .json({ message: "Não foi possível verificar as taxonomias." });
+  const old = terms?.find((x: any) => x.id === t.id);
+  if (t.id && !old)
+    return res.status(404).json({ message: "Taxonomia não encontrada." });
+  if (old && old.kind !== t.kind)
+    return res.status(400).json({ message: "O grupo não pode ser alterado." });
+  const parent = terms?.find((x: any) => x.id === t.parent_id);
+  if (t.kind === "neighborhood" && (!parent || parent.kind !== "city"))
+    return res
+      .status(400)
+      .json({ message: "Selecione a cidade deste bairro." });
+  if (t.kind === "type" && t.parent_id) {
+    if (!parent || parent.kind !== "type")
+      return res.status(400).json({ message: "Tipo superior inválido." });
+    let cursor = parent;
+    const visited = new Set();
+    while (cursor) {
+      if (cursor.id === t.id || visited.has(cursor.id))
+        return res
+          .status(400)
+          .json({ message: "A hierarquia não pode formar um ciclo." });
+      visited.add(cursor.id);
+      cursor = terms?.find((x: any) => x.id === cursor.parent_id);
     }
   }
+  if (
+    terms?.some(
+      (x: any) =>
+        x.id !== t.id &&
+        x.kind === t.kind &&
+        (x.slug === slug(t.slug || t.label) ||
+          (slug(x.label) === slug(t.label) &&
+            (t.kind !== "neighborhood" || x.parent_id === t.parent_id))),
+    )
+  )
+    return res
+      .status(409)
+      .json({
+        message: "Já existe um termo com este nome ou slug neste grupo.",
+      });
+  if (!Number.isInteger(Number(t.sort_order || 0)))
+    return res
+      .status(400)
+      .json({ message: "A ordem deve ser um número inteiro." });
+  if (old?.kind === "neighborhood" && old.parent_id !== t.parent_id) {
+    const { data: rows } = await supabase!.from("properties").select("*");
+    const oldCity = terms?.find((x: any) => x.id === old.parent_id)?.label;
+    if (
+      rows?.some(
+        (p: any) =>
+          neighborhood(p) === old.label &&
+          (p.signature_meta?.city || p.location) === oldCity,
+      )
+    )
+      return res
+        .status(409)
+        .json({
+          message:
+            "Este bairro tem imóveis vinculados. Atualize a localização deles antes de mudar a cidade.",
+        });
+  }
+  if (
+    old?.kind === "feature" &&
+    (old.meta?.scope || "property") !== (t.meta?.scope || "property")
+  ) {
+    const { data: rows } = await supabase!.from("properties").select("*");
+    if (
+      rows?.some(
+        (p: any) =>
+          (p.signature_meta?.features || []).includes(old.label) ||
+          (p.floorplans || []).some((plan: any) =>
+            (plan.features || []).includes(old.label),
+          ),
+      )
+    )
+      return res
+        .status(409)
+        .json({
+          message:
+            "Esta característica está em uso. Mantenha sua aplicação ou crie outro termo.",
+        });
+  }
   const row = {
-    id: t.id || `${t.kind}-${randomUUID()}`,
+    id: t.id || t.kind + "-" + randomUUID(),
     kind: t.kind,
     label: t.label.trim(),
     slug: slug(t.slug || t.label),
-    parent_id: t.kind === "neighborhood" ? t.parent_id || null : null,
-    show_home: !!t.show_home,
+    parent_id: ["type", "neighborhood"].includes(t.kind)
+      ? t.parent_id || null
+      : null,
+    show_home: t.kind === "type" && !!t.show_home,
     active: t.active !== false,
     sort_order: Number(t.sort_order) || 0,
+    meta: {
+      description: String(t.meta?.description || "").slice(0, 3000),
+      seoTitle: String(t.meta?.seoTitle || "").slice(0, 160),
+      seoDescription: String(t.meta?.seoDescription || "").slice(0, 320),
+      indexable: !!t.meta?.indexable,
+      filterable: t.meta?.filterable !== false,
+      scope: ["property", "condominium", "unit"].includes(t.meta?.scope)
+        ? t.meta.scope
+        : "property",
+    },
   };
-  const { data, error } = await supabase!
-    .from("signature_taxonomies")
-    .upsert(row)
-    .select()
-    .single();
-  if (error) return res.status(400).json({ message: error.message });
+  const { data, error } = await supabase!.rpc("signature_save_taxonomy", {
+    term: row,
+  });
+  if (error)
+    return res
+      .status(400)
+      .json({
+        message:
+          error.code === "23505"
+            ? "Este slug já está cadastrado."
+            : "Não foi possível salvar a taxonomia.",
+      });
   res.json(data);
 });
 router.post("/admin/catalog/media", async (req: any, res: any) => {

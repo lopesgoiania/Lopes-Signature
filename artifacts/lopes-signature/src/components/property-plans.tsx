@@ -44,7 +44,10 @@ export function PropertyPlans({ property }: { property: any }) {
                   : p.title}
             </span>
             <span className="mt-1 block text-2xl">
-              {new Intl.NumberFormat('pt-BR',{maximumFractionDigits:2}).format(Number(p.area))} <small className="text-xs">m²</small>
+              {new Intl.NumberFormat("pt-BR", {
+                maximumFractionDigits: 2,
+              }).format(Number(p.area))}{" "}
+              <small className="text-xs">m²</small>
             </span>
           </button>
         ))}
@@ -81,6 +84,13 @@ export function PropertyPlans({ property }: { property: any }) {
               ? money(Number(plan.price))
               : "Sob consulta"}
           </p>
+          {(plan.features || []).length > 0 && (
+            <ul className="my-5 space-y-2 text-sm text-[#c9c9c9]">
+              {plan.features.map((f: string) => (
+                <li key={f}>{f}</li>
+              ))}
+            </ul>
+          )}
           <h3 className="serif mb-4 mt-7 text-2xl text-white">
             Características desta planta
           </h3>
@@ -93,7 +103,12 @@ export function PropertyPlans({ property }: { property: any }) {
             ].map(([key, label]) =>
               plan[key] !== undefined && plan[key] !== "" ? (
                 <span key={key}>
-                  {key==='area'?new Intl.NumberFormat('pt-BR',{maximumFractionDigits:2}).format(Number(plan[key])):plan[key]} {label}
+                  {key === "area"
+                    ? new Intl.NumberFormat("pt-BR", {
+                        maximumFractionDigits: 2,
+                      }).format(Number(plan[key]))
+                    : plan[key]}{" "}
+                  {label}
                 </span>
               ) : null,
             )}

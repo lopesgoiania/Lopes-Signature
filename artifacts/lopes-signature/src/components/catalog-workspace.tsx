@@ -1,3 +1,4 @@
+import { TaxonomyWorkspace } from "./taxonomy-workspace";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -100,7 +101,23 @@ export function CatalogWorkspace() {
   const change = (key: string, value: any) =>
     setP((old: any) => ({ ...old, [key]: value }));
   const list = (kind: string) =>
-    terms.data?.filter((t) => t.kind === kind && t.active) || [];
+    terms.data?.filter(
+      (t) =>
+        t.kind === kind &&
+        (t.active ||
+          t.label ===
+            p[
+              (
+                {
+                  type: "category",
+                  city: "city",
+                  neighborhood: "neighborhood",
+                  status: "condition",
+                } as any
+              )[kind]
+            ] ||
+          p.features?.includes(t.label)),
+    ) || [];
   const field = (key: string, label: string, type = "text") => (
     <label className="block space-y-2 text-sm">
       <span>{label}</span>
@@ -402,11 +419,11 @@ export function CatalogWorkspace() {
                   "Tipo de imóvel *",
                   list("type").map((t) => t.label),
                 )}
-                {select("condition", "Condição", [
-                  "Pronto",
-                  "Na planta",
-                  "Lançamento",
-                ])}
+                {select(
+                  "condition",
+                  "Condição",
+                  list("status").map((t) => t.label),
+                )}
                 {p.condition !== "Pronto" &&
                   field("delivery", "Previsão de entrega", "month")}
                 {[
@@ -435,25 +452,27 @@ export function CatalogWorkspace() {
                 <div className="md:col-span-2">
                   <h3 className="mb-3">Características e diferenciais</h3>
                   <div className="flex flex-wrap gap-4">
-                    {list("feature").map((t) => (
-                      <label key={t.id} className="flex gap-2 text-sm">
-                        <input
-                          type="checkbox"
-                          checked={p.features.includes(t.label)}
-                          onChange={(e) =>
-                            change(
-                              "features",
-                              e.target.checked
-                                ? [...p.features, t.label]
-                                : p.features.filter(
-                                    (f: string) => f !== t.label,
-                                  ),
-                            )
-                          }
-                        />
-                        {t.label}
-                      </label>
-                    ))}
+                    {list("feature")
+                      .filter((t) => t.meta?.scope !== "unit")
+                      .map((t) => (
+                        <label key={t.id} className="flex gap-2 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={p.features.includes(t.label)}
+                            onChange={(e) =>
+                              change(
+                                "features",
+                                e.target.checked
+                                  ? [...p.features, t.label]
+                                  : p.features.filter(
+                                      (f: string) => f !== t.label,
+                                    ),
+                              )
+                            }
+                          />
+                          {t.label}
+                        </label>
+                      ))}
                   </div>
                 </div>
               </div>
@@ -527,6 +546,43 @@ export function CatalogWorkspace() {
                           />
                         </label>
                       ))}
+                      <fieldset className="md:col-span-2">
+                        <legend className="mb-3 text-sm">
+                          Características desta planta
+                        </legend>
+                        <div className="flex flex-wrap gap-4">
+                          {list("feature")
+                            .filter(
+                              (t) =>
+                                t.meta?.scope === "unit" ||
+                                (plan.features || []).includes(t.label),
+                            )
+                            .map((t) => (
+                              <label
+                                key={t.id}
+                                className="flex items-center gap-2 text-sm"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={(plan.features || []).includes(
+                                    t.label,
+                                  )}
+                                  onChange={(e) =>
+                                    update(
+                                      "features",
+                                      e.target.checked
+                                        ? [...(plan.features || []), t.label]
+                                        : (plan.features || []).filter(
+                                            (f: string) => f !== t.label,
+                                          ),
+                                    )
+                                  }
+                                />
+                                {t.label}
+                              </label>
+                            ))}
+                        </div>
+                      </fieldset>
                       {plan.image && (
                         <img
                           src={plan.image}
@@ -639,166 +695,3 @@ export function CatalogWorkspace() {
     </div>
   );
 }
-function TaxonomyWorkspace() {
-  const qc = useQueryClient();
-  const { data: terms = [], error } = useQuery<Taxonomy[]>({
-    queryKey: ["taxonomies"],
-    queryFn: () => catalogRequest("taxonomies"),
-  });
-  const [kind, setKind] = useState("type");
-  const empty = (k: string) => ({
-    kind: k,
-    label: "",
-    slug: "",
-    parent_id: "",
-    show_home: false,
-    active: true,
-    sort_order: 0,
-  });
-  const [item, setItem] = useState<any>(empty("type"));
-  const [message, setMessage] = useState("");
-  const [busy, setBusy] = useState(false);
-  return (
-    <div>
-      <div className="mb-5 flex flex-wrap gap-2">
-        {Object.entries(kinds).map(([k, label]) => (
-          <button
-            key={k}
-            className={`${button} ${kind === k ? "bg-primary/15" : ""}`}
-            onClick={() => {
-              setKind(k);
-              setItem(empty(k));
-              setMessage("");
-            }}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-      {error && <p role="alert">Não foi possível carregar as taxonomias.</p>}
-      <div className="grid gap-6 lg:grid-cols-[1fr_1.5fr]">
-        <form
-          className="space-y-4 rounded-2xl border border-white/10 p-5"
-          onSubmit={async (e) => {
-            e.preventDefault();
-            setBusy(true);
-            try {
-              await catalogRequest("admin/catalog/taxonomies", item);
-              await qc.invalidateQueries({ queryKey: ["taxonomies"] });
-              setItem(empty(kind));
-              setMessage("Taxonomia salva.");
-            } catch (err) {
-              setMessage((err as Error).message);
-            } finally {
-              setBusy(false);
-            }
-          }}
-        >
-          <h3>
-            {item.id ? "Editar" : "Adicionar"} — {kinds[kind]}
-          </h3>
-          <label className="block text-sm">
-            Nome
-            <input
-              className={`${input} mt-2`}
-              required
-              value={item.label}
-              onChange={(e) => setItem({ ...item, label: e.target.value })}
-            />
-          </label>
-          {kind === "neighborhood" && (
-            <label className="block text-sm">
-              Cidade
-              <select
-                className={`${input} mt-2`}
-                required
-                value={item.parent_id}
-                onChange={(e) =>
-                  setItem({ ...item, parent_id: e.target.value })
-                }
-              >
-                <option value="">Selecionar cidade</option>
-                {terms
-                  .filter((t) => t.kind === "city")
-                  .map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.label}
-                    </option>
-                  ))}
-              </select>
-            </label>
-          )}
-          <label className="block text-sm">
-            Ordem
-            <input
-              type="number"
-              className={`${input} mt-2`}
-              value={item.sort_order}
-              onChange={(e) =>
-                setItem({ ...item, sort_order: Number(e.target.value) })
-              }
-            />
-          </label>
-          <label className="flex gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={item.active}
-              onChange={(e) => setItem({ ...item, active: e.target.checked })}
-            />
-            Ativa
-          </label>
-          {kind === "type" && (
-            <label className="flex gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={item.show_home}
-                onChange={(e) =>
-                  setItem({ ...item, show_home: e.target.checked })
-                }
-              />
-              Exibir como opção na home quando houver imóveis
-            </label>
-          )}
-          <button disabled={busy} className={button}>
-            {busy ? "Salvando…" : "Salvar taxonomia"}
-          </button>
-          <button
-            type="button"
-            className="ml-3 text-sm"
-            onClick={() => setItem(empty(kind))}
-          >
-            Limpar
-          </button>
-          <p role="status" className="text-sm text-primary">
-            {message}
-          </p>
-        </form>
-        <div className="space-y-2">
-          {terms
-            .filter((t) => t.kind === kind)
-            .map((t) => (
-              <button
-                key={t.id}
-                className="flex w-full items-center justify-between rounded-xl border border-white/10 p-4 text-left"
-                onClick={() => setItem(t)}
-              >
-                <span>
-                  {t.label}
-                  <small className="ml-3 text-white/50">
-                    {t.active ? "Ativa" : "Inativa"}
-                    {t.show_home ? " · Home" : ""}
-                  </small>
-                </span>
-                <span className="text-sm text-primary">Editar</span>
-              </button>
-            ))}
-          <p className="pt-3 text-xs text-white/50">
-            Desative termos para deixar de oferecê-los em novos cadastros. Os
-            imóveis existentes conservam os valores cadastrados.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-

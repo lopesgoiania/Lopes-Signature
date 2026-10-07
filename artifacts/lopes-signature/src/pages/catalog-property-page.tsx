@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, Link } from "wouter";
 import { catalogRequest, propertyHref, propertyLocation } from "@/lib/catalog";
-import LandingPage from "./landing-page";
+import PropertyDetailPage from "./property-detail";
 import BauhausPage from "./bauhaus-page";
 export default function CatalogPropertyPage() {
   const { id } = useParams();
@@ -98,6 +98,6 @@ export default function CatalogPropertyPage() {
   return p.id === "bauhaus" ? (
     <BauhausPage property={p} />
   ) : (
-    <LandingPage property={p} />
+    <PropertyDetailPage suppliedProperty={p} />
   );
 }

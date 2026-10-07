@@ -1,18 +1,26 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { catalogRequest, slugify, type Taxonomy } from "@/lib/catalog";
+import {
+  catalogRequest,
+  slugify,
+  taxonomyMatches,
+  type Taxonomy,
+} from "@/lib/catalog";
+const EMPTY_TERMS: Taxonomy[] = [];
 export function CatalogSearch({
   properties,
   onResults,
   initialType = "",
   home = false,
+  initialTerm,
 }: {
   properties: any[];
   onResults: (items: any[]) => void;
   initialType?: string;
   home?: boolean;
+  initialTerm?: Taxonomy;
 }) {
-  const { data: terms = [] } = useQuery<Taxonomy[]>({
+  const { data: terms = EMPTY_TERMS } = useQuery<Taxonomy[]>({
     queryKey: ["taxonomies"],
     queryFn: () => catalogRequest("taxonomies"),
   });
@@ -26,50 +34,65 @@ export function CatalogSearch({
     area: "",
     suites: "",
     feature: "",
+    condition: "",
   });
   const [filters, setFilters] = useState(draft);
   const [open, setOpen] = useState(false);
   const results = useMemo(
     () =>
       properties.filter((p) => {
+        if (initialTerm && !taxonomyMatches(p, initialTerm, terms))
+          return false;
         const q = slugify(filters.search);
         return (
           (!q ||
             slugify(`${p.title} ${p.location} ${p.neighborhood}`).includes(
               q,
             )) &&
-          (!filters.city || p.location === filters.city) &&
+          (!filters.city || (p.city || p.location) === filters.city) &&
           (!filters.neighborhood || p.neighborhood === filters.neighborhood) &&
           (!filters.type ||
-            slugify(p.category || "").includes(slugify(filters.type))) &&
+            (terms.some((t) => t.kind === "type" && t.label === filters.type)
+              ? terms.some(
+                  (t) =>
+                    t.kind === "type" &&
+                    t.label === filters.type &&
+                    taxonomyMatches(p, t, terms),
+                )
+              : slugify(p.category || "").includes(slugify(filters.type)))) &&
           (!filters.min || p.price >= Number(filters.min)) &&
           (!filters.max || p.price <= Number(filters.max)) &&
           (!filters.area || p.area >= Number(filters.area)) &&
           (!filters.suites || p.suites >= Number(filters.suites)) &&
-          (!filters.feature || (p.features || []).includes(filters.feature))
+          (!filters.condition || p.condition === filters.condition) &&
+          (!filters.feature ||
+            (p.features || []).includes(filters.feature) ||
+            (p.floorplans || []).some((plan: any) =>
+              (plan.features || []).includes(filters.feature),
+            ))
         );
       }),
-    [properties, filters],
+    [properties, filters, initialTerm, terms],
   );
   useEffect(() => onResults(results), [results, onResults]);
-  const cities = [
-    ...new Set(properties.map((p) => p.location).filter(Boolean)),
-  ];
-  const neighborhoods = [
-    ...new Set(
-      properties
-        .filter((p) => !draft.city || p.location === draft.city)
-        .map((p) => p.neighborhood)
-        .filter(Boolean),
-    ),
-  ];
-  const types = terms.filter(
-    (t) =>
-      t.kind === "type" &&
-      t.active &&
-      (!home || t.show_home) &&
-      properties.some((p) => slugify(p.category || "") === slugify(t.label)),
-  );
+  const available = (kind: string) =>
+    terms.filter(
+      (t) =>
+        t.kind === kind &&
+        t.active &&
+        (kind !== "neighborhood" ||
+          terms.some((c) => c.id === t.parent_id && c.active)) &&
+        properties.some((p) => taxonomyMatches(p, t, terms)),
+    );
+  const cities = available("city").map((t) => t.label);
+  const neighborhoods = available("neighborhood")
+    .filter(
+      (t) =>
+        !draft.city ||
+        terms.find((c) => c.id === t.parent_id)?.label === draft.city,
+    )
+    .map((t) => t.label);
+  const types = available("type").filter((t) => !home || t.show_home);
   const set = (key: string, value: string) =>
     setDraft((d) => ({
       ...d,
@@ -136,18 +159,20 @@ export function CatalogSearch({
               onChange={(e) => set("type", e.target.value)}
             >
               <option value="">Todos os tipos</option>
-              {terms
-                .filter(
-                  (t) =>
-                    t.kind === "type" &&
-                    t.active &&
-                    properties.some(
-                      (p) => slugify(p.category || "") === slugify(t.label),
-                    ),
-                )
-                .map((t) => (
-                  <option key={t.id}>{t.label}</option>
-                ))}
+              {available("type").map((t) => (
+                <option key={t.id}>{t.label}</option>
+              ))}
+            </select>
+            <select
+              aria-label="Status do imóvel"
+              className="rounded-xl bg-background p-3"
+              value={draft.condition}
+              onChange={(e) => set("condition", e.target.value)}
+            >
+              <option value="">Todos os status</option>
+              {available("status").map((t) => (
+                <option key={t.id}>{t.label}</option>
+              ))}
             </select>
             {[
               ["min", "Valor mínimo"],
@@ -174,7 +199,19 @@ export function CatalogSearch({
             >
               <option value="">Todas as características</option>
               {terms
-                .filter((t) => t.kind === "feature" && t.active)
+                .filter(
+                  (t) =>
+                    t.kind === "feature" &&
+                    t.active &&
+                    t.meta?.filterable !== false &&
+                    properties.some(
+                      (p) =>
+                        (p.features || []).includes(t.label) ||
+                        (p.floorplans || []).some((plan: any) =>
+                          (plan.features || []).includes(t.label),
+                        ),
+                    ),
+                )
                 .map((t) => (
                   <option key={t.id}>{t.label}</option>
                 ))}
@@ -220,6 +257,7 @@ export function CatalogSearch({
               area: "",
               suites: "",
               feature: "",
+              condition: "",
             };
             setDraft(next);
             setFilters(next);

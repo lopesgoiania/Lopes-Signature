@@ -1,37 +1,108 @@
-import { CatalogWorkspace } from '@/components/catalog-workspace';
-import { useState, useEffect, type FormEvent } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { Activity, BarChart3, Bell, Bot, Building2, Check, ChevronDown, CircleDollarSign, Code2, ExternalLink, Eye, FileText, Globe2, LayoutDashboard, LogOut, Menu, MoreHorizontal, Pencil, Plus, RefreshCw, Save, Sparkles, Trash2, Users, X } from 'lucide-react';
-import { Link } from 'wouter';
-import { getGetAnalyticsSummaryQueryKey, getGetAnalyticsTimeseriesQueryKey, getGetTrackingSettingsQueryKey, getListLeadsQueryKey, getListPropertiesQueryKey, useCreateProperty, useDeleteProperty, useGetAnalyticsSummary, useGetAnalyticsTimeseries, useGetTrackingSettings, useListLeads, useListProperties, useUpdateLead, useUpdateProperty, useUpdateTrackingSettings, type Lead, type LeadInput, type Property, type PropertyInput, type TrackingSettings } from '@workspace/api-client-react';
-import { EmptyState, ErrorState, PageLogo, money } from '@/components/signature-ui';
-import { RaioXModal } from '@/components/raio-x-modal';
-import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { TaxonomyWorkspace } from "@/components/taxonomy-workspace";
+import { CatalogWorkspace } from "@/components/catalog-workspace";
+import { useState, useEffect, type FormEvent } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  Activity,
+  BarChart3,
+  Bell,
+  Bot,
+  Building2,
+  Check,
+  ChevronDown,
+  CircleDollarSign,
+  Code2,
+  ExternalLink,
+  Eye,
+  FileText,
+  Globe2,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  MoreHorizontal,
+  Pencil,
+  Plus,
+  RefreshCw,
+  Save,
+  Sparkles,
+  Trash2,
+  Users,
+  X,
+} from "lucide-react";
+import { Link } from "wouter";
+import {
+  getGetAnalyticsSummaryQueryKey,
+  getGetAnalyticsTimeseriesQueryKey,
+  getGetTrackingSettingsQueryKey,
+  getListLeadsQueryKey,
+  getListPropertiesQueryKey,
+  useCreateProperty,
+  useDeleteProperty,
+  useGetAnalyticsSummary,
+  useGetAnalyticsTimeseries,
+  useGetTrackingSettings,
+  useListLeads,
+  useListProperties,
+  useUpdateLead,
+  useUpdateProperty,
+  useUpdateTrackingSettings,
+  type Lead,
+  type LeadInput,
+  type Property,
+  type PropertyInput,
+  type TrackingSettings,
+} from "@workspace/api-client-react";
+import {
+  EmptyState,
+  ErrorState,
+  PageLogo,
+  money,
+} from "@/components/signature-ui";
+import { RaioXModal } from "@/components/raio-x-modal";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
-type Tab = 'overview' | 'catalog' | 'blog' | 'leads' | 'tracking';
+type Tab =
+  "overview" | "catalog" | "taxonomies" | "blog" | "leads" | "tracking";
 
-const leadColumns: { key: Lead['status']; label: string; color: string }[] = [
-  { key: 'new', label: 'Novos', color: '#d4af37' },
-  { key: 'contacted', label: 'Em contato', color: '#5b9bd5' },
-  { key: 'scheduled', label: 'Visita agendada', color: '#e0a93a' },
-  { key: 'negotiation', label: 'Negociação', color: '#b99be8' },
-  { key: 'closed', label: 'Fechados', color: '#4caf6d' },
+const leadColumns: { key: Lead["status"]; label: string; color: string }[] = [
+  { key: "new", label: "Novos", color: "#d4af37" },
+  { key: "contacted", label: "Em contato", color: "#5b9bd5" },
+  { key: "scheduled", label: "Visita agendada", color: "#e0a93a" },
+  { key: "negotiation", label: "Negociação", color: "#b99be8" },
+  { key: "closed", label: "Fechados", color: "#4caf6d" },
 ];
 
-function AdminSidebar({ tab, setTab, mobileOpen, setMobileOpen }: { tab: Tab; setTab: (tab: Tab) => void; mobileOpen: boolean; setMobileOpen: (value: boolean) => void }) {
+function AdminSidebar({
+  tab,
+  setTab,
+  mobileOpen,
+  setMobileOpen,
+}: {
+  tab: Tab;
+  setTab: (tab: Tab) => void;
+  mobileOpen: boolean;
+  setMobileOpen: (value: boolean) => void;
+}) {
   const items: [Tab, string, typeof LayoutDashboard][] = [
-    ['overview', 'Visão Geral & Métricas', LayoutDashboard],
-    ['catalog', 'Produtos & Empreendimentos', Building2],
-    ['blog', 'Blog & Agente de IA', Bot],
-    ['leads', 'Pipeline de Leads', Users],
-    ['tracking', 'Tracking & Pixels', Code2],
+    ["overview", "Visão Geral & Métricas", LayoutDashboard],
+    ["catalog", "Produtos & Empreendimentos", Building2],
+    ["taxonomies", "Taxonomias", Building2],
+    ["blog", "Blog & Agente de IA", Bot],
+    ["leads", "Pipeline de Leads", Users],
+    ["tracking", "Tracking & Pixels", Code2],
   ];
 
   return (
-    <aside className={`${mobileOpen ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-40 w-[270px] border-r border-white/10 bg-[#0e0e0e] p-6 transition-transform lg:translate-x-0`}>
+    <aside
+      className={`${mobileOpen ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-40 w-[270px] border-r border-white/10 bg-[#0e0e0e] p-6 transition-transform lg:translate-x-0`}
+    >
       <div className="flex items-center justify-between">
         <PageLogo />
-        <button className="text-[#9a9a9a] lg:hidden" onClick={() => setMobileOpen(false)} aria-label="Fechar menu">
+        <button
+          className="text-[#9a9a9a] lg:hidden"
+          onClick={() => setMobileOpen(false)}
+          aria-label="Fechar menu"
+        >
           <X size={20} />
         </button>
       </div>
@@ -41,11 +112,14 @@ function AdminSidebar({ tab, setTab, mobileOpen, setMobileOpen }: { tab: Tab; se
         {items.map(([key, label, Icon]) => (
           <button
             key={key}
-            onClick={() => { setTab(key); setMobileOpen(false); }}
+            onClick={() => {
+              setTab(key);
+              setMobileOpen(false);
+            }}
             className={`relative mb-1 flex h-12 w-full items-center gap-3 rounded-xl px-4 text-left text-sm ${
               tab === key
-                ? 'bg-[#d4af37]/10 text-[#e8c766] before:absolute before:-left-6 before:h-7 before:w-[3px] before:bg-[#d4af37]'
-                : 'text-[#9a9a9a] hover:bg-white/5 hover:text-white'
+                ? "bg-[#d4af37]/10 text-[#e8c766] before:absolute before:-left-6 before:h-7 before:w-[3px] before:bg-[#d4af37]"
+                : "text-[#9a9a9a] hover:bg-white/5 hover:text-white"
             }`}
           >
             <Icon size={17} strokeWidth={1.5} />
@@ -55,10 +129,19 @@ function AdminSidebar({ tab, setTab, mobileOpen, setMobileOpen }: { tab: Tab; se
       </div>
 
       <div className="absolute bottom-6 left-6 right-6 border-t border-white/10 pt-5">
-        <Link href="/" className="mb-4 flex items-center gap-3 text-xs text-[#9a9a9a] hover:text-[#e8c766]">
+        <Link
+          href="/"
+          className="mb-4 flex items-center gap-3 text-xs text-[#9a9a9a] hover:text-[#e8c766]"
+        >
           <Globe2 size={16} /> Ver Portal Público
         </Link>
-        <button onClick={() => { if (supabase) supabase.auth.signOut(); else window.location.href = '/'; }} className="flex items-center gap-3 text-xs text-[#ababab] hover:text-white">
+        <button
+          onClick={() => {
+            if (supabase) supabase.auth.signOut();
+            else window.location.href = "/";
+          }}
+          className="flex items-center gap-3 text-xs text-[#ababab] hover:text-white"
+        >
           <LogOut size={16} /> Sair do Painel
         </button>
       </div>
@@ -66,22 +149,44 @@ function AdminSidebar({ tab, setTab, mobileOpen, setMobileOpen }: { tab: Tab; se
   );
 }
 
-function MetricCard({ label, value, subtext, change, icon: Icon, tone = '#d4af37' }: { label: string; value: string; subtext?: string; change?: number; icon: typeof Eye; tone?: string }) {
+function MetricCard({
+  label,
+  value,
+  subtext,
+  change,
+  icon: Icon,
+  tone = "#d4af37",
+}: {
+  label: string;
+  value: string;
+  subtext?: string;
+  change?: number;
+  icon: typeof Eye;
+  tone?: string;
+}) {
   return (
     <div className="rounded-2xl border border-white/10 bg-[#121212] p-5">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-xs text-[#ababab]">{label}</p>
           <p className="mt-2 text-2xl font-semibold text-white">{value}</p>
-          {subtext && <p className="mt-1 text-[11px] text-[#ababab]">{subtext}</p>}
+          {subtext && (
+            <p className="mt-1 text-[11px] text-[#ababab]">{subtext}</p>
+          )}
         </div>
-        <span className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ color: tone, backgroundColor: `${tone}18` }}>
+        <span
+          className="flex h-10 w-10 items-center justify-center rounded-xl"
+          style={{ color: tone, backgroundColor: `${tone}18` }}
+        >
           <Icon size={19} />
         </span>
       </div>
       {change !== undefined && (
-        <p className={`mt-3 text-[11px] ${change >= 0 ? 'text-[#7acb8e]' : 'text-[#e0554a]'}`}>
-          {change >= 0 ? '↑' : '↓'} {Math.abs(change).toFixed(1)}% <span className="text-[#ababab]">vs. período anterior</span>
+        <p
+          className={`mt-3 text-[11px] ${change >= 0 ? "text-[#7acb8e]" : "text-[#e0554a]"}`}
+        >
+          {change >= 0 ? "↑" : "↓"} {Math.abs(change).toFixed(1)}%{" "}
+          <span className="text-[#ababab]">vs. período anterior</span>
         </p>
       )}
     </div>
@@ -102,28 +207,69 @@ function Overview() {
   const max = Math.max(...values.map((point) => point.visits), 1);
 
   const totalLeads = leads.length;
-  const formLeads = leads.filter((l) => l.source?.toLowerCase().includes('form') || l.source?.toLowerCase().includes('website') || l.source?.toLowerCase().includes('newsletter')).length;
-  const whatsappLeads = leads.filter((l) => l.source?.toLowerCase().includes('whatsapp')).length;
-  const lpLeads = leads.filter((l) => l.source?.toLowerCase().includes('lp')).length;
+  const formLeads = leads.filter(
+    (l) =>
+      l.source?.toLowerCase().includes("form") ||
+      l.source?.toLowerCase().includes("website") ||
+      l.source?.toLowerCase().includes("newsletter"),
+  ).length;
+  const whatsappLeads = leads.filter((l) =>
+    l.source?.toLowerCase().includes("whatsapp"),
+  ).length;
+  const lpLeads = leads.filter((l) =>
+    l.source?.toLowerCase().includes("lp"),
+  ).length;
 
-  const formPct = totalLeads > 0 ? Math.round((formLeads / totalLeads) * 100) : 0;
-  const whatsappPct = totalLeads > 0 ? Math.round((whatsappLeads / totalLeads) * 100) : 0;
+  const formPct =
+    totalLeads > 0 ? Math.round((formLeads / totalLeads) * 100) : 0;
+  const whatsappPct =
+    totalLeads > 0 ? Math.round((whatsappLeads / totalLeads) * 100) : 0;
   const lpPct = totalLeads > 0 ? Math.round((lpLeads / totalLeads) * 100) : 0;
 
   return (
     <div className="space-y-8">
       <div>
-        <p className="mono-label text-[#d4af37]">Painel de Performance & Métricas</p>
-        <h1 className="serif mt-2 text-4xl text-white md:text-5xl">Métricas da Plataforma</h1>
-        <p className="mt-2 text-sm text-[#ababab]">Acompanhamento de visitas, conversões e acessos a Landing Pages em tempo real no Supabase.</p>
+        <p className="mono-label text-[#d4af37]">
+          Painel de Performance & Métricas
+        </p>
+        <h1 className="serif mt-2 text-4xl text-white md:text-5xl">
+          Métricas da Plataforma
+        </h1>
+        <p className="mt-2 text-sm text-[#ababab]">
+          Acompanhamento de visitas, conversões e acessos a Landing Pages em
+          tempo real no Supabase.
+        </p>
       </div>
 
       {/* Cards de Métricas Principais (Mês, Semana, Dia, Conversão) */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard label="Total de Visitas" value={(summary?.totalVisits || 0).toLocaleString('pt-BR')} subtext="Acessos registrados" icon={Eye} />
-        <MetricCard label="Acessos a LPs" value={(summary?.lpViews || 0).toLocaleString('pt-BR')} subtext="Visualizações de produtos" icon={BarChart3} tone="#5b9bd5" />
-        <MetricCard label="Cliques WhatsApp" value={(summary?.whatsappClicks || 0).toLocaleString('pt-BR')} subtext="Contatos diretos iniciados" icon={Activity} tone="#4caf6d" />
-        <MetricCard label="Taxa de Conversão" value={`${summary?.conversionRate ?? 0}%`} subtext="Leads / Visitantes" icon={CircleDollarSign} tone="#e0a93a" />
+        <MetricCard
+          label="Total de Visitas"
+          value={(summary?.totalVisits || 0).toLocaleString("pt-BR")}
+          subtext="Acessos registrados"
+          icon={Eye}
+        />
+        <MetricCard
+          label="Acessos a LPs"
+          value={(summary?.lpViews || 0).toLocaleString("pt-BR")}
+          subtext="Visualizações de produtos"
+          icon={BarChart3}
+          tone="#5b9bd5"
+        />
+        <MetricCard
+          label="Cliques WhatsApp"
+          value={(summary?.whatsappClicks || 0).toLocaleString("pt-BR")}
+          subtext="Contatos diretos iniciados"
+          icon={Activity}
+          tone="#4caf6d"
+        />
+        <MetricCard
+          label="Taxa de Conversão"
+          value={`${summary?.conversionRate ?? 0}%`}
+          subtext="Leads / Visitantes"
+          icon={CircleDollarSign}
+          tone="#e0a93a"
+        />
       </div>
 
       {/* Gráfico de Tráfego e Distribuição */}
@@ -131,35 +277,56 @@ function Overview() {
         <div className="rounded-2xl border border-white/10 bg-[#121212] p-5 md:p-7">
           <div className="mb-7 flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-white">Evolução do Tráfego Diário</p>
-              <p className="mt-1 text-xs text-[#ababab]">Visitas e geração de Leads nos últimos dias</p>
+              <p className="text-sm font-semibold text-white">
+                Evolução do Tráfego Diário
+              </p>
+              <p className="mt-1 text-xs text-[#ababab]">
+                Visitas e geração de Leads nos últimos dias
+              </p>
             </div>
             <div className="flex gap-4 text-[10px] text-[#9a9a9a]">
-              <span className="flex items-center gap-1"><i className="h-2 w-2 rounded-full bg-[#d4af37]" />Visitas</span>
-              <span className="flex items-center gap-1"><i className="h-2 w-2 rounded-full bg-[#4caf6d]" />Leads</span>
+              <span className="flex items-center gap-1">
+                <i className="h-2 w-2 rounded-full bg-[#d4af37]" />
+                Visitas
+              </span>
+              <span className="flex items-center gap-1">
+                <i className="h-2 w-2 rounded-full bg-[#4caf6d]" />
+                Leads
+              </span>
             </div>
           </div>
           {values.length === 0 ? (
             <div className="flex h-56 flex-col items-center justify-center rounded-xl border border-dashed border-white/10 p-6 text-center text-[#ababab]">
               <Activity size={24} className="mb-2 text-[#d4af37]" />
-              <p className="text-xs">Aguardando novos acessos registrados no Supabase...</p>
+              <p className="text-xs">
+                Aguardando novos acessos registrados no Supabase...
+              </p>
             </div>
           ) : (
             <div className="flex h-56 items-end gap-2 md:gap-5">
               {values.map((point) => (
-                <div key={point.label} className="flex h-full flex-1 flex-col justify-end gap-2">
+                <div
+                  key={point.label}
+                  className="flex h-full flex-1 flex-col justify-end gap-2"
+                >
                   <div className="relative flex flex-1 items-end justify-center">
                     <div
                       className="w-full max-w-10 rounded-t-md bg-[#d4af37]/70"
-                      style={{ height: `${point.visits > 0 ? Math.max(15, (point.visits / max) * 100) : 4}%` }}
+                      style={{
+                        height: `${point.visits > 0 ? Math.max(15, (point.visits / max) * 100) : 4}%`,
+                      }}
                       title={`${point.visits} visitas`}
                     />
                     <div
                       className="absolute bottom-0 w-2 rounded-full bg-[#4caf6d]"
-                      style={{ height: `${point.leads > 0 ? Math.max(8, (point.leads / max) * 100 * 4) : 0}%` }}
+                      style={{
+                        height: `${point.leads > 0 ? Math.max(8, (point.leads / max) * 100 * 4) : 0}%`,
+                      }}
                     />
                   </div>
-                  <span className="text-center text-[10px] text-[#ababab]">{point.label}</span>
+                  <span className="text-center text-[10px] text-[#ababab]">
+                    {point.label}
+                  </span>
                 </div>
               ))}
             </div>
@@ -169,8 +336,12 @@ function Overview() {
         <div className="rounded-2xl border border-white/10 bg-[#121212] p-5 md:p-7">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm font-semibold text-white">Origem dos Contatos</p>
-              <p className="mt-1 text-xs text-[#ababab]">Distribuição por canal de captação</p>
+              <p className="text-sm font-semibold text-white">
+                Origem dos Contatos
+              </p>
+              <p className="mt-1 text-xs text-[#ababab]">
+                Distribuição por canal de captação
+              </p>
             </div>
             <MoreHorizontal size={17} className="text-[#ababab]" />
           </div>
@@ -182,15 +353,24 @@ function Overview() {
           </div>
           <div className="space-y-3 text-xs">
             <div className="flex justify-between text-[#c9c9c9]">
-              <span className="flex items-center gap-2"><i className="h-2 w-2 rounded-full bg-[#d4af37]" />Formulário do Portal</span>
+              <span className="flex items-center gap-2">
+                <i className="h-2 w-2 rounded-full bg-[#d4af37]" />
+                Formulário do Portal
+              </span>
               <b>{formPct}%</b>
             </div>
             <div className="flex justify-between text-[#c9c9c9]">
-              <span className="flex items-center gap-2"><i className="h-2 w-2 rounded-full bg-[#5b9bd5]" />WhatsApp Direct</span>
+              <span className="flex items-center gap-2">
+                <i className="h-2 w-2 rounded-full bg-[#5b9bd5]" />
+                WhatsApp Direct
+              </span>
               <b>{whatsappPct}%</b>
             </div>
             <div className="flex justify-between text-[#c9c9c9]">
-              <span className="flex items-center gap-2"><i className="h-2 w-2 rounded-full bg-[#4caf6d]" />Landing Pages de Produtos</span>
+              <span className="flex items-center gap-2">
+                <i className="h-2 w-2 rounded-full bg-[#4caf6d]" />
+                Landing Pages de Produtos
+              </span>
               <b>{lpPct}%</b>
             </div>
           </div>
@@ -201,7 +381,13 @@ function Overview() {
 }
 
 // Modal de Criação / Edição de Produto Completo
-function PropertyModal({ property, onClose }: { property?: Property; onClose: () => void }) {
+function PropertyModal({
+  property,
+  onClose,
+}: {
+  property?: Property;
+  onClose: () => void;
+}) {
   const queryClient = useQueryClient();
   const create = useCreateProperty();
   const update = useUpdateProperty();
@@ -210,36 +396,45 @@ function PropertyModal({ property, onClose }: { property?: Property; onClose: ()
     event.preventDefault();
     const form = new FormData(event.currentTarget);
 
-    const title = String(form.get('title') || '');
-    const builder = String(form.get('builder') || 'Lopes Signature');
-    const location = String(form.get('location') || '');
-    const neighborhood = String(form.get('neighborhood') || '');
-    const address = String(form.get('address') || '');
-    const category = String(form.get('category') || 'Apartamentos');
-    const price = Number(form.get('price') || 0);
-    const area = Number(form.get('area') || 0);
-    const bedrooms = Number(form.get('bedrooms') || 0);
-    const suites = Number(form.get('suites') || 0);
-    const bathrooms = Number(form.get('bathrooms') || 0);
-    const parking = Number(form.get('parking') || 0);
-    const description = String(form.get('description') || '');
-    const images = String(form.get('images') || '').split('\n').map((i) => i.trim()).filter(Boolean);
-    const gallery = String(form.get('gallery') || '').split('\n').map((i) => i.trim()).filter(Boolean);
-    const badges = String(form.get('badges') || '').split(',').map((i) => i.trim()).filter(Boolean);
-    const lpUrl = String(form.get('lpUrl') || '');
-    const pdfUrl = String(form.get('pdfUrl') || '');
-    const featured = form.get('featured') === 'on';
+    const title = String(form.get("title") || "");
+    const builder = String(form.get("builder") || "Lopes Signature");
+    const location = String(form.get("location") || "");
+    const neighborhood = String(form.get("neighborhood") || "");
+    const address = String(form.get("address") || "");
+    const category = String(form.get("category") || "Apartamentos");
+    const price = Number(form.get("price") || 0);
+    const area = Number(form.get("area") || 0);
+    const bedrooms = Number(form.get("bedrooms") || 0);
+    const suites = Number(form.get("suites") || 0);
+    const bathrooms = Number(form.get("bathrooms") || 0);
+    const parking = Number(form.get("parking") || 0);
+    const description = String(form.get("description") || "");
+    const images = String(form.get("images") || "")
+      .split("\n")
+      .map((i) => i.trim())
+      .filter(Boolean);
+    const gallery = String(form.get("gallery") || "")
+      .split("\n")
+      .map((i) => i.trim())
+      .filter(Boolean);
+    const badges = String(form.get("badges") || "")
+      .split(",")
+      .map((i) => i.trim())
+      .filter(Boolean);
+    const lpUrl = String(form.get("lpUrl") || "");
+    const pdfUrl = String(form.get("pdfUrl") || "");
+    const featured = form.get("featured") === "on";
 
     // Planta 1 simples
-    const fp1Title = String(form.get('fp1Title') || '');
-    const fp1Price = Number(form.get('fp1Price') || 0);
-    const fp1Area = String(form.get('fp1Area') || '');
-    const fp1Image = String(form.get('fp1Image') || '');
+    const fp1Title = String(form.get("fp1Title") || "");
+    const fp1Price = Number(form.get("fp1Price") || 0);
+    const fp1Area = String(form.get("fp1Area") || "");
+    const fp1Image = String(form.get("fp1Image") || "");
 
     const floorplans = fp1Title
       ? [
           {
-            id: 'fp-1',
+            id: "fp-1",
             title: fp1Title,
             area: fp1Area || `${area}m²`,
             price: fp1Price || price,
@@ -247,7 +442,7 @@ function PropertyModal({ property, onClose }: { property?: Property; onClose: ()
             suites,
             bathrooms,
             parking,
-            image: fp1Image || images[0] || '',
+            image: fp1Image || images[0] || "",
           },
         ]
       : (property as any)?.floorplans || [];
@@ -273,12 +468,14 @@ function PropertyModal({ property, onClose }: { property?: Property; onClose: ()
       featured,
       lpUrl: lpUrl || `/lp/${property?.id || Date.now()}`,
       pdfUrl,
-      status: 'Disponível',
+      status: "Disponível",
     };
 
     const options = {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: getListPropertiesQueryKey() });
+        queryClient.invalidateQueries({
+          queryKey: getListPropertiesQueryKey(),
+        });
         onClose();
       },
     };
@@ -295,39 +492,83 @@ function PropertyModal({ property, onClose }: { property?: Property; onClose: ()
       <div className="my-auto max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-3xl border border-[#d4af37]/30 bg-[#161618] p-6 md:p-8 text-[#f5f2e9]">
         <div className="mb-6 flex items-center justify-between border-b border-white/10 pb-4">
           <div>
-            <p className="mono-label text-[#d4af37]">Cadastro de Empreendimento</p>
-            <h2 className="serif text-3xl text-white">{property ? 'Editar Produto' : 'Novo Produto'}</h2>
+            <p className="mono-label text-[#d4af37]">
+              Cadastro de Empreendimento
+            </p>
+            <h2 className="serif text-3xl text-white">
+              {property ? "Editar Produto" : "Novo Produto"}
+            </h2>
           </div>
-          <button onClick={onClose} className="text-[#9a9a9a] hover:text-white" aria-label="Fechar">
+          <button
+            onClick={onClose}
+            className="text-[#9a9a9a] hover:text-white"
+            aria-label="Fechar"
+          >
             <X />
           </button>
         </div>
 
-        <form onSubmit={submit} className="grid gap-4 sm:grid-cols-2" data-testid="form-admin-property">
+        <form
+          onSubmit={submit}
+          className="grid gap-4 sm:grid-cols-2"
+          data-testid="form-admin-property"
+        >
           <label>
             <span className="admin-label">Nome do Produto *</span>
-            <input name="title" defaultValue={property?.title} required placeholder="Ex: Bauhaus" className="admin-input" />
+            <input
+              name="title"
+              defaultValue={property?.title}
+              required
+              placeholder="Ex: Bauhaus"
+              className="admin-input"
+            />
           </label>
           <label>
             <span className="admin-label">Construtora / Incorporadora</span>
-            <input name="builder" defaultValue={(property as any)?.builder || 'Sousa Andrade'} placeholder="Ex: Sousa Andrade / Opus" className="admin-input" />
+            <input
+              name="builder"
+              defaultValue={(property as any)?.builder || "Sousa Andrade"}
+              placeholder="Ex: Sousa Andrade / Opus"
+              className="admin-input"
+            />
           </label>
           <label>
             <span className="admin-label">Cidade / Região *</span>
-            <input name="location" defaultValue={property?.location} required placeholder="Ex: Goiânia, GO" className="admin-input" />
+            <input
+              name="location"
+              defaultValue={property?.location}
+              required
+              placeholder="Ex: Goiânia, GO"
+              className="admin-input"
+            />
           </label>
           <label>
             <span className="admin-label">Bairro / Setor *</span>
-            <input name="neighborhood" defaultValue={property?.neighborhood} required placeholder="Ex: Setor Bueno" className="admin-input" />
+            <input
+              name="neighborhood"
+              defaultValue={property?.neighborhood}
+              required
+              placeholder="Ex: Setor Bueno"
+              className="admin-input"
+            />
           </label>
           <label className="sm:col-span-2">
             <span className="admin-label">Endereço Completo</span>
-            <input name="address" defaultValue={(property as any)?.address} placeholder="Ex: Avenida T-3, Setor Bueno, em frente ao Parque Vaca Brava" className="admin-input" />
+            <input
+              name="address"
+              defaultValue={(property as any)?.address}
+              placeholder="Ex: Avenida T-3, Setor Bueno, em frente ao Parque Vaca Brava"
+              className="admin-input"
+            />
           </label>
 
           <label>
             <span className="admin-label">Categoria</span>
-            <select name="category" defaultValue={property?.category || 'Apartamentos'} className="admin-input">
+            <select
+              name="category"
+              defaultValue={property?.category || "Apartamentos"}
+              className="admin-input"
+            >
               <option>Apartamentos</option>
               <option>Coberturas</option>
               <option>Casas em Condomínio</option>
@@ -336,77 +577,193 @@ function PropertyModal({ property, onClose }: { property?: Property; onClose: ()
           </label>
           <label>
             <span className="admin-label">Preço Inicial (R$) *</span>
-            <input name="price" type="number" defaultValue={property?.price} required placeholder="Ex: 8136691" className="admin-input" />
+            <input
+              name="price"
+              type="number"
+              defaultValue={property?.price}
+              required
+              placeholder="Ex: 8136691"
+              className="admin-input"
+            />
           </label>
 
           <label>
             <span className="admin-label">Área Principal (m²) *</span>
-            <input name="area" type="number" defaultValue={property?.area} required placeholder="Ex: 398" className="admin-input" />
+            <input
+              name="area"
+              type="number"
+              defaultValue={property?.area}
+              required
+              placeholder="Ex: 398"
+              className="admin-input"
+            />
           </label>
           <label>
             <span className="admin-label">Suítes / Quartos</span>
-            <input name="suites" type="number" defaultValue={property?.suites || property?.bedrooms} placeholder="Ex: 4" className="admin-input" />
+            <input
+              name="suites"
+              type="number"
+              defaultValue={property?.suites || property?.bedrooms}
+              placeholder="Ex: 4"
+              className="admin-input"
+            />
           </label>
           <label>
             <span className="admin-label">Banheiros</span>
-            <input name="bathrooms" type="number" defaultValue={(property as any)?.bathrooms || 5} placeholder="Ex: 6" className="admin-input" />
+            <input
+              name="bathrooms"
+              type="number"
+              defaultValue={(property as any)?.bathrooms || 5}
+              placeholder="Ex: 6"
+              className="admin-input"
+            />
           </label>
           <label>
             <span className="admin-label">Vagas de Garagem</span>
-            <input name="parking" type="number" defaultValue={property?.parking} placeholder="Ex: 4" className="admin-input" />
+            <input
+              name="parking"
+              type="number"
+              defaultValue={property?.parking}
+              placeholder="Ex: 4"
+              className="admin-input"
+            />
           </label>
 
           <label className="sm:col-span-2">
-            <span className="admin-label">Descrição Completa para o Raio-X *</span>
-            <textarea name="description" defaultValue={property?.description} required rows={4} placeholder="Descreva os diferenciais, vista, lazer, acabamentos..." className="admin-input" />
+            <span className="admin-label">
+              Descrição Completa para o Raio-X *
+            </span>
+            <textarea
+              name="description"
+              defaultValue={property?.description}
+              required
+              rows={4}
+              placeholder="Descreva os diferenciais, vista, lazer, acabamentos..."
+              className="admin-input"
+            />
           </label>
 
           <label className="sm:col-span-2">
-            <span className="admin-label">Imagens Principais (URLs, uma por linha)</span>
-            <textarea name="images" defaultValue={property?.images?.join('\n')} rows={3} placeholder="https://..." className="admin-input font-mono text-xs" />
+            <span className="admin-label">
+              Imagens Principais (URLs, uma por linha)
+            </span>
+            <textarea
+              name="images"
+              defaultValue={property?.images?.join("\n")}
+              rows={3}
+              placeholder="https://..."
+              className="admin-input font-mono text-xs"
+            />
           </label>
 
           <label className="sm:col-span-2">
-            <span className="admin-label">Galeria de Fotos Completa (URLs, uma por linha)</span>
-            <textarea name="gallery" defaultValue={(property as any)?.gallery?.join('\n')} rows={3} placeholder="https://..." className="admin-input font-mono text-xs" />
+            <span className="admin-label">
+              Galeria de Fotos Completa (URLs, uma por linha)
+            </span>
+            <textarea
+              name="gallery"
+              defaultValue={(property as any)?.gallery?.join("\n")}
+              rows={3}
+              placeholder="https://..."
+              className="admin-input font-mono text-xs"
+            />
           </label>
 
           {/* Configuração de Planta do Raio-X */}
           <div className="sm:col-span-2 rounded-2xl border border-white/10 bg-black/40 p-4 space-y-3">
-            <p className="mono-label text-xs text-[#d4af37]">Configuração da Planta 1 do Raio-X</p>
+            <p className="mono-label text-xs text-[#d4af37]">
+              Configuração da Planta 1 do Raio-X
+            </p>
             <div className="grid gap-3 sm:grid-cols-2">
-              <input name="fp1Title" defaultValue={(property as any)?.floorplans?.[0]?.title || 'Planta 700 - 398.78m²'} placeholder="Título da Planta (ex: Planta 700 - 398m²)" className="admin-input text-xs" />
-              <input name="fp1Price" type="number" defaultValue={(property as any)?.floorplans?.[0]?.price} placeholder="Preço da Planta (R$)" className="admin-input text-xs" />
-              <input name="fp1Area" defaultValue={(property as any)?.floorplans?.[0]?.area} placeholder="Metragem (ex: 398.78m²)" className="admin-input text-xs" />
-              <input name="fp1Image" defaultValue={(property as any)?.floorplans?.[0]?.image} placeholder="URL da Imagem da Planta Técnica" className="admin-input text-xs font-mono" />
+              <input
+                name="fp1Title"
+                defaultValue={
+                  (property as any)?.floorplans?.[0]?.title ||
+                  "Planta 700 - 398.78m²"
+                }
+                placeholder="Título da Planta (ex: Planta 700 - 398m²)"
+                className="admin-input text-xs"
+              />
+              <input
+                name="fp1Price"
+                type="number"
+                defaultValue={(property as any)?.floorplans?.[0]?.price}
+                placeholder="Preço da Planta (R$)"
+                className="admin-input text-xs"
+              />
+              <input
+                name="fp1Area"
+                defaultValue={(property as any)?.floorplans?.[0]?.area}
+                placeholder="Metragem (ex: 398.78m²)"
+                className="admin-input text-xs"
+              />
+              <input
+                name="fp1Image"
+                defaultValue={(property as any)?.floorplans?.[0]?.image}
+                placeholder="URL da Imagem da Planta Técnica"
+                className="admin-input text-xs font-mono"
+              />
             </div>
           </div>
 
           <label>
-            <span className="admin-label">Badges / Destaques (separados por vírgula)</span>
-            <input name="badges" defaultValue={property?.badges?.join(', ')} placeholder="FRENTE AO PARQUE, EXCLUSIVO" className="admin-input" />
+            <span className="admin-label">
+              Badges / Destaques (separados por vírgula)
+            </span>
+            <input
+              name="badges"
+              defaultValue={property?.badges?.join(", ")}
+              placeholder="FRENTE AO PARQUE, EXCLUSIVO"
+              className="admin-input"
+            />
           </label>
           <label>
             <span className="admin-label">URL do Material PDF (opcional)</span>
-            <input name="pdfUrl" defaultValue={(property as any)?.pdfUrl} placeholder="https://..." className="admin-input font-mono text-xs" />
+            <input
+              name="pdfUrl"
+              defaultValue={(property as any)?.pdfUrl}
+              placeholder="https://..."
+              className="admin-input font-mono text-xs"
+            />
           </label>
 
           <label className="sm:col-span-2">
             <span className="admin-label">URL da Landing Page Individual</span>
-            <input name="lpUrl" defaultValue={property?.lpUrl || `/lp/${property?.id || ''}`} placeholder="/lp/nome-do-produto" className="admin-input font-mono text-xs" />
+            <input
+              name="lpUrl"
+              defaultValue={property?.lpUrl || `/lp/${property?.id || ""}`}
+              placeholder="/lp/nome-do-produto"
+              className="admin-input font-mono text-xs"
+            />
           </label>
 
           <label className="flex items-center gap-3 sm:col-span-2">
-            <input type="checkbox" name="featured" defaultChecked={property?.featured ?? true} className="h-4 w-4 accent-[#d4af37]" />
-            <span className="text-sm text-[#c9c9c9]">Exibir em destaque no catálogo Signature</span>
+            <input
+              type="checkbox"
+              name="featured"
+              defaultChecked={property?.featured ?? true}
+              className="h-4 w-4 accent-[#d4af37]"
+            />
+            <span className="text-sm text-[#c9c9c9]">
+              Exibir em destaque no catálogo Signature
+            </span>
           </label>
 
           <div className="flex justify-end gap-3 pt-4 sm:col-span-2 border-t border-white/10">
-            <button type="button" onClick={onClose} className="rounded-xl border border-white/15 px-5 py-3 text-xs text-[#c9c9c9]">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-xl border border-white/15 px-5 py-3 text-xs text-[#c9c9c9]"
+            >
               Cancelar
             </button>
-            <button type="submit" className="metal-button rounded-xl px-7 py-3 text-xs font-bold">
-              {create.isPending || update.isPending ? 'Salvando...' : 'Salvar Produto'}
+            <button
+              type="submit"
+              className="metal-button rounded-xl px-7 py-3 text-xs font-bold"
+            >
+              {create.isPending || update.isPending
+                ? "Salvando..."
+                : "Salvar Produto"}
             </button>
           </div>
         </form>
@@ -421,12 +778,20 @@ function Catalog() {
   const query = useListProperties();
   const remove = useDeleteProperty();
 
-  const [modal, setModal] = useState<Property | 'new' | null>(null);
+  const [modal, setModal] = useState<Property | "new" | null>(null);
   const [raioXProperty, setRaioXProperty] = useState<Property | null>(null);
 
   function deleteProperty(property: Property) {
     if (window.confirm(`Excluir o produto ${property.title}?`)) {
-      remove.mutate({ propertyId: property.id }, { onSuccess: () => queryClient.invalidateQueries({ queryKey: getListPropertiesQueryKey() }) });
+      remove.mutate(
+        { propertyId: property.id },
+        {
+          onSuccess: () =>
+            queryClient.invalidateQueries({
+              queryKey: getListPropertiesQueryKey(),
+            }),
+        },
+      );
     }
   }
 
@@ -437,9 +802,9 @@ function Catalog() {
 
   function fetchSync() {
     setSyncLoading(true);
-    fetch('/api/crm/sync')
-      .then(res => res.json())
-      .then(data => {
+    fetch("/api/crm/sync")
+      .then((res) => res.json())
+      .then((data) => {
         setSyncItems(data || []);
         setSelectedSync([]);
         setShowSync(true);
@@ -450,14 +815,16 @@ function Catalog() {
   function handleImport() {
     if (selectedSync.length === 0) return;
     setSyncLoading(true);
-    fetch('/api/crm/import', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ids: selectedSync })
+    fetch("/api/crm/import", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids: selectedSync }),
     })
       .then(() => {
         setShowSync(false);
-        queryClient.invalidateQueries({ queryKey: getListPropertiesQueryKey() });
+        queryClient.invalidateQueries({
+          queryKey: getListPropertiesQueryKey(),
+        });
       })
       .finally(() => setSyncLoading(false));
   }
@@ -469,13 +836,26 @@ function Catalog() {
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
         <div>
           <p className="mono-label text-[#d4af37]">Gestão de Produtos</p>
-          <h1 className="serif mt-2 text-4xl text-white">Catálogo de Empreendimentos</h1>
+          <h1 className="serif mt-2 text-4xl text-white">
+            Catálogo de Empreendimentos
+          </h1>
         </div>
         <div className="flex gap-3">
-          <button onClick={fetchSync} disabled={syncLoading} className="metal-button flex h-11 items-center justify-center gap-2 rounded-full px-5 text-xs font-bold bg-[#1a1a1a] border border-[#d4af37]/40 text-[#e8c766] hover:bg-[#d4af37]/10">
-            <RefreshCw size={16} className={syncLoading ? "animate-spin" : ""} /> Sincronizar CRM
+          <button
+            onClick={fetchSync}
+            disabled={syncLoading}
+            className="metal-button flex h-11 items-center justify-center gap-2 rounded-full px-5 text-xs font-bold bg-[#1a1a1a] border border-[#d4af37]/40 text-[#e8c766] hover:bg-[#d4af37]/10"
+          >
+            <RefreshCw
+              size={16}
+              className={syncLoading ? "animate-spin" : ""}
+            />{" "}
+            Sincronizar CRM
           </button>
-          <button onClick={() => setModal('new')} className="metal-button flex h-11 items-center justify-center gap-2 rounded-full px-5 text-xs font-bold">
+          <button
+            onClick={() => setModal("new")}
+            className="metal-button flex h-11 items-center justify-center gap-2 rounded-full px-5 text-xs font-bold"
+          >
             <Plus size={16} /> Novo Produto
           </button>
         </div>
@@ -493,7 +873,7 @@ function Catalog() {
         <EmptyState
           title="Nenhum produto cadastrado"
           description="Clique em '+ Novo Produto' para cadastrar o primeiro empreendimento com Raio-X e Landing Page."
-          onReset={() => setModal('new')}
+          onReset={() => setModal("new")}
         />
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-white/10 bg-[#121212]">
@@ -510,19 +890,39 @@ function Catalog() {
             </thead>
             <tbody>
               {properties.map((property) => (
-                <tr key={property.id} className="border-b border-white/5 last:border-0 hover:bg-white/[.02]">
+                <tr
+                  key={property.id}
+                  className="border-b border-white/5 last:border-0 hover:bg-white/[.02]"
+                >
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
-                      <img src={property.images?.[0] || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'} alt="" className="h-11 w-14 rounded-lg object-cover" />
+                      <img
+                        src={
+                          property.images?.[0] ||
+                          "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80"
+                        }
+                        alt=""
+                        className="h-11 w-14 rounded-lg object-cover"
+                      />
                       <div>
-                        <p className="text-sm font-semibold text-white">{property.title}</p>
-                        <p className="text-[11px] text-[#ababab]">{property.category} · {property.area} m²</p>
+                        <p className="text-sm font-semibold text-white">
+                          {property.title}
+                        </p>
+                        <p className="text-[11px] text-[#ababab]">
+                          {property.category} · {property.area} m²
+                        </p>
                       </div>
                     </div>
                   </td>
-                  <td className="text-xs text-[#c9c9c9]">{(property as any).builder || 'Sousa Andrade'}</td>
-                  <td className="text-xs text-[#9a9a9a]">{property.neighborhood}, {property.location}</td>
-                  <td className="text-sm text-[#e8c766]">{money(property.price)}</td>
+                  <td className="text-xs text-[#c9c9c9]">
+                    {(property as any).builder || "Sousa Andrade"}
+                  </td>
+                  <td className="text-xs text-[#9a9a9a]">
+                    {property.neighborhood}, {property.location}
+                  </td>
+                  <td className="text-sm text-[#e8c766]">
+                    {money(property.price)}
+                  </td>
                   <td>
                     <span className="rounded-full bg-[#4caf6d]/10 px-3 py-1 text-[10px] text-[#7acb8e]">
                       Disponível
@@ -569,50 +969,110 @@ function Catalog() {
         </div>
       )}
 
-      {modal && <PropertyModal property={modal === 'new' ? undefined : modal} onClose={() => setModal(null)} />}
-      {raioXProperty && <RaioXModal property={raioXProperty} onClose={() => setRaioXProperty(null)} />}
-      
+      {modal && (
+        <PropertyModal
+          property={modal === "new" ? undefined : modal}
+          onClose={() => setModal(null)}
+        />
+      )}
+      {raioXProperty && (
+        <RaioXModal
+          property={raioXProperty}
+          onClose={() => setRaioXProperty(null)}
+        />
+      )}
+
       {showSync && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4">
           <div className="w-full max-w-2xl rounded-3xl border border-[#d4af37]/30 bg-[#121212] p-8">
             <div className="mb-6 flex items-center justify-between">
               <div>
-                <h2 className="serif text-2xl text-white">Fila de Importação CRM</h2>
-                <p className="text-xs text-[#ababab]">Selecione os imóveis que deseja importar para o catálogo público.</p>
+                <h2 className="serif text-2xl text-white">
+                  Fila de Importação CRM
+                </h2>
+                <p className="text-xs text-[#ababab]">
+                  Selecione os imóveis que deseja importar para o catálogo
+                  público.
+                </p>
               </div>
-              <button onClick={() => setShowSync(false)} className="text-[#9a9a9a] hover:text-white"><X /></button>
+              <button
+                onClick={() => setShowSync(false)}
+                className="text-[#9a9a9a] hover:text-white"
+              >
+                <X />
+              </button>
             </div>
-            
+
             <div className="max-h-[50vh] overflow-y-auto space-y-3 mb-6 pr-2">
               {syncItems.length === 0 ? (
-                <p className="text-sm text-[#ababab] text-center py-10">Nenhum imóvel pendente no momento.</p>
+                <p className="text-sm text-[#ababab] text-center py-10">
+                  Nenhum imóvel pendente no momento.
+                </p>
               ) : (
-                syncItems.map(item => {
-                  const title = item.payload?.titulo || item.payload?.nome || item.payload?.title || `CRM #${item.crm_id}`;
+                syncItems.map((item) => {
+                  const title =
+                    item.payload?.titulo ||
+                    item.payload?.nome ||
+                    item.payload?.title ||
+                    `CRM #${item.crm_id}`;
                   const price = item.payload?.valor || item.payload?.price || 0;
                   const isChecked = selectedSync.includes(item.id);
                   return (
-                    <label key={item.id} className={`flex cursor-pointer items-start gap-4 rounded-xl border p-4 transition ${isChecked ? 'border-[#d4af37] bg-[#d4af37]/10' : 'border-white/10 bg-[#161616] hover:bg-white/5'}`}>
-                      <input type="checkbox" checked={isChecked} onChange={(e) => setSelectedSync(prev => e.target.checked ? [...prev, item.id] : prev.filter(id => id !== item.id))} className="mt-1 h-5 w-5 accent-[#d4af37]" />
+                    <label
+                      key={item.id}
+                      className={`flex cursor-pointer items-start gap-4 rounded-xl border p-4 transition ${isChecked ? "border-[#d4af37] bg-[#d4af37]/10" : "border-white/10 bg-[#161616] hover:bg-white/5"}`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={(e) =>
+                          setSelectedSync((prev) =>
+                            e.target.checked
+                              ? [...prev, item.id]
+                              : prev.filter((id) => id !== item.id),
+                          )
+                        }
+                        className="mt-1 h-5 w-5 accent-[#d4af37]"
+                      />
                       <div>
-                        <p className="text-sm font-semibold text-white">{title}</p>
-                        <p className="text-xs text-[#ababab]">CRM ID: {item.crm_id} · Recebido em: {new Date(item.created_at).toLocaleDateString('pt-BR')}</p>
+                        <p className="text-sm font-semibold text-white">
+                          {title}
+                        </p>
+                        <p className="text-xs text-[#ababab]">
+                          CRM ID: {item.crm_id} · Recebido em:{" "}
+                          {new Date(item.created_at).toLocaleDateString(
+                            "pt-BR",
+                          )}
+                        </p>
                       </div>
                       <div className="ml-auto text-right">
-                        <p className="text-sm font-bold text-[#e8c766]">{money(Number(price))}</p>
+                        <p className="text-sm font-bold text-[#e8c766]">
+                          {money(Number(price))}
+                        </p>
                       </div>
                     </label>
                   );
                 })
               )}
             </div>
-            
+
             <div className="flex justify-between items-center border-t border-white/10 pt-5">
-              <span className="text-xs text-[#9a9a9a]">{selectedSync.length} selecionado(s)</span>
+              <span className="text-xs text-[#9a9a9a]">
+                {selectedSync.length} selecionado(s)
+              </span>
               <div className="flex gap-3">
-                <button onClick={() => setShowSync(false)} className="rounded-xl px-5 py-3 text-xs text-[#c9c9c9] hover:bg-white/5">Cancelar</button>
-                <button onClick={handleImport} disabled={syncLoading || selectedSync.length === 0} className="metal-button rounded-xl px-6 py-3 text-xs font-bold disabled:opacity-50">
-                  {syncLoading ? 'Importando...' : 'Importar Selecionados'}
+                <button
+                  onClick={() => setShowSync(false)}
+                  className="rounded-xl px-5 py-3 text-xs text-[#c9c9c9] hover:bg-white/5"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleImport}
+                  disabled={syncLoading || selectedSync.length === 0}
+                  className="metal-button rounded-xl px-6 py-3 text-xs font-bold disabled:opacity-50"
+                >
+                  {syncLoading ? "Importando..." : "Importar Selecionados"}
                 </button>
               </div>
             </div>
@@ -625,15 +1085,19 @@ function Catalog() {
 
 // Aba de Blog & Agente de IA (Integrado com OpenRouter API)
 function BlogAgent() {
-  const [apiKey, setApiKey] = useState<string>(() => localStorage.getItem('openrouter_key') || '');
-  const [model, setModel] = useState<string>('google/gemini-2.5-flash');
-  const [topic, setTopic] = useState<string>('Tendências e Valorização Imobiliária no Setor Bueno e Marista em Goiânia');
+  const [apiKey, setApiKey] = useState<string>(
+    () => localStorage.getItem("openrouter_key") || "",
+  );
+  const [model, setModel] = useState<string>("google/gemini-2.5-flash");
+  const [topic, setTopic] = useState<string>(
+    "Tendências e Valorização Imobiliária no Setor Bueno e Marista em Goiânia",
+  );
   const [posts, setPosts] = useState<any[]>([]);
   const [generating, setGenerating] = useState(false);
-  const [statusMsg, setStatusMsg] = useState('');
+  const [statusMsg, setStatusMsg] = useState("");
 
   const fetchPosts = () => {
-    fetch('/api/blog')
+    fetch("/api/blog")
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) setPosts(data);
@@ -647,40 +1111,42 @@ function BlogAgent() {
 
   function handleSaveKey(e: FormEvent) {
     e.preventDefault();
-    localStorage.setItem('openrouter_key', apiKey);
-    setStatusMsg('Chave do OpenRouter salva com sucesso!');
-    setTimeout(() => setStatusMsg(''), 3000);
+    localStorage.setItem("openrouter_key", apiKey);
+    setStatusMsg("Chave do OpenRouter salva com sucesso!");
+    setTimeout(() => setStatusMsg(""), 3000);
   }
 
   function handleGeneratePost(e: FormEvent) {
     e.preventDefault();
     if (!apiKey) {
-      alert('Insira a sua chave da OpenRouter API Key para acionar o agente de IA.');
+      alert(
+        "Insira a sua chave da OpenRouter API Key para acionar o agente de IA.",
+      );
       return;
     }
 
     setGenerating(true);
-    setStatusMsg('Agente de IA pesquisando e escrevendo artigo...');
+    setStatusMsg("Agente de IA pesquisando e escrevendo artigo...");
 
-    fetch('/api/blog/generate-ai', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    fetch("/api/blog/generate-ai", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         apiKey,
         model,
         topic,
-        region: 'Goiânia - GO',
+        region: "Goiânia - GO",
       }),
     })
       .then(async (res) => {
         if (!res.ok) {
           const err = await res.json();
-          throw new Error(err.message || 'Erro ao gerar artigo.');
+          throw new Error(err.message || "Erro ao gerar artigo.");
         }
         return res.json();
       })
       .then(() => {
-        setStatusMsg('Artigo criado e publicado no Blog com sucesso!');
+        setStatusMsg("Artigo criado e publicado no Blog com sucesso!");
         fetchPosts();
       })
       .catch((err) => {
@@ -692,28 +1158,40 @@ function BlogAgent() {
   }
 
   function handleDeletePost(id: string) {
-    if (confirm('Deseja excluir este artigo do blog?')) {
-      fetch(`/api/blog/${id}`, { method: 'DELETE' }).then(() => fetchPosts());
+    if (confirm("Deseja excluir este artigo do blog?")) {
+      fetch(`/api/blog/${id}`, { method: "DELETE" }).then(() => fetchPosts());
     }
   }
 
   return (
     <div className="space-y-8 max-w-4xl">
       <div>
-        <p className="mono-label text-[#d4af37]">Automação com Inteligência Artificial</p>
-        <h1 className="serif mt-2 text-4xl text-white">Agente de IA do Blog (OpenRouter API)</h1>
+        <p className="mono-label text-[#d4af37]">
+          Automação com Inteligência Artificial
+        </p>
+        <h1 className="serif mt-2 text-4xl text-white">
+          Agente de IA do Blog (OpenRouter API)
+        </h1>
         <p className="mt-2 text-sm text-[#ababab]">
-          Gere matérias completas e aprofundadas sobre o mercado imobiliário em Goiânia utilizando IA.
+          Gere matérias completas e aprofundadas sobre o mercado imobiliário em
+          Goiânia utilizando IA.
         </p>
       </div>
 
       {/* Configuração da Chave OpenRouter */}
-      <form onSubmit={handleSaveKey} className="rounded-2xl border border-white/10 bg-[#121212] p-6 space-y-4">
+      <form
+        onSubmit={handleSaveKey}
+        className="rounded-2xl border border-white/10 bg-[#121212] p-6 space-y-4"
+      >
         <div className="flex items-center gap-3">
           <Bot size={24} className="text-[#d4af37]" />
           <div>
-            <h2 className="text-base font-semibold text-white">Conexão OpenRouter API</h2>
-            <p className="text-xs text-[#ababab]">Insira sua chave obtida em openrouter.ai</p>
+            <h2 className="text-base font-semibold text-white">
+              Conexão OpenRouter API
+            </h2>
+            <p className="text-xs text-[#ababab]">
+              Insira sua chave obtida em openrouter.ai
+            </p>
           </div>
         </div>
 
@@ -725,32 +1203,52 @@ function BlogAgent() {
             placeholder="sk-or-v1-..."
             className="admin-input flex-1 font-mono text-xs"
           />
-          <button type="submit" className="rounded-xl border border-[#d4af37]/40 bg-[#d4af37]/10 px-5 text-xs text-[#e8c766]">
+          <button
+            type="submit"
+            className="rounded-xl border border-[#d4af37]/40 bg-[#d4af37]/10 px-5 text-xs text-[#e8c766]"
+          >
             Salvar Chave
           </button>
         </div>
       </form>
 
       {/* Form de Geração de Artigos com IA */}
-      <form onSubmit={handleGeneratePost} className="rounded-2xl border border-[#d4af37]/30 bg-[#161618] p-6 space-y-5">
+      <form
+        onSubmit={handleGeneratePost}
+        className="rounded-2xl border border-[#d4af37]/30 bg-[#161618] p-6 space-y-5"
+      >
         <div className="flex items-center gap-3">
           <Sparkles size={22} className="text-[#e8c766]" />
-          <h2 className="serif text-2xl text-white">Gerar Novo Artigo com IA</h2>
+          <h2 className="serif text-2xl text-white">
+            Gerar Novo Artigo com IA
+          </h2>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
           <div>
             <label className="admin-label">Modelo OpenRouter</label>
-            <select value={model} onChange={(e) => setModel(e.target.value)} className="admin-input">
-              <option value="google/gemini-2.5-flash">Google Gemini 2.5 Flash (Rápido e Barato)</option>
+            <select
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              className="admin-input"
+            >
+              <option value="google/gemini-2.5-flash">
+                Google Gemini 2.5 Flash (Rápido e Barato)
+              </option>
               <option value="openai/gpt-4o-mini">OpenAI GPT-4o Mini</option>
-              <option value="anthropic/claude-3-haiku">Anthropic Claude 3 Haiku</option>
+              <option value="anthropic/claude-3-haiku">
+                Anthropic Claude 3 Haiku
+              </option>
             </select>
           </div>
 
           <div>
             <label className="admin-label">Região Alvo</label>
-            <input value="Goiânia - GO (Setor Bueno, Marista, Oeste)" readOnly className="admin-input bg-black/40 text-[#9a9a9a]" />
+            <input
+              value="Goiânia - GO (Setor Bueno, Marista, Oeste)"
+              readOnly
+              className="admin-input bg-black/40 text-[#9a9a9a]"
+            />
           </div>
         </div>
 
@@ -769,20 +1267,33 @@ function BlogAgent() {
           disabled={generating}
           className="metal-button flex items-center justify-center gap-2 w-full rounded-xl py-4 text-xs font-bold"
         >
-          {generating ? <RefreshCw size={16} className="animate-spin" /> : <Bot size={16} />}
-          {generating ? 'Pesquisando e Gerando Artigo...' : 'Iniciar Agente de IA para Escrever Artigo'}
+          {generating ? (
+            <RefreshCw size={16} className="animate-spin" />
+          ) : (
+            <Bot size={16} />
+          )}
+          {generating
+            ? "Pesquisando e Gerando Artigo..."
+            : "Iniciar Agente de IA para Escrever Artigo"}
         </button>
 
-        {statusMsg && <p className="text-xs text-[#7acb8e] text-center">{statusMsg}</p>}
+        {statusMsg && (
+          <p className="text-xs text-[#7acb8e] text-center">{statusMsg}</p>
+        )}
       </form>
 
       {/* Lista de Artigos Publicados */}
       <div className="space-y-4">
-        <h2 className="serif text-2xl text-white">Artigos Publicados ({posts.length})</h2>
+        <h2 className="serif text-2xl text-white">
+          Artigos Publicados ({posts.length})
+        </h2>
 
         <div className="space-y-3">
           {posts.map((post) => (
-            <div key={post.id} className="flex items-center justify-between rounded-xl border border-white/10 bg-[#121212] p-4">
+            <div
+              key={post.id}
+              className="flex items-center justify-between rounded-xl border border-white/10 bg-[#121212] p-4"
+            >
               <div>
                 <p className="text-sm font-semibold text-white">{post.title}</p>
                 <p className="text-xs text-[#ababab]">
@@ -810,7 +1321,7 @@ function Leads() {
   const update = useUpdateLead();
   const leads = Array.isArray(query.data) ? query.data : [];
 
-  function moveLead(lead: Lead, status: Lead['status']) {
+  function moveLead(lead: Lead, status: Lead["status"]) {
     const data: LeadInput = {
       name: lead.name,
       email: lead.email,
@@ -821,7 +1332,13 @@ function Leads() {
       source: lead.source,
       note: lead.note,
     };
-    update.mutate({ leadId: lead.id, data }, { onSuccess: () => queryClient.invalidateQueries({ queryKey: getListLeadsQueryKey() }) });
+    update.mutate(
+      { leadId: lead.id, data },
+      {
+        onSuccess: () =>
+          queryClient.invalidateQueries({ queryKey: getListLeadsQueryKey() }),
+      },
+    );
   }
 
   return (
@@ -831,7 +1348,10 @@ function Leads() {
           <p className="mono-label text-[#d4af37]">CRM Lopes Signature</p>
           <h1 className="serif mt-2 text-4xl text-white">Pipeline de Leads</h1>
         </div>
-        <button onClick={() => query.refetch()} className="flex h-10 items-center gap-2 rounded-full border border-white/10 px-4 text-xs text-[#9a9a9a]">
+        <button
+          onClick={() => query.refetch()}
+          className="flex h-10 items-center gap-2 rounded-full border border-white/10 px-4 text-xs text-[#9a9a9a]"
+        >
           <Activity size={14} /> Atualizar
         </button>
       </div>
@@ -845,28 +1365,45 @@ function Leads() {
       ) : (
         <div className="flex gap-4 overflow-x-auto pb-4">
           {leadColumns.map((column) => (
-            <div key={column.key} className="min-w-[260px] flex-1 rounded-2xl bg-[#0f0f0f] p-3">
+            <div
+              key={column.key}
+              className="min-w-[260px] flex-1 rounded-2xl bg-[#0f0f0f] p-3"
+            >
               <div className="mb-3 flex items-center justify-between px-2">
-                <p className="text-xs font-semibold text-white">{column.label}</p>
-                <span className="text-xs text-[#ababab]">{leads.filter((lead) => lead.status === column.key).length}</span>
+                <p className="text-xs font-semibold text-white">
+                  {column.label}
+                </p>
+                <span className="text-xs text-[#ababab]">
+                  {leads.filter((lead) => lead.status === column.key).length}
+                </span>
               </div>
               <div className="space-y-3">
                 {leads
                   .filter((lead) => lead.status === column.key)
                   .map((lead) => (
-                    <article key={lead.id} className="rounded-xl border border-white/10 bg-[#181818] p-4">
+                    <article
+                      key={lead.id}
+                      className="rounded-xl border border-white/10 bg-[#181818] p-4"
+                    >
                       <div className="flex items-start justify-between">
                         <div>
-                          <p className="text-sm font-semibold text-white">{lead.name}</p>
-                          <p className="mt-1 line-clamp-1 text-[11px] text-[#9a9a9a]">{lead.propertyTitle || 'Interesse geral'}</p>
+                          <p className="text-sm font-semibold text-white">
+                            {lead.name}
+                          </p>
+                          <p className="mt-1 line-clamp-1 text-[11px] text-[#9a9a9a]">
+                            {lead.propertyTitle || "Interesse geral"}
+                          </p>
                         </div>
                       </div>
                       <p className="mt-3 text-[11px] text-[#ababab]">
-                        {new Date(lead.createdAt).toLocaleDateString('pt-BR')} · {lead.source}
+                        {new Date(lead.createdAt).toLocaleDateString("pt-BR")} ·{" "}
+                        {lead.source}
                       </p>
                       <select
                         value={lead.status}
-                        onChange={(event) => moveLead(lead, event.target.value as Lead['status'])}
+                        onChange={(event) =>
+                          moveLead(lead, event.target.value as Lead["status"])
+                        }
                         className="mt-3 h-9 w-full rounded-lg border border-white/10 bg-[#101010] px-2 text-[11px] text-[#c9c9c9]"
                       >
                         {leadColumns.map((item) => (
@@ -897,12 +1434,12 @@ function Tracking() {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const data: TrackingSettings = {
-      metaPixelId: String(form.get('metaPixelId') || ''),
-      metaEnabled: form.get('metaEnabled') === 'on',
-      gtmContainerId: String(form.get('gtmContainerId') || ''),
-      ga4MeasurementId: String(form.get('ga4MeasurementId') || ''),
-      customHeadScript: String(form.get('customHeadScript') || ''),
-      customBodyScript: String(form.get('customBodyScript') || ''),
+      metaPixelId: String(form.get("metaPixelId") || ""),
+      metaEnabled: form.get("metaEnabled") === "on",
+      gtmContainerId: String(form.get("gtmContainerId") || ""),
+      ga4MeasurementId: String(form.get("ga4MeasurementId") || ""),
+      customHeadScript: String(form.get("customHeadScript") || ""),
+      customBodyScript: String(form.get("customBodyScript") || ""),
     };
     update.mutate({ data }, { onSuccess: () => setSaved(true) });
   }
@@ -921,13 +1458,26 @@ function Tracking() {
             </span>
             <div>
               <p className="text-sm font-semibold text-white">Meta Pixel</p>
-              <p className="text-xs text-[#ababab]">Eventos de conversão no Facebook/Instagram</p>
+              <p className="text-xs text-[#ababab]">
+                Eventos de conversão no Facebook/Instagram
+              </p>
             </div>
             <label className="ml-auto flex items-center gap-2 text-xs text-[#9a9a9a]">
-              <input name="metaEnabled" type="checkbox" defaultChecked={settings?.metaEnabled} className="accent-[#d4af37]" /> Ativo
+              <input
+                name="metaEnabled"
+                type="checkbox"
+                defaultChecked={settings?.metaEnabled}
+                className="accent-[#d4af37]"
+              />{" "}
+              Ativo
             </label>
           </div>
-          <input name="metaPixelId" defaultValue={settings?.metaPixelId} placeholder="ID do Meta Pixel" className="admin-input" />
+          <input
+            name="metaPixelId"
+            defaultValue={settings?.metaPixelId}
+            placeholder="ID do Meta Pixel"
+            className="admin-input"
+          />
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-[#121212] p-6">
@@ -936,26 +1486,46 @@ function Tracking() {
               <Code2 size={17} />
             </span>
             <div>
-              <p className="text-sm font-semibold text-white">Google Tag Manager & GA4</p>
+              <p className="text-sm font-semibold text-white">
+                Google Tag Manager & GA4
+              </p>
             </div>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <label>
               <span className="admin-label">GTM Container ID</span>
-              <input name="gtmContainerId" defaultValue={settings?.gtmContainerId} placeholder="GTM-XXXXXXX" className="admin-input" />
+              <input
+                name="gtmContainerId"
+                defaultValue={settings?.gtmContainerId}
+                placeholder="GTM-XXXXXXX"
+                className="admin-input"
+              />
             </label>
             <label>
               <span className="admin-label">GA4 Measurement ID</span>
-              <input name="ga4MeasurementId" defaultValue={settings?.ga4MeasurementId} placeholder="G-XXXXXXXXXX" className="admin-input" />
+              <input
+                name="ga4MeasurementId"
+                defaultValue={settings?.ga4MeasurementId}
+                placeholder="G-XXXXXXXXXX"
+                className="admin-input"
+              />
             </label>
           </div>
         </div>
 
         <div className="flex items-center gap-4">
-          <button type="submit" className="metal-button flex h-11 items-center gap-2 rounded-full px-6 text-xs font-bold">
-            <Save size={15} /> {update.isPending ? 'Salvando...' : 'Salvar configurações'}
+          <button
+            type="submit"
+            className="metal-button flex h-11 items-center gap-2 rounded-full px-6 text-xs font-bold"
+          >
+            <Save size={15} />{" "}
+            {update.isPending ? "Salvando..." : "Salvar configurações"}
           </button>
-          {saved && <span className="flex items-center gap-2 text-xs text-[#7acb8e]"><Check size={15} /> Salvo</span>}
+          {saved && (
+            <span className="flex items-center gap-2 text-xs text-[#7acb8e]">
+              <Check size={15} /> Salvo
+            </span>
+          )}
         </div>
       </form>
     </div>
@@ -963,17 +1533,17 @@ function Tracking() {
 }
 
 function AdminLoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    setErrorMsg('');
-    setSuccessMsg('');
+    setErrorMsg("");
+    setSuccessMsg("");
     setLoading(true);
 
     if (!supabase) return;
@@ -982,14 +1552,21 @@ function AdminLoginPage() {
       if (isSignUp) {
         const { error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
-        setSuccessMsg('Conta de gestão criada! Se a confirmação de e-mail estiver ativa no Supabase, verifique sua caixa de entrada.');
+        setSuccessMsg(
+          "Conta de gestão criada! Se a confirmação de e-mail estiver ativa no Supabase, verifique sua caixa de entrada.",
+        );
         setIsSignUp(false);
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
         if (error) throw error;
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Falha na autenticação. Verifique e-mail e senha.');
+      setErrorMsg(
+        err.message || "Falha na autenticação. Verifique e-mail e senha.",
+      );
     } finally {
       setLoading(false);
     }
@@ -1000,8 +1577,12 @@ function AdminLoginPage() {
       <div className="w-full max-w-md rounded-3xl border border-[#d4af37]/30 bg-[#121212] p-8 shadow-2xl md:p-10">
         <div className="mb-8 text-center">
           <PageLogo />
-          <h2 className="serif mt-4 text-2xl text-white">Painel Administrativo</h2>
-          <p className="mt-1 text-xs text-[#ababab]">Acesso restrito à gestão Lopes Signature (Supabase Auth)</p>
+          <h2 className="serif mt-4 text-2xl text-white">
+            Painel Administrativo
+          </h2>
+          <p className="mt-1 text-xs text-[#ababab]">
+            Acesso restrito à gestão Lopes Signature (Supabase Auth)
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -1046,16 +1627,26 @@ function AdminLoginPage() {
             disabled={loading}
             className="metal-button h-12 w-full rounded-xl text-xs font-bold uppercase tracking-wider"
           >
-            {loading ? 'Autenticando...' : isSignUp ? 'Criar Usuário de Gestão' : 'Entrar no Painel'}
+            {loading
+              ? "Autenticando..."
+              : isSignUp
+                ? "Criar Usuário de Gestão"
+                : "Entrar no Painel"}
           </button>
         </form>
 
         <div className="mt-6 border-t border-white/10 pt-4 text-center">
           <button
-            onClick={() => { setIsSignUp(!isSignUp); setErrorMsg(''); setSuccessMsg(''); }}
+            onClick={() => {
+              setIsSignUp(!isSignUp);
+              setErrorMsg("");
+              setSuccessMsg("");
+            }}
             className="text-xs text-[#d4af37] hover:underline"
           >
-            {isSignUp ? 'Já tem conta? Fazer Login' : 'Primeiro acesso? Criar usuário no Supabase'}
+            {isSignUp
+              ? "Já tem conta? Fazer Login"
+              : "Primeiro acesso? Criar usuário no Supabase"}
           </button>
         </div>
       </div>
@@ -1064,7 +1655,7 @@ function AdminLoginPage() {
 }
 
 export default function AdminPage() {
-  const [tab, setTab] = useState<Tab>('overview');
+  const [tab, setTab] = useState<Tab>("overview");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [session, setSession] = useState<any>(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -1080,7 +1671,9 @@ export default function AdminPage() {
       setAuthLoading(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
 
@@ -1094,7 +1687,9 @@ export default function AdminPage() {
       <div className="signature-shell admin-shell noise flex min-h-screen items-center justify-center text-white">
         <div className="space-y-3 text-center">
           <div className="skeleton mx-auto h-10 w-40 rounded-xl" />
-          <p className="text-xs text-[#ababab]">Verificando sessão de gestão no Supabase...</p>
+          <p className="text-xs text-[#ababab]">
+            Verificando sessão de gestão no Supabase...
+          </p>
         </div>
       </div>
     );
@@ -1106,36 +1701,54 @@ export default function AdminPage() {
 
   return (
     <div className="signature-shell admin-shell min-h-[100dvh] text-[#f5f2e9]">
-      <AdminSidebar tab={tab} setTab={setTab} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
+      <AdminSidebar
+        tab={tab}
+        setTab={setTab}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
+      />
       <div className="lg:pl-[270px]">
         <header className="sticky top-0 z-30 flex h-[76px] items-center justify-between border-b border-white/10 bg-[#0a0a0a]/90 px-5 backdrop-blur-xl md:px-10">
-          <button onClick={() => setMobileOpen(true)} className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 text-[#d4af37] lg:hidden" aria-label="Abrir menu">
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 text-[#d4af37] lg:hidden"
+            aria-label="Abrir menu"
+          >
             <Menu size={18} />
           </button>
           <div className="hidden items-center gap-2 text-xs text-[#ababab] lg:flex">
-            <span className="h-2 w-2 rounded-full bg-[#4caf6d]" /> Autenticado via Supabase Auth
+            <span className="h-2 w-2 rounded-full bg-[#4caf6d]" /> Autenticado
+            via Supabase Auth
           </div>
           <div className="ml-auto flex items-center gap-4">
-            <button className="relative text-[#9a9a9a] hover:text-white" aria-label="Notificações">
+            <button
+              className="relative text-[#9a9a9a] hover:text-white"
+              aria-label="Notificações"
+            >
               <Bell size={18} />
               <i className="absolute -right-1 -top-1 h-1.5 w-1.5 rounded-full bg-[#d4af37]" />
             </button>
             <div className="flex items-center gap-2 border-l border-white/10 pl-4">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#d4af37] text-xs font-bold text-black">
-                {session?.user?.email ? session.user.email.substring(0, 2).toUpperCase() : 'ML'}
+                {session?.user?.email
+                  ? session.user.email.substring(0, 2).toUpperCase()
+                  : "ML"}
               </div>
-              <span className="hidden text-xs text-[#c9c9c9] md:block">{session?.user?.email || 'Gestão Lopes Signature'}</span>
+              <span className="hidden text-xs text-[#c9c9c9] md:block">
+                {session?.user?.email || "Gestão Lopes Signature"}
+              </span>
               <ChevronDown size={14} className="text-[#ababab]" />
             </div>
           </div>
         </header>
 
         <main className="mx-auto max-w-[1500px] p-5 md:p-10">
-          {tab === 'overview' && <Overview />}
-          {tab === 'catalog' && <CatalogWorkspace />}
-          {tab === 'blog' && <BlogAgent />}
-          {tab === 'leads' && <Leads />}
-          {tab === 'tracking' && <Tracking />}
+          {tab === "overview" && <Overview />}
+          {tab === "catalog" && <CatalogWorkspace />}
+          {tab === "taxonomies" && <TaxonomyWorkspace />}
+          {tab === "blog" && <BlogAgent />}
+          {tab === "leads" && <Leads />}
+          {tab === "tracking" && <Tracking />}
         </main>
       </div>
     </div>

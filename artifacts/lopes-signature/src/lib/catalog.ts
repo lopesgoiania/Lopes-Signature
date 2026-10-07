@@ -13,6 +13,14 @@ export type Taxonomy = {
   show_home: boolean;
   active: boolean;
   sort_order: number;
+  meta?: {
+    description?: string;
+    seoTitle?: string;
+    seoDescription?: string;
+    indexable?: boolean;
+    filterable?: boolean;
+    scope?: string;
+  };
 };
 export const slugify = (s: string) =>
   s
@@ -89,4 +97,41 @@ export async function uploadMedia(file: File) {
       content,
     })
   ).url as string;
+}
+
+export const taxonomyHref = (t: Taxonomy) =>
+  "/imoveis/taxonomia/" + t.kind + "/" + t.slug;
+export function taxonomyMatches(
+  p: any,
+  t: Taxonomy,
+  terms: Taxonomy[],
+): boolean {
+  if (t.kind === "feature")
+    return (
+      (p.features || []).includes(t.label) ||
+      (p.floorplans || []).some((plan: any) =>
+        (plan.features || []).includes(t.label),
+      )
+    );
+  if (t.kind === "city") return (p.city || p.location) === t.label;
+  if (t.kind === "neighborhood")
+    return (
+      p.neighborhood === t.label &&
+      (p.city || p.location) === terms.find((c) => c.id === t.parent_id)?.label
+    );
+  if (t.kind === "status") return p.condition === t.label;
+  if (t.kind === "type")
+    return (
+      p.category === t.label ||
+      terms.some(
+        (child) =>
+          child.parent_id === t.id &&
+          taxonomyMatches(
+            p,
+            child,
+            terms.filter((x) => x.id !== t.id),
+          ),
+      )
+    );
+  return false;
 }
