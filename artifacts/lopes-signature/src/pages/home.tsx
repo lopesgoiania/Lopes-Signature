@@ -123,11 +123,6 @@ export default function HomePage() {
             <p className="text-sm leading-6 text-[#D0D0D0] mb-8">
               A Lopes Signature reúne essa especialização à experiência da Lopes, com atendimento próximo e orientação em cada etapa da aquisição.
             </p>
-            <ul className="flex flex-wrap gap-4 text-xs font-bold uppercase tracking-wider text-primary">
-              <li className="flex items-center gap-2"><div className="h-1 w-1 rounded-full bg-primary" /> Especialistas em alto padrão</li>
-              <li className="flex items-center gap-2"><div className="h-1 w-1 rounded-full bg-primary" /> Atendimento personalizado</li>
-              <li className="flex items-center gap-2"><div className="h-1 w-1 rounded-full bg-primary" /> Experiência Lopes</li>
-            </ul>
           </div>
         </div>
       </section>

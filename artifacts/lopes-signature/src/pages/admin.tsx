@@ -37,7 +37,7 @@ function AdminSidebar({ tab, setTab, mobileOpen, setMobileOpen }: { tab: Tab; se
       </div>
 
       <div className="mt-12">
-        <p className="mono-label mb-4 text-[#5c5c5c]">Painel de Controle</p>
+        <p className="mono-label mb-4 text-[#ababab]">Painel de Controle</p>
         {items.map(([key, label, Icon]) => (
           <button
             key={key}
@@ -58,7 +58,7 @@ function AdminSidebar({ tab, setTab, mobileOpen, setMobileOpen }: { tab: Tab; se
         <Link href="/" className="mb-4 flex items-center gap-3 text-xs text-[#9a9a9a] hover:text-[#e8c766]">
           <Globe2 size={16} /> Ver Portal Público
         </Link>
-        <button onClick={() => { if (supabase) supabase.auth.signOut(); else window.location.href = '/'; }} className="flex items-center gap-3 text-xs text-[#7a7a7a] hover:text-white">
+        <button onClick={() => { if (supabase) supabase.auth.signOut(); else window.location.href = '/'; }} className="flex items-center gap-3 text-xs text-[#ababab] hover:text-white">
           <LogOut size={16} /> Sair do Painel
         </button>
       </div>
@@ -71,9 +71,9 @@ function MetricCard({ label, value, subtext, change, icon: Icon, tone = '#d4af37
     <div className="rounded-2xl border border-white/10 bg-[#121212] p-5">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs text-[#7a7a7a]">{label}</p>
+          <p className="text-xs text-[#ababab]">{label}</p>
           <p className="mt-2 text-2xl font-semibold text-white">{value}</p>
-          {subtext && <p className="mt-1 text-[11px] text-[#7a7a7a]">{subtext}</p>}
+          {subtext && <p className="mt-1 text-[11px] text-[#ababab]">{subtext}</p>}
         </div>
         <span className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ color: tone, backgroundColor: `${tone}18` }}>
           <Icon size={19} />
@@ -81,7 +81,7 @@ function MetricCard({ label, value, subtext, change, icon: Icon, tone = '#d4af37
       </div>
       {change !== undefined && (
         <p className={`mt-3 text-[11px] ${change >= 0 ? 'text-[#7acb8e]' : 'text-[#e0554a]'}`}>
-          {change >= 0 ? '↑' : '↓'} {Math.abs(change).toFixed(1)}% <span className="text-[#5c5c5c]">vs. período anterior</span>
+          {change >= 0 ? '↑' : '↓'} {Math.abs(change).toFixed(1)}% <span className="text-[#ababab]">vs. período anterior</span>
         </p>
       )}
     </div>
@@ -115,7 +115,7 @@ function Overview() {
       <div>
         <p className="mono-label text-[#d4af37]">Painel de Performance & Métricas</p>
         <h1 className="serif mt-2 text-4xl text-white md:text-5xl">Métricas da Plataforma</h1>
-        <p className="mt-2 text-sm text-[#7a7a7a]">Acompanhamento de visitas, conversões e acessos a Landing Pages em tempo real no Supabase.</p>
+        <p className="mt-2 text-sm text-[#ababab]">Acompanhamento de visitas, conversões e acessos a Landing Pages em tempo real no Supabase.</p>
       </div>
 
       {/* Cards de Métricas Principais (Mês, Semana, Dia, Conversão) */}
@@ -132,7 +132,7 @@ function Overview() {
           <div className="mb-7 flex items-center justify-between">
             <div>
               <p className="text-sm font-semibold text-white">Evolução do Tráfego Diário</p>
-              <p className="mt-1 text-xs text-[#7a7a7a]">Visitas e geração de Leads nos últimos dias</p>
+              <p className="mt-1 text-xs text-[#ababab]">Visitas e geração de Leads nos últimos dias</p>
             </div>
             <div className="flex gap-4 text-[10px] text-[#9a9a9a]">
               <span className="flex items-center gap-1"><i className="h-2 w-2 rounded-full bg-[#d4af37]" />Visitas</span>
@@ -140,7 +140,7 @@ function Overview() {
             </div>
           </div>
           {values.length === 0 ? (
-            <div className="flex h-56 flex-col items-center justify-center rounded-xl border border-dashed border-white/10 p-6 text-center text-[#7a7a7a]">
+            <div className="flex h-56 flex-col items-center justify-center rounded-xl border border-dashed border-white/10 p-6 text-center text-[#ababab]">
               <Activity size={24} className="mb-2 text-[#d4af37]" />
               <p className="text-xs">Aguardando novos acessos registrados no Supabase...</p>
             </div>
@@ -159,7 +159,7 @@ function Overview() {
                       style={{ height: `${point.leads > 0 ? Math.max(8, (point.leads / max) * 100 * 4) : 0}%` }}
                     />
                   </div>
-                  <span className="text-center text-[10px] text-[#7a7a7a]">{point.label}</span>
+                  <span className="text-center text-[10px] text-[#ababab]">{point.label}</span>
                 </div>
               ))}
             </div>
@@ -170,14 +170,14 @@ function Overview() {
           <div className="flex items-start justify-between">
             <div>
               <p className="text-sm font-semibold text-white">Origem dos Contatos</p>
-              <p className="mt-1 text-xs text-[#7a7a7a]">Distribuição por canal de captação</p>
+              <p className="mt-1 text-xs text-[#ababab]">Distribuição por canal de captação</p>
             </div>
-            <MoreHorizontal size={17} className="text-[#7a7a7a]" />
+            <MoreHorizontal size={17} className="text-[#ababab]" />
           </div>
           <div className="mx-auto my-8 flex h-36 w-36 items-center justify-center rounded-full border-[18px] border-[#d4af37] border-r-[#5b9bd5] border-b-[#4caf6d]">
             <div className="text-center">
               <p className="text-2xl font-bold text-white">{totalLeads}</p>
-              <p className="text-[10px] text-[#7a7a7a]">leads no total</p>
+              <p className="text-[10px] text-[#ababab]">leads no total</p>
             </div>
           </div>
           <div className="space-y-3 text-xs">
@@ -498,7 +498,7 @@ function Catalog() {
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-white/10 bg-[#121212]">
           <table className="w-full min-w-[800px] text-left">
-            <thead className="border-b border-white/10 text-[10px] uppercase tracking-[.15em] text-[#7a7a7a]">
+            <thead className="border-b border-white/10 text-[10px] uppercase tracking-[.15em] text-[#ababab]">
               <tr>
                 <th className="px-5 py-4">Produto</th>
                 <th>Incorporadora</th>
@@ -516,7 +516,7 @@ function Catalog() {
                       <img src={property.images?.[0] || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'} alt="" className="h-11 w-14 rounded-lg object-cover" />
                       <div>
                         <p className="text-sm font-semibold text-white">{property.title}</p>
-                        <p className="text-[11px] text-[#7a7a7a]">{property.category} · {property.area} m²</p>
+                        <p className="text-[11px] text-[#ababab]">{property.category} · {property.area} m²</p>
                       </div>
                     </div>
                   </td>
@@ -578,14 +578,14 @@ function Catalog() {
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <h2 className="serif text-2xl text-white">Fila de Importação CRM</h2>
-                <p className="text-xs text-[#7a7a7a]">Selecione os imóveis que deseja importar para o catálogo público.</p>
+                <p className="text-xs text-[#ababab]">Selecione os imóveis que deseja importar para o catálogo público.</p>
               </div>
               <button onClick={() => setShowSync(false)} className="text-[#9a9a9a] hover:text-white"><X /></button>
             </div>
             
             <div className="max-h-[50vh] overflow-y-auto space-y-3 mb-6 pr-2">
               {syncItems.length === 0 ? (
-                <p className="text-sm text-[#7a7a7a] text-center py-10">Nenhum imóvel pendente no momento.</p>
+                <p className="text-sm text-[#ababab] text-center py-10">Nenhum imóvel pendente no momento.</p>
               ) : (
                 syncItems.map(item => {
                   const title = item.payload?.titulo || item.payload?.nome || item.payload?.title || `CRM #${item.crm_id}`;
@@ -596,7 +596,7 @@ function Catalog() {
                       <input type="checkbox" checked={isChecked} onChange={(e) => setSelectedSync(prev => e.target.checked ? [...prev, item.id] : prev.filter(id => id !== item.id))} className="mt-1 h-5 w-5 accent-[#d4af37]" />
                       <div>
                         <p className="text-sm font-semibold text-white">{title}</p>
-                        <p className="text-xs text-[#7a7a7a]">CRM ID: {item.crm_id} · Recebido em: {new Date(item.created_at).toLocaleDateString('pt-BR')}</p>
+                        <p className="text-xs text-[#ababab]">CRM ID: {item.crm_id} · Recebido em: {new Date(item.created_at).toLocaleDateString('pt-BR')}</p>
                       </div>
                       <div className="ml-auto text-right">
                         <p className="text-sm font-bold text-[#e8c766]">{money(Number(price))}</p>
@@ -702,7 +702,7 @@ function BlogAgent() {
       <div>
         <p className="mono-label text-[#d4af37]">Automação com Inteligência Artificial</p>
         <h1 className="serif mt-2 text-4xl text-white">Agente de IA do Blog (OpenRouter API)</h1>
-        <p className="mt-2 text-sm text-[#7a7a7a]">
+        <p className="mt-2 text-sm text-[#ababab]">
           Gere matérias completas e aprofundadas sobre o mercado imobiliário em Goiânia utilizando IA.
         </p>
       </div>
@@ -713,7 +713,7 @@ function BlogAgent() {
           <Bot size={24} className="text-[#d4af37]" />
           <div>
             <h2 className="text-base font-semibold text-white">Conexão OpenRouter API</h2>
-            <p className="text-xs text-[#7a7a7a]">Insira sua chave obtida em openrouter.ai</p>
+            <p className="text-xs text-[#ababab]">Insira sua chave obtida em openrouter.ai</p>
           </div>
         </div>
 
@@ -785,7 +785,7 @@ function BlogAgent() {
             <div key={post.id} className="flex items-center justify-between rounded-xl border border-white/10 bg-[#121212] p-4">
               <div>
                 <p className="text-sm font-semibold text-white">{post.title}</p>
-                <p className="text-xs text-[#7a7a7a]">
+                <p className="text-xs text-[#ababab]">
                   {post.category} · {post.date} · {post.author}
                 </p>
               </div>
@@ -848,7 +848,7 @@ function Leads() {
             <div key={column.key} className="min-w-[260px] flex-1 rounded-2xl bg-[#0f0f0f] p-3">
               <div className="mb-3 flex items-center justify-between px-2">
                 <p className="text-xs font-semibold text-white">{column.label}</p>
-                <span className="text-xs text-[#7a7a7a]">{leads.filter((lead) => lead.status === column.key).length}</span>
+                <span className="text-xs text-[#ababab]">{leads.filter((lead) => lead.status === column.key).length}</span>
               </div>
               <div className="space-y-3">
                 {leads
@@ -861,7 +861,7 @@ function Leads() {
                           <p className="mt-1 line-clamp-1 text-[11px] text-[#9a9a9a]">{lead.propertyTitle || 'Interesse geral'}</p>
                         </div>
                       </div>
-                      <p className="mt-3 text-[11px] text-[#7a7a7a]">
+                      <p className="mt-3 text-[11px] text-[#ababab]">
                         {new Date(lead.createdAt).toLocaleDateString('pt-BR')} · {lead.source}
                       </p>
                       <select
@@ -921,7 +921,7 @@ function Tracking() {
             </span>
             <div>
               <p className="text-sm font-semibold text-white">Meta Pixel</p>
-              <p className="text-xs text-[#7a7a7a]">Eventos de conversão no Facebook/Instagram</p>
+              <p className="text-xs text-[#ababab]">Eventos de conversão no Facebook/Instagram</p>
             </div>
             <label className="ml-auto flex items-center gap-2 text-xs text-[#9a9a9a]">
               <input name="metaEnabled" type="checkbox" defaultChecked={settings?.metaEnabled} className="accent-[#d4af37]" /> Ativo
@@ -996,12 +996,12 @@ function AdminLoginPage() {
   }
 
   return (
-    <div className="signature-shell noise flex min-h-screen items-center justify-center p-4">
+    <div className="signature-shell admin-shell noise flex min-h-screen items-center justify-center p-4">
       <div className="w-full max-w-md rounded-3xl border border-[#d4af37]/30 bg-[#121212] p-8 shadow-2xl md:p-10">
         <div className="mb-8 text-center">
           <PageLogo />
           <h2 className="serif mt-4 text-2xl text-white">Painel Administrativo</h2>
-          <p className="mt-1 text-xs text-[#7a7a7a]">Acesso restrito à gestão Lopes Signature (Supabase Auth)</p>
+          <p className="mt-1 text-xs text-[#ababab]">Acesso restrito à gestão Lopes Signature (Supabase Auth)</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -1091,10 +1091,10 @@ export default function AdminPage() {
 
   if (authLoading) {
     return (
-      <div className="signature-shell noise flex min-h-screen items-center justify-center text-white">
+      <div className="signature-shell admin-shell noise flex min-h-screen items-center justify-center text-white">
         <div className="space-y-3 text-center">
           <div className="skeleton mx-auto h-10 w-40 rounded-xl" />
-          <p className="text-xs text-[#7a7a7a]">Verificando sessão de gestão no Supabase...</p>
+          <p className="text-xs text-[#ababab]">Verificando sessão de gestão no Supabase...</p>
         </div>
       </div>
     );
@@ -1105,14 +1105,14 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="signature-shell min-h-[100dvh] text-[#f5f2e9]">
+    <div className="signature-shell admin-shell min-h-[100dvh] text-[#f5f2e9]">
       <AdminSidebar tab={tab} setTab={setTab} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
       <div className="lg:pl-[270px]">
         <header className="sticky top-0 z-30 flex h-[76px] items-center justify-between border-b border-white/10 bg-[#0a0a0a]/90 px-5 backdrop-blur-xl md:px-10">
           <button onClick={() => setMobileOpen(true)} className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 text-[#d4af37] lg:hidden" aria-label="Abrir menu">
             <Menu size={18} />
           </button>
-          <div className="hidden items-center gap-2 text-xs text-[#7a7a7a] lg:flex">
+          <div className="hidden items-center gap-2 text-xs text-[#ababab] lg:flex">
             <span className="h-2 w-2 rounded-full bg-[#4caf6d]" /> Autenticado via Supabase Auth
           </div>
           <div className="ml-auto flex items-center gap-4">
@@ -1125,7 +1125,7 @@ export default function AdminPage() {
                 {session?.user?.email ? session.user.email.substring(0, 2).toUpperCase() : 'ML'}
               </div>
               <span className="hidden text-xs text-[#c9c9c9] md:block">{session?.user?.email || 'Gestão Lopes Signature'}</span>
-              <ChevronDown size={14} className="text-[#7a7a7a]" />
+              <ChevronDown size={14} className="text-[#ababab]" />
             </div>
           </div>
         </header>
