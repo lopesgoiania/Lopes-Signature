@@ -57,7 +57,6 @@ export function PublicNav() {
     </div>
     {open && <nav className="glass-panel mx-auto mt-2 max-w-[1280px] rounded-3xl p-4 xl:hidden" id="signature-mobile-menu" aria-label="Menu mobile">
       <Link onClick={() => setOpen(false)} href="/imoveis" className="block rounded-xl px-4 py-3 text-sm text-[#D0D0D0] hover:bg-white/5" data-testid="link-mobile-imoveis">Imóveis</Link>
-      <Link onClick={() => setOpen(false)} href="/empreendimentos" className="block rounded-xl px-4 py-3 text-sm text-[#D0D0D0] hover:bg-white/5" data-testid="link-mobile-empreendimentos">Empreendimentos</Link>
       <Link onClick={() => setOpen(false)} href="/sobre" className="block rounded-xl px-4 py-3 text-sm text-[#D0D0D0] hover:bg-white/5" data-testid="link-mobile-sobre">Sobre nós</Link>
       <Link onClick={() => setOpen(false)} href="/especialistas" className="block rounded-xl px-4 py-3 text-sm text-[#D0D0D0] hover:bg-white/5" data-testid="link-mobile-especialistas">Especialistas</Link>
       <Link onClick={() => setOpen(false)} href="/journal" className="block rounded-xl px-4 py-3 text-sm text-[#D0D0D0] hover:bg-white/5" data-testid="link-mobile-conteudos">Journal</Link>
