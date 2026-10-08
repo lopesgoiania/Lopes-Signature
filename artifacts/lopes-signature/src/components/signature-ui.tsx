@@ -1,3 +1,4 @@
+import './property-card.css';
 import { deliveryLabel, propertyHref, propertyLocation } from '@/lib/catalog';
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';

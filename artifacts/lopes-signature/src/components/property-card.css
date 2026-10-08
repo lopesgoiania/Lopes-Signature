@@ -1,0 +1,7 @@
+/* Canonical property listing style, shared by home and all catalog routes. */
+.signature-shell .property-card {border-radius:14px;border-color:#d8d3c8;background:#fffcf8;}
+.signature-shell .property-card h3 {font-size:28px;}
+.signature-shell .property-card .metal-button {margin-top:20px;border-radius:6px;background:#25241f;color:#f4e7bf;}
+.signature-shell .property-card .metal-button:hover {background:#40392b;}
+.signature-shell .property-card p.text-primary {color:#876526;}
+.signature-shell .property-card :is(a,button):focus-visible {outline:2px solid #a77d24;outline-offset:4px;}

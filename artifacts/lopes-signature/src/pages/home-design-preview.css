@@ -13,11 +13,6 @@
 .home-preview #hp-selection {padding-top:88px;padding-bottom:96px;}
 .home-preview #hp-selection>div:first-child {margin-bottom:40px;}
 .home-preview #hp-selection h2 {font-size:clamp(38px,4.2vw,58px);line-height:1.08;}
-.home-preview .property-card {border-radius:14px;border-color:#d8d3c8;background:#fffcf8;}
-.home-preview .property-card h3 {font-size:28px;}
-.home-preview .property-card .metal-button {margin-top:20px;border-radius:6px;background:#25241f;color:#f4e7bf;}
-.home-preview .property-card .metal-button:hover {background:#40392b;}
-.home-preview .property-card p.text-primary {color:#876526;}
 .home-preview #manifesto>div {padding-top:104px;padding-bottom:104px;gap:80px;}
 .home-preview #manifesto h2 {font-size:clamp(44px,5.1vw,68px);}
 .home-preview #manifesto>div>div:last-child {border-top:1px solid #b9984d70;padding-top:32px;}
