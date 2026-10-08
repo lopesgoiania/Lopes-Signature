@@ -1,10 +1,12 @@
+import { PublicNav } from "@/components/signature-ui";
+import './home-design-preview.css';
 import { CatalogSearch } from '@/components/catalog-search';
 const EMPTY_PROPERTIES: any[] = [];
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { ArrowRight, ArrowUpRight, Building2, ChevronLeft, ChevronRight, Instagram, Linkedin, Mail, MapPin, Play, Waves } from 'lucide-react';
 import { Link } from 'wouter';
 import { useCreateLead, useListProperties, useListSpecialists, type Property } from '@workspace/api-client-react';
-import { EmptyState, ErrorState, PageLogo, PropertyCard, PublicNav, SearchBar, SectionLabel, SkeletonGrid, SpecialistAvatar, imageFor, money, propertyImages } from '@/components/signature-ui';
+import { EmptyState, ErrorState, PageLogo, PropertyCard, SearchBar, SectionLabel, SkeletonGrid, SpecialistAvatar, imageFor, money, propertyImages } from '@/components/signature-ui';
 import { RaioXModal } from '@/components/raio-x-modal';
 import { ScrollVideoHero } from '@/components/scroll-video-hero';
 
@@ -13,7 +15,7 @@ const categories = [
 ];
 
 export default function HomePage() {
-  const [search, setSearch] = useState('');
+  const [searchRevision, setSearchRevision] = useState(0);
   const [saved, setSaved] = useState<string[]>(() => {
     try {
       const parsed = JSON.parse(localStorage.getItem('lopes-saved') || '[]');
@@ -30,7 +32,14 @@ export default function HomePage() {
   const createLead = useCreateLead();
   const allProperties = Array.isArray(propertyQuery.data) ? propertyQuery.data : EMPTY_PROPERTIES;
   const [filteredProperties,setFilteredProperties] = useState<any[] | null>(null);
-  const properties = filteredProperties ?? allProperties;
+  const results = filteredProperties ?? allProperties;
+  const isFullCatalog = results.length === allProperties.length && results.every((property, index) => property.id === allProperties[index]?.id);
+  const preferred = ['Epic City Home', 'City Park Palace', 'City Park Royal', 'B.Side', 'Legacy City Home', 'City Park Majestic'];
+  const curated = useMemo(() => [...allProperties].sort((a, b) => {
+    const rank = (property: any) => { const index = preferred.findIndex(title => property.title?.toLowerCase().includes(title.toLowerCase())); return index < 0 ? preferred.length : index; };
+    return rank(a) - rank(b);
+  }).slice(0, 6), [allProperties]);
+  const properties = isFullCatalog ? curated : results;
 
   // Buscar posts dinâmicos da API /api/blog e registrar visita real
   useEffect(() => {
@@ -62,16 +71,16 @@ export default function HomePage() {
     createLead.mutate({ data: { name: String(form.get('name') || 'Interesse Signature'), email: String(form.get('email') || ''), phone: '', propertyId: '', propertyTitle: 'Newsletter Lopes Signature', status: 'new', source: 'newsletter', note: 'Inscrição no Journal Signature.' } }, { onSuccess: () => formElement.reset() });
   }
 
-  return <div className="signature-shell noise min-h-[100dvh] text-foreground">
+  return <div className="signature-shell home-preview min-h-[100dvh] text-foreground">
     <PublicNav />
     <main>
-      <ScrollVideoHero />
+      <div className="hp-hero"><ScrollVideoHero /></div>
 
       <section className="relative z-10 mx-auto -mt-8 max-w-[1180px] px-5 md:px-10" id="catalogo">
-        <CatalogSearch properties={allProperties} onResults={setFilteredProperties} home/>
+        <CatalogSearch key={searchRevision} properties={allProperties} onResults={setFilteredProperties} home/>
       </section>
 
-      <section className="mx-auto max-w-[1280px] px-5 py-24 md:px-10 md:py-32">
+      <section id="hp-selection" className="mx-auto max-w-[1280px] px-5 py-24 md:px-10 md:py-32">
         <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="max-w-2xl">
             <SectionLabel>Lopes Signature</SectionLabel>
@@ -80,31 +89,7 @@ export default function HomePage() {
           </div>
           <Link href="/imoveis" className="shrink-0 text-sm font-semibold text-primary hover:underline">Ver catálogo de imóveis</Link>
         </div>
-        {propertyQuery.isLoading ? <SkeletonGrid /> : propertyQuery.isError ? <ErrorState onRetry={() => propertyQuery.refetch()} /> : properties.length === 0 ? <EmptyState title="Nenhum empreendimento cadastrado no momento" description="" onReset={() => setSearch('')} /> : <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">{properties.map((property) => <PropertyCard key={property.id} property={property} saved={saved.includes(property.id)} onSave={() => toggleSave(property.id)} onOpenRaioX={(prop) => setSelectedRaioXProperty(prop)} />)}</div>}
-      </section>
-
-      {/* Categorias Editoriais */}
-      <section className="mx-auto max-w-[1280px] px-5 pb-24 md:px-10 md:pb-32">
-        <div className="mb-12 max-w-3xl">
-          <h2 className="serif text-3xl text-foreground md:text-4xl">Encontre seu imóvel de alto padrão em Goiânia</h2>
-          <p className="mt-4 text-sm leading-6 text-muted-foreground">Da privacidade de uma casa à praticidade de um apartamento, diferentes formas de morar pedem escolhas diferentes. Explore o catálogo pelo tipo de imóvel que faz sentido para sua rotina.</p>
-        </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {[
-            { title: 'Casas de alto padrão em Goiânia', desc: 'Explore casas com diferentes propostas de arquitetura, áreas de convivência e espaços ao ar livre. Compare as características de cada endereço e encontre opções compatíveis com o seu estilo de vida.', link: 'Ver casas de alto padrão', href: '/casas-alto-padrao-goiania' },
-            { title: 'Apartamentos de luxo em Goiânia', desc: 'Conheça apartamentos que combinam localização, distribuição dos ambientes e comodidades para o dia a dia. Consulte plantas, metragens e diferenciais dos empreendimentos disponíveis.', link: 'Ver apartamentos de luxo', href: '/apartamentos-luxo-goiania' },
-            { title: 'Coberturas em Goiânia', desc: 'Para quem busca amplitude e uma relação diferente com a cidade, explore coberturas e confira as particularidades de cada unidade, das áreas externas à configuração dos ambientes.', link: 'Conhecer coberturas', href: '/coberturas-goiania' },
-            { title: 'Empreendimentos de alto padrão em Goiânia', desc: 'Descubra projetos residenciais e compare arquitetura, localização, plantas e estágio de construção. Nossa equipe ajuda você a entender as opções disponíveis e os detalhes de cada empreendimento.', link: 'Explorar empreendimentos', href: '/empreendimentos' }
-          ].map((cat) => (
-            <div key={cat.title} className="flex flex-col justify-between rounded-3xl border border-border bg-card p-6">
-              <div>
-                <h3 className="serif text-xl text-foreground mb-3">{cat.title}</h3>
-                <p className="text-xs leading-5 text-muted-foreground mb-6">{cat.desc}</p>
-              </div>
-              <Link href={cat.href} className="text-xs font-bold text-primary hover:underline">{cat.link}</Link>
-            </div>
-          ))}
-        </div>
+        {propertyQuery.isLoading ? <SkeletonGrid /> : propertyQuery.isError ? <ErrorState onRetry={() => propertyQuery.refetch()} /> : properties.length === 0 ? <EmptyState title="Nenhum empreendimento cadastrado no momento" description="" onReset={() => {setFilteredProperties(null); setSearchRevision(value => value + 1);}} /> : <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">{properties.map((property) => <PropertyCard key={property.id} property={property} saved={saved.includes(property.id)} onSave={() => toggleSave(property.id)} onOpenRaioX={(prop) => setSelectedRaioXProperty(prop)} />)}</div>}
       </section>
 
       <section id="manifesto" className="bg-secondary text-secondary-foreground">
@@ -181,8 +166,53 @@ export default function HomePage() {
         <Link href="/journal" className="mt-10 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#876526] hover:underline">Ver todos os artigos <ArrowRight size={15} /></Link>
       </section>
 
+      <section id="contato" className="mx-auto max-w-[1280px] px-5 pb-24 md:px-10 md:pb-32">
+        <div className="relative overflow-hidden rounded-[2rem] border border-primary/20 bg-accent p-8 md:p-14">
+          <div className="relative grid gap-10 md:grid-cols-[1fr_1fr] md:items-center">
+            <div>
+              <SectionLabel>Assine o Journal Signature</SectionLabel>
+              <h2 className="serif text-3xl text-foreground md:text-4xl mt-2">Um olhar sobre o luxo. Uma leitura só sua.</h2>
+              <p className="mt-4 text-sm text-foreground/80">Receba as leituras do Journal Signature sobre arquitetura, endereços e o mercado de Goiânia.</p>
+            </div>
+            <form onSubmit={submitNewsletter} className="flex flex-col gap-3" data-testid="form-newsletter">
+              <input name="name" autoComplete="name" aria-label="Seu nome" required placeholder="Seu nome" className="h-12 rounded-xl border border-border bg-card px-4 text-sm text-foreground outline-none focus:border-primary" data-testid="input-newsletter-name" />
+              <div className="flex flex-col gap-2 md:flex-row">
+                <input name="email" autoComplete="email" aria-label="E-mail" type="email" required placeholder="seu@email.com" className="h-12 min-w-0 flex-1 rounded-xl border border-border bg-card px-4 text-sm text-foreground outline-none focus:border-primary" data-testid="input-newsletter-email" />
+                <button type="submit" disabled={createLead.isPending} className="metal-button disabled:opacity-60 rounded-xl px-5 py-3 text-xs font-bold whitespace-nowrap" data-testid="button-newsletter-submit">{createLead.isPending ? 'Enviando...' : 'Quero receber'}</button>
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-2">Ao se inscrever, você concorda com nossa Política de Privacidade.</p>
+              {createLead.isError && <p role="alert" className="text-sm text-red-800">Não foi possível registrar sua inscrição. Tente novamente.</p>}
+              {createLead.isSuccess && <p className="text-xs text-[#168b41] mt-2" data-testid="status-newsletter-success">Sua inscrição no Journal Signature foi recebida.</p>}
+            </form>
+          </div>
+        </div>
+      </section>
+      {/* Categorias Editoriais */}
+      <section id="hp-categories" className="mx-auto max-w-[1280px] px-5 pb-24 md:px-10 md:pb-32">
+        <div className="mb-12 max-w-3xl">
+          <h2 className="serif text-3xl text-foreground md:text-4xl">Encontre seu imóvel de alto padrão em Goiânia</h2>
+          <p className="mt-4 text-sm leading-6 text-muted-foreground">Da privacidade de uma casa à praticidade de um apartamento, diferentes formas de morar pedem escolhas diferentes. Explore o catálogo pelo tipo de imóvel que faz sentido para sua rotina.</p>
+        </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {[
+            { title: 'Casas de alto padrão em Goiânia', desc: 'Explore casas com diferentes propostas de arquitetura, áreas de convivência e espaços ao ar livre. Compare as características de cada endereço e encontre opções compatíveis com o seu estilo de vida.', link: 'Ver casas de alto padrão', href: '/casas-alto-padrao-goiania' },
+            { title: 'Apartamentos de luxo em Goiânia', desc: 'Conheça apartamentos que combinam localização, distribuição dos ambientes e comodidades para o dia a dia. Consulte plantas, metragens e diferenciais dos empreendimentos disponíveis.', link: 'Ver apartamentos de luxo', href: '/apartamentos-luxo-goiania' },
+            { title: 'Coberturas em Goiânia', desc: 'Para quem busca amplitude e uma relação diferente com a cidade, explore coberturas e confira as particularidades de cada unidade, das áreas externas à configuração dos ambientes.', link: 'Conhecer coberturas', href: '/coberturas-goiania' },
+            { title: 'Empreendimentos de alto padrão em Goiânia', desc: 'Descubra projetos residenciais e compare arquitetura, localização, plantas e estágio de construção. Nossa equipe ajuda você a entender as opções disponíveis e os detalhes de cada empreendimento.', link: 'Explorar empreendimentos', href: '/empreendimentos' }
+          ].map((cat) => (
+            <div key={cat.title} className="flex flex-col justify-between rounded-3xl border border-border bg-card p-6">
+              <div>
+                <h3 className="serif text-xl text-foreground mb-3">{cat.title}</h3>
+                <p className="text-xs leading-5 text-muted-foreground mb-6">{cat.desc}</p>
+              </div>
+              <Link href={cat.href} className="text-xs font-bold text-primary hover:underline">{cat.link}</Link>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* FAQ */}
-      <section className="mx-auto max-w-[800px] px-5 pb-24 md:px-10 md:pb-32">
+      <section id="hp-faq" className="mx-auto max-w-[800px] px-5 pb-24 md:px-10 md:pb-32">
         <div className="mb-10 text-center">
           <h2 className="serif text-3xl text-foreground md:text-4xl">Dúvidas sobre imóveis de alto padrão em Goiânia</h2>
         </div>
@@ -196,7 +226,7 @@ export default function HomePage() {
             <details key={i} className="group rounded-2xl border border-border bg-card">
               <summary className="flex cursor-pointer items-center justify-between p-6 font-semibold text-foreground">
                 <h3 className="text-sm md:text-base">{faq.q}</h3>
-                <span className="ml-4 transition group-open:rotate-180">+</span>
+                <span aria-hidden="true" className="hp-faq-icon ml-4"><span className="group-open:hidden">+</span><span className="hidden group-open:inline">−</span></span>
               </summary>
               <div className="px-6 pb-6 text-sm leading-6 text-muted-foreground">
                 {faq.a}
@@ -206,27 +236,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="contato" className="mx-auto max-w-[1280px] px-5 pb-24 md:px-10 md:pb-32">
-        <div className="relative overflow-hidden rounded-[2rem] border border-primary/20 bg-accent p-8 md:p-14">
-          <div className="relative grid gap-10 md:grid-cols-[1fr_1fr] md:items-center">
-            <div>
-              <SectionLabel>Assine o Journal Signature</SectionLabel>
-              <h2 className="serif text-3xl text-foreground md:text-4xl mt-2">Um olhar sobre o luxo. Uma leitura só sua.</h2>
-              <p className="mt-4 text-sm text-foreground/80">Receba as leituras do Journal Signature sobre arquitetura, endereços e o mercado de Goiânia.</p>
-            </div>
-            <form onSubmit={submitNewsletter} className="flex flex-col gap-3" data-testid="form-newsletter">
-              <input name="name" required placeholder="Seu nome" className="h-12 rounded-xl border border-border bg-card px-4 text-sm text-foreground outline-none focus:border-primary" data-testid="input-newsletter-name" />
-              <div className="flex flex-col gap-2 md:flex-row">
-                <input name="email" type="email" required placeholder="seu@email.com" className="h-12 min-w-0 flex-1 rounded-xl border border-border bg-card px-4 text-sm text-foreground outline-none focus:border-primary" data-testid="input-newsletter-email" />
-                <button type="submit" disabled={createLead.isPending} className="metal-button disabled:opacity-60 rounded-xl px-5 py-3 text-xs font-bold whitespace-nowrap" data-testid="button-newsletter-submit">{createLead.isPending ? 'Enviando...' : 'Quero receber'}</button>
-              </div>
-              <p className="text-[10px] text-muted-foreground mt-2">Ao se inscrever, você concorda com nossa Política de Privacidade.</p>
-              {createLead.isError && <p role="alert" className="text-sm text-red-800">Não foi possível registrar sua inscrição. Tente novamente.</p>}
-              {createLead.isSuccess && <p className="text-xs text-[#168b41] mt-2" data-testid="status-newsletter-success">Sua inscrição no Journal Signature foi recebida.</p>}
-            </form>
-          </div>
-        </div>
-      </section>
     </main>
 
     {/* Modal do Raio-X */}

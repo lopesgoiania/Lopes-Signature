@@ -52,10 +52,10 @@ export function PublicNav() {
       </nav>
       <div className="flex items-center gap-2">
         <Link href="/contato" className="metal-button hidden rounded-full px-5 py-3 text-[11px] font-bold tracking-wide md:block" data-testid="link-nav-falar">Falar com um especialista</Link>
-        <button onClick={() => setOpen(!open)} className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-primary xl:hidden" aria-label="Abrir menu" data-testid="button-open-menu">{open ? <X size={18} /> : <Menu size={18} />}</button>
+        <button onClick={() => setOpen(!open)} className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-primary xl:hidden" aria-label={open ? "Fechar menu" : "Abrir menu"} aria-expanded={open} aria-controls="signature-mobile-menu" data-testid="button-open-menu">{open ? <X size={18} /> : <Menu size={18} />}</button>
       </div>
     </div>
-    {open && <nav className="glass-panel mx-auto mt-2 max-w-[1280px] rounded-3xl p-4 xl:hidden" aria-label="Menu mobile">
+    {open && <nav className="glass-panel mx-auto mt-2 max-w-[1280px] rounded-3xl p-4 xl:hidden" id="signature-mobile-menu" aria-label="Menu mobile">
       <Link onClick={() => setOpen(false)} href="/imoveis" className="block rounded-xl px-4 py-3 text-sm text-[#D0D0D0] hover:bg-white/5" data-testid="link-mobile-imoveis">Imóveis</Link>
       <Link onClick={() => setOpen(false)} href="/empreendimentos" className="block rounded-xl px-4 py-3 text-sm text-[#D0D0D0] hover:bg-white/5" data-testid="link-mobile-empreendimentos">Empreendimentos</Link>
       <Link onClick={() => setOpen(false)} href="/sobre" className="block rounded-xl px-4 py-3 text-sm text-[#D0D0D0] hover:bg-white/5" data-testid="link-mobile-sobre">Sobre nós</Link>
