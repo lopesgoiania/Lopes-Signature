@@ -1,0 +1,54 @@
+/* Isolated specialist direction; the public route retains its approved design. */
+.specialists-preview {background:#f5f2eb;color:#24231f;}
+.specialists-preview ::selection {background:#d8bc7c;color:#24231f;}
+.specialists-preview :is(a,button):focus-visible {outline:2px solid #876526;outline-offset:5px;}
+.specialists-preview header .glass-panel {background:#20201ded;border-color:#b998493d;}
+.specialists-preview header img {width:120px;height:44px;object-fit:cover;}
+.specialists-preview .specialists-intro {padding-top:64px;padding-bottom:72px;border-color:#d7d0c1;}
+.specialists-preview .specialists-intro-inner {display:grid;grid-template-columns:1.25fr .75fr;gap:80px;align-items:end;}
+.specialists-preview .specialist-heading {font-size:clamp(48px,6.2vw,84px);line-height:1.07;letter-spacing:-.03em;margin:0;}
+.specialists-preview .specialists-intro-inner>p {font-size:17px;line-height:1.8;max-width:400px;margin:0 0 8px;}
+.specialists-preview #time {padding-top:64px;padding-bottom:96px;}
+.specialists-preview .specialists-directory-header {flex-direction:row;align-items:end;gap:40px;margin-bottom:44px;}
+.specialists-preview .specialists-directory-header h2 {font-size:34px;line-height:1.18;letter-spacing:-.02em;max-width:450px;text-wrap:balance;}
+.specialists-preview .specialists-directory-header>div:last-child {max-width:530px;justify-content:flex-end;gap:8px;}
+.specialists-preview .specialists-directory-header button {font-size:12px;padding-inline:16px;border-radius:4px;min-height:44px;}
+.specialists-preview .specialists-directory-grid {grid-template-columns:repeat(4,minmax(0,1fr));gap:52px 28px;}
+.specialists-preview .specialist-card {background:transparent;border-radius:0;overflow:visible;}
+.specialists-preview .specialist-portrait {aspect-ratio:4/5;background:#242521;overflow:hidden;border-radius:8px;}
+.specialists-preview .specialist-portrait img {padding:0;object-fit:cover;object-position:center top;}
+.specialists-preview .specialists-profile-copy {padding:20px 0 0;}
+.specialists-preview .specialists-profile-copy>p:first-child {font-size:11px;line-height:1.5;color:#775b25;letter-spacing:.01em;}
+.specialists-preview .specialists-profile-copy h3 {font-size:32px;line-height:1.12;color:#24231f;letter-spacing:-.02em;margin-top:8px;}
+.specialists-preview .specialists-profile-copy>p:nth-of-type(2) {color:#655f53;font-size:12px;}
+.specialists-preview .specialists-profile-copy>p:nth-of-type(3) {color:#59564e;font-size:14px;line-height:1.7;margin-top:12px;}
+.specialists-preview .specialists-profile-actions {margin-top:20px;padding-top:16px;border-color:#d7d0c1;}
+.specialists-preview .specialists-profile-actions>a {border:0;border-radius:0;min-height:44px;color:#876526;background:transparent;padding:0;justify-content:flex-start;font-size:13px;font-weight:600;gap:10px;}
+.specialists-preview .specialists-profile-actions>a:hover {color:#24231f;text-decoration:underline;text-underline-offset:5px;background:transparent;}
+.specialists-preview footer {border-color:#d7d0c1;}
+@media(max-width:1199px){
+ .specialists-preview .specialists-directory-grid {grid-template-columns:repeat(3,minmax(0,1fr));}
+ .specialists-preview .specialists-intro-inner {gap:48px;}
+ .specialists-preview .specialists-directory-header {align-items:start;flex-direction:column;gap:24px;}
+ .specialists-preview .specialists-directory-header>div:last-child {justify-content:flex-start;max-width:none;}
+}
+@media(max-width:767px){
+ .specialists-preview .specialists-intro {padding-top:32px;padding-bottom:40px;}
+ .specialists-preview .specialists-intro-inner {grid-template-columns:1fr;gap:24px;}
+ .specialists-preview .specialist-heading {font-size:50px;line-height:1.08;}
+ .specialists-preview .specialists-intro-inner>p {font-size:15px;line-height:1.8;max-width:none;}
+ .specialists-preview #time {padding-top:40px;padding-bottom:64px;}
+ .specialists-preview .specialists-directory-header {gap:24px;margin-bottom:32px;}
+ .specialists-preview .specialists-directory-header h2 {font-size:30px;}
+ .specialists-preview .specialists-directory-header>div:last-child {gap:8px;}
+ .specialists-preview .specialists-directory-header button {padding-inline:12px;font-size:11px;}
+ .specialists-preview .specialists-directory-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:36px 16px;}
+ .specialists-preview .specialists-profile-copy {padding-top:16px;}
+ .specialists-preview .specialists-profile-copy h3 {font-size:26px;overflow-wrap:anywhere;}
+ .specialists-preview .specialists-profile-copy>p:first-child {font-size:10px;}
+ .specialists-preview .specialists-profile-copy>p:nth-of-type(3) {font-size:13px;line-height:1.65;}
+ .specialists-preview .specialists-profile-actions>a {font-size:12px;gap:6px;}
+ .specialists-preview .specialists-profile-actions svg {width:15px;flex-shrink:0;}
+}
+@media(max-width:359px){.specialists-preview .specialists-directory-grid {grid-template-columns:1fr;}.specialists-preview .specialist-heading {font-size:44px;}}
+@media(prefers-reduced-motion:reduce){.specialists-preview *{transition:none!important;scroll-behavior:auto!important;}}

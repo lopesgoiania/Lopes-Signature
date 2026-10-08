@@ -1,3 +1,4 @@
+import './specialists-design-preview.css';
 import { useState } from 'react';
 import { Mail } from 'lucide-react';
 import { Link } from 'wouter';
@@ -16,13 +17,13 @@ export default function SpecialistsPage() {
     : specialists.filter(s => s.role.split(' - ').pop()?.trim() === selectedRole);
 
   return (
-    <div className="signature-shell specialists-page min-h-[100dvh] text-foreground">
+    <div className="signature-shell specialists-page specialists-preview min-h-[100dvh] text-foreground">
       <PublicNav />
 
       <main className="pt-28 md:pt-36">
         {/* Banner de Topo / Hero da Página */}
-        <section className="relative border-b border-white/10 px-5 pb-16 pt-10 md:px-10 md:pb-24">
-          <div className="mx-auto max-w-[1280px]">
+        <section className="specialists-intro relative border-b border-white/10 px-5 pb-16 pt-10 md:px-10 md:pb-24">
+          <div className="specialists-intro-inner mx-auto max-w-[1280px]">
 
             <h1 className="serif specialist-heading text-5xl leading-[1.08] text-foreground md:text-7xl">
               Especialistas em <br />
@@ -36,7 +37,7 @@ export default function SpecialistsPage() {
 
         {/* Lista de Especialistas */}
         <section className="mx-auto max-w-[1280px] px-5 py-20 md:px-10 md:py-28" id="time">
-          <div className="mb-10 flex flex-col justify-between gap-6">
+          <div className="specialists-directory-header mb-10 flex flex-col justify-between gap-6">
             <div>
 
               <h2 className="serif text-4xl text-foreground md:text-5xl">
@@ -61,7 +62,7 @@ export default function SpecialistsPage() {
             </div>
           </div>
 
-          <div className="grid gap-x-8 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
+          <div className="specialists-directory-grid grid gap-x-8 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
             {filteredSpecialists.map((person) => (
               <article
                 key={person.id}
@@ -69,13 +70,13 @@ export default function SpecialistsPage() {
               >
                 <div className="specialist-portrait relative aspect-[4/5] w-full bg-[#191918]">
                   <img
-                    src={person.image || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80'}
+                    src={person.image || '/images/logo-signature.png'}
                     alt={`Retrato de ${person.name}`}
                     loading="lazy" decoding="async"
                     className="absolute inset-0 h-full w-full object-contain object-center p-4"
                   />
                 </div>
-                <div className="flex flex-1 flex-col p-6">
+                <div className="specialists-profile-copy flex flex-1 flex-col p-6">
                 <p className="text-xs leading-5 tracking-wide text-[#d8bc7c]">{person.role}</p>
                 <h3 className="serif mt-2 text-3xl text-white">{person.name}</h3>
                 <p className="mt-2 text-xs text-[#bcb8af]">
@@ -83,7 +84,7 @@ export default function SpecialistsPage() {
                 </p>
                 <p className="mt-4 flex-1 text-sm leading-6 text-[#bcb8af]">{person.bio}</p>
 
-                <div className="mt-8 flex gap-3 border-t border-white/10 pt-5">
+                <div className="specialists-profile-actions mt-8 flex gap-3 border-t border-white/10 pt-5">
                   {person.whatsapp && <a
                     href={`https://wa.me/${person.whatsapp}?text=Olá%20${encodeURIComponent(person.name)},%20gostaria%20de%20falar%20sobre%20os%20imóveis%20Lopes%20Signature.`}
                     target="_blank"
