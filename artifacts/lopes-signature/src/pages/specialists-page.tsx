@@ -121,7 +121,6 @@ export default function SpecialistsPage() {
             <p className="mono-label mb-5 text-primary">Navegue</p>
             <div className="flex flex-col gap-3 text-sm text-[#D0D0D0]">
               <Link href="/imoveis" className="hover:text-primary">Imóveis</Link>
-              <Link href="/empreendimentos" className="hover:text-primary">Empreendimentos</Link>
               <Link href="/especialistas" className="text-primary hover:text-primary">Especialistas</Link>
               <Link href="/journal" className="hover:text-primary">Journal</Link>
               <Link href="/contato" className="hover:text-primary">Contato</Link>

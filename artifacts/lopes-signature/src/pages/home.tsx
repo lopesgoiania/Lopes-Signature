@@ -199,7 +199,7 @@ export default function HomePage() {
             { title: 'Casas de alto padrão em Goiânia', desc: 'Explore casas com diferentes propostas de arquitetura, áreas de convivência e espaços ao ar livre. Compare as características de cada endereço e encontre opções compatíveis com o seu estilo de vida.', link: 'Ver casas de alto padrão', href: '/casas-alto-padrao-goiania' },
             { title: 'Apartamentos de luxo em Goiânia', desc: 'Conheça apartamentos que combinam localização, distribuição dos ambientes e comodidades para o dia a dia. Consulte plantas, metragens e diferenciais dos empreendimentos disponíveis.', link: 'Ver apartamentos de luxo', href: '/apartamentos-luxo-goiania' },
             { title: 'Coberturas em Goiânia', desc: 'Para quem busca amplitude e uma relação diferente com a cidade, explore coberturas e confira as particularidades de cada unidade, das áreas externas à configuração dos ambientes.', link: 'Conhecer coberturas', href: '/coberturas-goiania' },
-            { title: 'Empreendimentos de alto padrão em Goiânia', desc: 'Descubra projetos residenciais e compare arquitetura, localização, plantas e estágio de construção. Nossa equipe ajuda você a entender as opções disponíveis e os detalhes de cada empreendimento.', link: 'Explorar empreendimentos', href: '/empreendimentos' }
+            { title: 'Empreendimentos de alto padrão em Goiânia', desc: 'Descubra projetos residenciais e compare arquitetura, localização, plantas e estágio de construção. Nossa equipe ajuda você a entender as opções disponíveis e os detalhes de cada empreendimento.', link: 'Explorar empreendimentos', href: '/imoveis' }
           ].map((cat) => (
             <div key={cat.title} className="flex flex-col justify-between rounded-3xl border border-border bg-card p-6">
               <div>
@@ -262,7 +262,6 @@ export default function HomePage() {
           <p className="mono-label mb-5 text-primary">Navegue</p>
           <div className="flex flex-col gap-3 text-sm text-[#D0D0D0]">
             <a href="/imoveis" className="hover:text-primary">Imóveis</a>
-            <Link href="/empreendimentos" className="hover:text-primary">Empreendimentos</Link>
             <Link href="/sobre" className="hover:text-primary">Sobre nós</Link>
             <Link href="/especialistas" className="hover:text-primary">Especialistas</Link>
             <a href="/journal" className="hover:text-primary">Journal</a>

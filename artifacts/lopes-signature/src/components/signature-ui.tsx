@@ -45,7 +45,6 @@ export function PublicNav() {
       <PageLogo />
       <nav className="hidden items-center gap-5 xl:flex" aria-label="Navegação principal">
         <Link href="/imoveis" className={`text-xs tracking-wide ${location === '/imoveis' ? 'text-primary' : 'text-[#D0D0D0] hover:text-[#F7F5F0]'}`} data-testid="link-nav-imoveis">Imóveis</Link>
-        <Link href="/empreendimentos" className={`text-xs tracking-wide ${location === '/empreendimentos' ? 'text-primary' : 'text-[#D0D0D0] hover:text-[#F7F5F0]'}`} data-testid="link-nav-empreendimentos">Empreendimentos</Link>
         <Link href="/sobre" className={`text-xs tracking-wide ${location === '/sobre' ? 'text-primary' : 'text-[#D0D0D0] hover:text-[#F7F5F0]'}`} data-testid="link-nav-sobre">Sobre nós</Link>
         <Link href="/especialistas" className={`text-xs tracking-wide ${location === '/especialistas' ? 'text-primary' : 'text-[#D0D0D0] hover:text-[#F7F5F0]'}`} data-testid="link-nav-especialistas">Especialistas</Link>
         <Link href="/journal" className={`text-xs tracking-wide ${(location === '/conteudos' || location.startsWith('/journal')) ? 'text-primary' : 'text-[#D0D0D0] hover:text-[#F7F5F0]'}`} data-testid="link-nav-conteudos">Journal</Link>

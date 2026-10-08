@@ -155,9 +155,6 @@ export default function CatalogPage({
               <Link href="/imoveis" className="hover:text-primary">
                 Imóveis
               </Link>
-              <Link href="/empreendimentos" className="hover:text-primary">
-                Empreendimentos
-              </Link>
               <Link href="/especialistas" className="hover:text-primary">
                 Especialistas
               </Link>

@@ -17,7 +17,7 @@ import ContactPage from "@/pages/contact-page";
 import LandingPage from "@/pages/landing-page";
 import BauhausPage from "@/pages/bauhaus-page";
 import CatalogPage from "@/pages/catalog-page";
-import { Route, Switch, useLocation, Router as WouterRouter } from "wouter";
+import { Route, Switch, Redirect, useLocation, Router as WouterRouter } from "wouter";
 
 const queryClient = new QueryClient();
 
@@ -53,13 +53,7 @@ function Router() {
             description="Descubra casas, apartamentos e coberturas de alto padrão em Goiânia."
           />
         </Route>
-        <Route path="/empreendimentos">
-          <CatalogPage
-            category="empreendimento"
-            title="Empreendimentos de alto padrão em Goiânia"
-            description="Descubra projetos residenciais e compare arquitetura, localização e plantas."
-          />
-        </Route>
+        <Route path="/empreendimentos" component={() => <Redirect to="/imoveis" />} />
         <Route path="/casas-alto-padrao-goiania">
           <CatalogPage
             category="casa"

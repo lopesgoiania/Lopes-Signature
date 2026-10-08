@@ -11,6 +11,11 @@
   ],
   "redirects": [
     {
+      "source": "/empreendimentos",
+      "destination": "/imoveis",
+      "permanent": true
+    },
+    {
       "source": "/lp/bauhaus-vaca-brava",
       "destination": "/imoveis/bauhaus",
       "permanent": true
