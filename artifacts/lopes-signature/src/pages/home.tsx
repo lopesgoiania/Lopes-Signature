@@ -1,3 +1,4 @@
+import '@/components/property-listing.css';
 import { PublicNav } from "@/components/signature-ui";
 import './home-design-preview.css';
 import { CatalogSearch } from '@/components/catalog-search';
@@ -80,7 +81,7 @@ export default function HomePage() {
         <CatalogSearch key={searchRevision} properties={allProperties} onResults={setFilteredProperties} home/>
       </section>
 
-      <section id="hp-selection" className="mx-auto max-w-[1280px] px-5 py-24 md:px-10 md:py-32">
+      <section id="hp-selection" className="property-listing mx-auto max-w-[1280px] px-5 py-24 md:px-10 md:py-32">
         <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="max-w-2xl">
             <SectionLabel>Lopes Signature</SectionLabel>
@@ -89,7 +90,7 @@ export default function HomePage() {
           </div>
           <Link href="/imoveis" className="shrink-0 text-sm font-semibold text-primary hover:underline">Ver catálogo de imóveis</Link>
         </div>
-        {propertyQuery.isLoading ? <SkeletonGrid /> : propertyQuery.isError ? <ErrorState onRetry={() => propertyQuery.refetch()} /> : properties.length === 0 ? <EmptyState title="Nenhum empreendimento cadastrado no momento" description="" onReset={() => {setFilteredProperties(null); setSearchRevision(value => value + 1);}} /> : <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">{properties.map((property) => <PropertyCard key={property.id} property={property} saved={saved.includes(property.id)} onSave={() => toggleSave(property.id)} onOpenRaioX={(prop) => setSelectedRaioXProperty(prop)} />)}</div>}
+        {propertyQuery.isLoading ? <SkeletonGrid /> : propertyQuery.isError ? <ErrorState onRetry={() => propertyQuery.refetch()} /> : properties.length === 0 ? <EmptyState title="Nenhum empreendimento cadastrado no momento" description="" onReset={() => {setFilteredProperties(null); setSearchRevision(value => value + 1);}} /> : <div className="listing-grid grid gap-5 md:grid-cols-2 lg:grid-cols-3">{properties.map((property) => <PropertyCard key={property.id} property={property} saved={saved.includes(property.id)} onSave={() => toggleSave(property.id)} onOpenRaioX={(prop) => setSelectedRaioXProperty(prop)} />)}</div>}
       </section>
 
       <section id="manifesto" className="bg-secondary text-secondary-foreground">

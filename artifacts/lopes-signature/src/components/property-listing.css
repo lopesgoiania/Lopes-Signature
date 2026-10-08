@@ -1,0 +1,17 @@
+/* One layout for the home selection and full property catalogs. */
+.property-listing {padding-top:88px;padding-bottom:96px;}
+.property-listing .listing-header {margin-bottom:40px;}
+.property-listing :is(h1,h2) {font-size:clamp(38px,4.2vw,58px);line-height:1.08;letter-spacing:-.025em;text-wrap:balance;}
+.property-listing .listing-grid {gap:20px;}
+.catalog-layout main {padding-top:136px;}
+.catalog-layout header .glass-panel {border-color:#d4af3733;background:#191917ed;}
+.catalog-layout header img {width:120px;height:44px;object-fit:cover;}
+.catalog-layout ::selection {background:#d4af37;color:#171612;}
+.catalog-layout :is(a,button,input,select):focus-visible {outline:2px solid #a77d24;outline-offset:5px;}
+@media(max-width:767px){
+ .catalog-layout main {padding-top:112px;}
+ .property-listing {padding-top:64px;padding-bottom:64px;}
+ .property-listing .listing-header {margin-bottom:28px;}
+ .property-listing :is(h1,h2) {font-size:38px;}
+ .property-listing .listing-grid {gap:24px;}
+}

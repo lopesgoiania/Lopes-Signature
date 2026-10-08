@@ -1,3 +1,4 @@
+import '@/components/property-listing.css';
 import { type Taxonomy } from "@/lib/catalog";
 import { CatalogSearch } from "@/components/catalog-search";
 const EMPTY_PROPERTIES: any[] = [];
@@ -59,11 +60,21 @@ export default function CatalogPage({
   }
 
   return (
-    <div className="signature-shell noise min-h-[100dvh] text-foreground bg-background">
+    <div className="signature-shell catalog-layout min-h-[100dvh] text-foreground bg-background">
       <PublicNav />
       <main className="pt-32">
-        <section className="mx-auto max-w-[1280px] px-5 pb-12 md:px-10">
-          <div className="mb-10 max-w-2xl">
+          <section className="catalog-search-layout mx-auto max-w-[1280px] px-5 md:px-10">
+            <CatalogSearch
+              initialTerm={taxonomy}
+              properties={allProperties}
+              onResults={setFilteredProperties}
+              initialType={category === "empreendimento" ? "" : category || ""}
+            />
+          </section>
+
+
+        <section className="property-listing mx-auto max-w-[1280px] px-5 md:px-10">
+          <div className="listing-header mb-10 max-w-2xl">
             <SectionLabel>CATÁLOGO SIGNATURE</SectionLabel>
             <h1 className="serif text-4xl text-foreground md:text-5xl mt-2 mb-4">
               {title}
@@ -71,15 +82,6 @@ export default function CatalogPage({
             <p className="text-sm leading-6 text-muted-foreground">
               {description}
             </p>
-          </div>
-
-          <div className="mb-12 max-w-[800px]">
-            <CatalogSearch
-              initialTerm={taxonomy}
-              properties={allProperties}
-              onResults={setFilteredProperties}
-              initialType={category === "empreendimento" ? "" : category || ""}
-            />
           </div>
 
           {propertyQuery.isLoading ? (
@@ -93,7 +95,7 @@ export default function CatalogPage({
               onReset={() => setSearch("")}
             />
           ) : (
-            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            <div className="listing-grid grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {properties.map((property) => (
                 <PropertyCard
                   key={property.id}
