@@ -19,10 +19,10 @@ app.use((req: any, res: any, next: any) => {
     /^\/api\/admin\/catalog\/(properties|taxonomies|media|maps)$/.test(
       req.path,
     );
-  const editorial = ["GET", "POST"].includes(req.method) && req.path === "/api/admin/blog";
+  const editorial = ["GET", "POST"].includes(req.method) && /^\/api\/admin\/blog(?:\/status)?$/.test(req.path);
   if (!publicRead && !lead && !admin && !editorial)
     return res.status(404).json({ message: "Rota não encontrada." });
   next();
 });
-app.use("/api", catalog, specialists, blog);
+app.use("/api", specialists, blog, catalog);
 export default app;

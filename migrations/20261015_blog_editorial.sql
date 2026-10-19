@@ -24,5 +24,12 @@ CREATE POLICY "Leitura editorial publicada" ON public.blog_posts FOR SELECT TO a
 DROP POLICY IF EXISTS "Restringir rascunhos públicos" ON public.blog_posts;
 CREATE POLICY "Restringir rascunhos públicos" ON public.blog_posts AS RESTRICTIVE FOR SELECT TO anon, authenticated
   USING (published = true AND status = 'published' AND (published_at IS NULL OR published_at <= now()));
+-- Unknown permissive legacy policies must not reopen direct browser writes.
+DROP POLICY IF EXISTS "Bloquear inserção direta editorial" ON public.blog_posts;
+CREATE POLICY "Bloquear inserção direta editorial" ON public.blog_posts AS RESTRICTIVE FOR INSERT TO anon, authenticated WITH CHECK (false);
+DROP POLICY IF EXISTS "Bloquear edição direta editorial" ON public.blog_posts;
+CREATE POLICY "Bloquear edição direta editorial" ON public.blog_posts AS RESTRICTIVE FOR UPDATE TO anon, authenticated USING (false) WITH CHECK (false);
+DROP POLICY IF EXISTS "Bloquear exclusão direta editorial" ON public.blog_posts;
+CREATE POLICY "Bloquear exclusão direta editorial" ON public.blog_posts AS RESTRICTIVE FOR DELETE TO anon, authenticated USING (false);
 -- Backend writes use the service-role key AFTER checking the administrative session.
 COMMIT;

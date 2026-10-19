@@ -41,7 +41,7 @@ export function PageLogo({ compact = false }: { compact?: boolean }) {
 export function PublicNav() {
   const [open, setOpen] = useState(false);
   const [location] = useLocation();
-  return <header className="fixed left-0 right-0 top-0 z-40 px-4 pt-4 md:px-8 md:pt-6">
+  return <header className="signature-public-nav fixed left-0 right-0 top-0 z-40 px-4 pt-4 md:px-8 md:pt-6">
     <div className="glass-panel mx-auto flex h-[62px] max-w-[1280px] items-center justify-between rounded-full px-4 md:h-[72px] md:px-7">
       <PageLogo />
       <nav className="hidden items-center gap-5 xl:flex" aria-label="Navegação principal">

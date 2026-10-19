@@ -35,7 +35,7 @@ export default function JournalPage() {
         : pageSeo("/journal"),
   );
   return (
-    <div className="signature-shell noise min-h-[100dvh] text-foreground">
+    <div className="signature-shell journal-page min-h-[100dvh] text-foreground">
       <PublicNav />
       <main className="journal-content mx-auto max-w-[1280px] px-5 pb-24 pt-40 md:px-10">
         {query.isLoading ? (
@@ -167,9 +167,31 @@ export default function JournalPage() {
               ))}
             </div>
             {!listing.data?.length && (
-              <p className="mt-8 rounded-2xl border border-border p-8 text-muted-foreground">
-                Em breve, novas leituras do Journal Signature.
-              </p>
+              <section
+                className="journal-empty"
+                aria-labelledby="journal-empty-title"
+              >
+                <div>
+                  <h2 id="journal-empty-title">
+                    Novas perspectivas,
+                    <br />
+                    <em>em preparação.</em>
+                  </h2>
+                  <p>Em breve, novas leituras do Journal Signature.</p>
+                </div>
+                <div className="journal-empty-next">
+                  <p>
+                    Enquanto isso, conheça os imóveis e converse com quem
+                    acompanha o mercado de Goiânia.
+                  </p>
+                  <Link href="/imoveis">
+                    Explorar o catálogo <span aria-hidden="true">→</span>
+                  </Link>
+                  <Link href="/especialistas">
+                    Conhecer os especialistas <span aria-hidden="true">→</span>
+                  </Link>
+                </div>
+              </section>
             )}
           </>
         )}

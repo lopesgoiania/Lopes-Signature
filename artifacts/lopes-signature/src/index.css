@@ -682,3 +682,6 @@ select.admin-input {
   border-color: var(--primary);
   color: var(--primary);
 }
+
+/* Keep the supplied signature mark legible inside the public masthead. */
+.signature-public-nav .glass-panel img{width:120px;height:44px;object-fit:cover}

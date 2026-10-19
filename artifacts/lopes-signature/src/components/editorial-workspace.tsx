@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { catalogRequest } from "@/lib/catalog";
 import { postHref, type Post } from "@/lib/journal";
@@ -18,6 +18,14 @@ const empty = (): Draft => ({
   sources: [],
 });
 export function EditorialWorkspace() {
+  const readiness = useQuery<{
+    schemaReady: boolean;
+    databaseAvailable: boolean;
+    rebuildConfigured: boolean;
+  }>({
+    queryKey: ["admin-blog-status"],
+    queryFn: () => catalogRequest("admin/blog/status"),
+  });
   const query = useQuery<(Post & { status: string })[]>({
     queryKey: ["admin-blog"],
     queryFn: () => catalogRequest("admin/blog"),
@@ -29,6 +37,15 @@ export function EditorialWorkspace() {
   const [error, setError] = useState("");
   const [dirty, setDirty] = useState(false);
   const [sources, setSources] = useState("");
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
   function select(post?: Post & { status: string }) {
     if (
       dirty &&
@@ -45,7 +62,7 @@ export function EditorialWorkspace() {
   }
   async function save(event: React.FormEvent) {
     event.preventDefault();
-    if (pending) return;
+    if (pending || !readiness.data?.schemaReady) return;
     setPending(true);
     setError("");
     setMessage("");
@@ -107,6 +124,50 @@ export function EditorialWorkspace() {
           Novo artigo
         </button>
       </div>
+      {readiness.isLoading ? (
+        <p role="status">Verificando o editor…</p>
+      ) : readiness.isError ? (
+        <div role="alert" className="rounded-xl border border-border p-5">
+          <p>
+            Não foi possível verificar o editor. Seu texto pode ser preparado
+            abaixo.
+          </p>
+          <button
+            type="button"
+            className="min-h-11 underline"
+            onClick={() => readiness.refetch()}
+          >
+            Verificar novamente
+          </button>
+        </div>
+      ) : !readiness.data?.schemaReady ? (
+        <div role="status" className="rounded-xl border border-border p-5">
+          <h2 className="serif text-2xl">
+            O editor precisa concluir sua configuração.
+          </h2>
+          <p className="mt-3 text-sm leading-6">
+            {readiness.data?.databaseAvailable
+              ? "O banco do Journal ainda precisa da atualização editorial. Você pode preparar e visualizar o texto abaixo; o salvamento será liberado depois da atualização."
+              : "Não foi possível acessar o banco do Journal. O salvamento será liberado quando a conexão for restabelecida."}
+          </p>
+          <button
+            type="button"
+            className="min-h-11 underline"
+            onClick={() => readiness.refetch()}
+          >
+            Verificar novamente
+          </button>
+        </div>
+      ) : !readiness.data.rebuildConfigured ? (
+        <p
+          role="status"
+          className="rounded-xl border border-border p-5 text-sm leading-6"
+        >
+          O editor está pronto para salvar. A atualização automática das páginas
+          públicas ainda precisa ser configurada; publique uma nova versão do
+          site após alterar um artigo público.
+        </p>
+      ) : null}
       {query.isLoading ? (
         <p role="status">Carregando artigos…</p>
       ) : query.isError ? (
@@ -242,7 +303,7 @@ export function EditorialWorkspace() {
         </p>
         <div className="flex flex-wrap gap-5">
           <button
-            disabled={pending}
+            disabled={pending || !readiness.data?.schemaReady}
             className="metal-button min-h-11 rounded-xl px-6 py-3 font-bold disabled:opacity-50"
           >
             {pending

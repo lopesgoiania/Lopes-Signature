@@ -104,6 +104,7 @@ export function CatalogSearch({
   return (
     <div>
       <form
+        data-filters-open={open}
         onSubmit={(e) => {
           e.preventDefault();
           setFilters(draft);
@@ -119,6 +120,7 @@ export function CatalogSearch({
             onChange={(e) => set("search", e.target.value)}
           />
           <select
+            data-catalog-location
             aria-label="Cidade"
             className="rounded-xl bg-background p-3 text-sm"
             value={draft.city}
@@ -130,6 +132,7 @@ export function CatalogSearch({
             ))}
           </select>
           <select
+            data-catalog-location
             aria-label="Bairro"
             className="rounded-xl bg-background p-3 text-sm"
             value={draft.neighborhood}
@@ -140,17 +143,20 @@ export function CatalogSearch({
               <option key={c}>{c}</option>
             ))}
           </select>
-          <button
-            type="button"
-            aria-expanded={open}
-            onClick={() => setOpen(!open)}
-            className="rounded-xl border border-primary/30 px-4 py-3 text-sm"
-          >
-            Filtros
-          </button>
-          <button className="metal-button rounded-xl px-5 py-3 text-sm font-bold">
-            Buscar imóveis
-          </button>
+          <div className="catalog-search-actions contents">
+            {" "}
+            <button
+              type="button"
+              aria-expanded={open}
+              onClick={() => setOpen(!open)}
+              className="rounded-xl border border-primary/30 px-4 py-3 text-sm"
+            >
+              Filtros
+            </button>
+            <button className="metal-button rounded-xl px-5 py-3 text-sm font-bold">
+              Buscar imóveis
+            </button>
+          </div>
         </div>
         {open && (
           <div className="mt-3 grid gap-3 border-t pt-3 sm:grid-cols-3">
@@ -243,10 +249,12 @@ export function CatalogSearch({
         </div>
       )}
       <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-        {showCount && <span aria-live="polite">
-          {results.length}{" "}
-          {results.length === 1 ? "imóvel encontrado" : "imóveis encontrados"}
-        </span>}
+        {showCount && (
+          <span aria-live="polite">
+            {results.length}{" "}
+            {results.length === 1 ? "imóvel encontrado" : "imóveis encontrados"}
+          </span>
+        )}
         <button
           onClick={() => {
             const next = {

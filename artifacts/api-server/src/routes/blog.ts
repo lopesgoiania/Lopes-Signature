@@ -1,3 +1,4 @@
+import { editorialStatus } from "../lib/editorial-status.js";
 import { requestSiteRebuild } from "../lib/site-rebuild.js";
 import { Router, type IRouter } from "express";
 import { randomUUID } from "node:crypto";
@@ -105,6 +106,10 @@ router.get("/blog/:id", async (req, res) => {
   }
 });
 router.use("/admin/blog", requireAdmin);
+router.get("/admin/blog/status", async (_req, res) => {
+  try { res.json(await editorialStatus()); }
+  catch { unavailable(res); }
+});
 router.get("/admin/blog", async (_req, res) => {
   try {
     const { data, error } = await supabase!
