@@ -48,3 +48,6 @@ Thumbs.db
 .cache/
 .local/
 .env
+
+# Intermediate server renderer used only at build time
+.server/

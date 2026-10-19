@@ -1,3 +1,4 @@
+import { SiteFooter } from "@/components/site-footer";
 import { useState, type FormEvent } from 'react';
 import { ArrowRight, CheckCircle2, Mail, MapPin, Phone, Send, Sparkles } from 'lucide-react';
 import { Link } from 'wouter';
@@ -119,18 +120,18 @@ export default function ContactPage() {
               <div className="rounded-xl border border-[#d4af37]/40 bg-[#141414] p-8">
                 <div className="flex items-center gap-3">
                   <Sparkles size={24} className="text-[#e8c766]" />
-                  <h3 className="serif text-xl text-white">Atendimento Imediato via WhatsApp</h3>
+                  <h3 className="serif text-xl text-white">Converse com nossa equipe</h3>
                 </div>
                 <p className="mt-3 text-xs leading-5 text-[#bcb8af]">
-                  Conecte-se diretamente com um especialista de plantão para envio de portfólios confidenciais.
+                  Ligue para nossa central ou envie uma mensagem pelo formulário.
                 </p>
                 <a
-                  href="https://wa.me/5511999991111?text=Olá,%20gostaria%20de%20iniciar%20um%20atendimento%20privado%20na%20Lopes%20Signature."
+                  href="tel:+556239219800"
                   target="_blank"
                   rel="noreferrer"
                   className="metal-button mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-bold"
                 >
-                  Iniciar conversa agora <ArrowRight size={16} />
+                  Ligar para a central <ArrowRight size={16} />
                 </a>
               </div>
             </div>
@@ -231,40 +232,7 @@ export default function ContactPage() {
         </section>
       </main>
 
-      <footer className="border-t border-border bg-secondary text-secondary-foreground">
-        <div className="mx-auto grid max-w-[1280px] gap-12 px-5 py-14 md:grid-cols-[1.2fr_1fr_1.5fr] md:px-10">
-          <div>
-            <PageLogo />
-            <p className="mt-5 max-w-xs text-sm leading-6 text-[#D0D0D0]">Casas, apartamentos e empreendimentos de alto padrão em Goiânia, com o olhar dos especialistas Lopes Signature.</p>
-          </div>
-          <div>
-            <p className="mono-label mb-5 text-primary">Navegue</p>
-            <div className="flex flex-col gap-3 text-sm text-[#D0D0D0]">
-              <Link href="/imoveis" className="hover:text-primary">Imóveis</Link>
-              <Link href="/especialistas" className="hover:text-primary">Especialistas</Link>
-              <Link href="/journal" className="hover:text-primary">Journal</Link>
-              <Link href="/contato" className="hover:text-primary text-primary">Contato</Link>
-            </div>
-          </div>
-          <div>
-            <p className="mono-label mb-5 text-primary">Contato</p>
-            <div className="text-sm text-[#D0D0D0] space-y-4">
-              <p>
-                <strong>Telefone:</strong> (62) 3921 9800<br />
-                <strong>E-mail:</strong> contato@lopessignature.com.br
-              </p>
-              <div>
-                <strong>Endereços:</strong>
-                <ul className="mt-2 space-y-2 text-xs">
-                  <li><span className="text-[#F7F5F0]">Lopes Marista:</span> R. 146, 495 - Marista, Goiânia - GO</li>
-                  <li><span className="text-[#F7F5F0]">Lopes Bueno:</span> Avenida T-11 Qd. 117 Lt. 20 - Nº 503 - St. Bueno</li>
-                  <li><span className="text-[#F7F5F0]">Lopes Jardim Goiás:</span> R. 14, Térreo C-9 Lotes 02/05-15 - Jardim Goiás</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

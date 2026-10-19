@@ -1,316 +1,283 @@
+import { requestSiteRebuild } from "../lib/site-rebuild.js";
 import { Router, type IRouter } from "express";
-import { supabase, isSupabaseConfigured } from "../lib/supabase.js";
+import { randomUUID } from "node:crypto";
+import { supabase } from "../lib/supabase.js";
+import { requireAdmin } from "../lib/admin-auth.js";
 
-export type BlogPost = {
-  id: string;
-  title: string;
-  category: string;
-  author: string;
-  readTime: string;
-  date: string;
-  summary: string;
-  content: string;
-  image: string;
-  published: boolean;
-};
-
-export const curatedTopics = [
-  "A Evolução do Metro Quadrado no Setor Marista: Onde o Luxo Encontra a Alta Rentabilidade",
-  "Casas de Alto Padrão em Condomínios Fechados de Goiânia: Exclusividade e Segurança",
-  "Arquitetura Autoral e Paisagismo de Assinatura nos Lançamentos Imobiliários de Goiânia",
-  "Investindo no Setor Bueno: A Vista Definitiva para o Parque Vaca Brava como Ativo Imobiliário",
-  "Penthouse e Coberturas de Luxo em Goiânia: O Auge da Privacidade e Conforto",
-  "Tendências do Mercado Imobiliário de Alto Padrão em Goiânia: Automação e Sustentabilidade",
-  "O Valor do Mármore Travertino e Acabamentos Nobres no Valor de Revenda dos Empreendimentos",
-  "Por Que Goiânia se Tornou o Polo de Investimento Imobiliário Mais Cobiçado do Centro-Oeste",
-];
-
-export let blogPosts: BlogPost[] = [];
-
+export const isPublicPost = (row: any, now = Date.now()) =>
+  row.published !== false &&
+  (!row.status || row.status === "published") &&
+  (!row.published_at || new Date(row.published_at).getTime() <= now);
+export const mapPost = (row: any) => ({
+  id: row.id,
+  slug: row.slug || row.id,
+  title: row.title,
+  category: row.category,
+  summary: row.summary,
+  content: row.content,
+  image: row.image || "",
+  author: row.author || "Lopes Signature",
+  date:
+    row.date ||
+    (row.published_at || row.created_at
+      ? new Date(row.published_at || row.created_at).toLocaleDateString(
+          "pt-BR",
+          { timeZone: "America/Sao_Paulo" },
+        )
+      : ""),
+  readTime:
+    row.read_time ||
+    `${Math.max(1, Math.ceil(String(row.content || "").split(/\s+/).length / 220))} min de leitura`,
+  status: row.status || (row.published === false ? "draft" : "published"),
+  published: isPublicPost(row),
+  publishedAt: row.published_at || row.created_at,
+  updatedAt: row.updated_at || row.created_at,
+  seoTitle: row.seo_title || "",
+  seoDescription: row.seo_description || "",
+  sources: Array.isArray(row.sources)
+    ? row.sources.filter(
+        (source: any) =>
+          source &&
+          typeof source.url === "string" &&
+          /^https?:\/\//i.test(source.url) &&
+          typeof source.title === "string",
+      )
+    : [],
+});
+const unavailable = (res: any) =>
+  res
+    .status(503)
+    .json({
+      message: "O Journal está temporariamente indisponível. Tente novamente.",
+    });
 const router: IRouter = Router();
-
-// GET /api/blog - Listar posts
 router.get("/blog", async (_req, res) => {
-  if (isSupabaseConfigured && supabase) {
-    try {
-      const { data, error } = await supabase
-        .from("blog_posts")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (!error && data) {
-        const mapped = data.map((item: any) => ({
-          id: item.id,
-          title: item.title,
-          category: item.category,
-          author: item.author || "IA Lopes Signature",
-          readTime: item.read_time || "5 min de leitura",
-          date: item.date || new Date(item.created_at).toLocaleDateString("pt-BR"),
-          summary: item.summary,
-          content: item.content,
-          image: item.image || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
-          published: true,
-        }));
-        res.json(mapped);
-        return;
-      }
-    } catch (e) {
-      console.warn("Erro ao buscar blog_posts no Supabase, caindo em memória:", e);
-    }
-  }
-
-  res.json(blogPosts);
-});
-
-// GET /api/blog/:id - Obter post específico
-router.get("/blog/:id", async (req, res) => {
-  const { id } = req.params;
-
-  if (isSupabaseConfigured && supabase) {
-    try {
-      const { data, error } = await supabase
-        .from("blog_posts")
-        .select("*")
-        .eq("id", id)
-        .single();
-
-      if (!error && data) {
-        res.json({
-          id: data.id,
-          title: data.title,
-          category: data.category,
-          author: data.author || "IA Lopes Signature",
-          readTime: data.read_time || "5 min de leitura",
-          date: data.date || new Date(data.created_at).toLocaleDateString("pt-BR"),
-          summary: data.summary,
-          content: data.content,
-          image: data.image || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
-          published: true,
-        });
-        return;
-      }
-    } catch (e) {
-      console.warn("Erro ao buscar post por ID no Supabase:", e);
-    }
-  }
-
-  const post = blogPosts.find((p) => p.id === id);
-  if (!post) {
-    res.status(404).json({ message: "Artigo não encontrado." });
+  if (!supabase) {
+    unavailable(res);
     return;
   }
-  res.json(post);
-});
-
-// POST /api/blog - Criar post manualmente
-router.post("/blog", async (req, res) => {
-  const { title, category, author, summary, content, image } = req.body;
-  if (!title || !content) {
-    res.status(400).json({ message: "Título e conteúdo são obrigatórios." });
-    return;
-  }
-
-  const newPost: BlogPost = {
-    id: `post-${Date.now()}`,
-    title,
-    category: category || "Mercado Imobiliário",
-    author: author || "Curadoria Lopes Signature",
-    readTime: `${Math.max(3, Math.ceil(content.length / 500))} min de leitura`,
-    date: new Date().toLocaleDateString("pt-BR"),
-    summary: summary || content.slice(0, 150) + "...",
-    content,
-    image: image || "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80",
-    published: true,
-  };
-
-  if (isSupabaseConfigured && supabase) {
-    try {
-      await supabase.from("blog_posts").insert({
-        id: newPost.id,
-        title: newPost.title,
-        category: newPost.category,
-        summary: newPost.summary,
-        content: newPost.content,
-        image: newPost.image,
-        date: newPost.date,
-        read_time: newPost.readTime,
-        author: newPost.author,
-      });
-    } catch (e) {
-      console.warn("Erro ao salvar post no Supabase:", e);
-    }
-  }
-
-  blogPosts.unshift(newPost);
-  res.status(201).json(newPost);
-});
-
-// DELETE /api/blog/:id - Deletar post
-router.delete("/blog/:id", async (req, res) => {
-  const { id } = req.params;
-
-  if (isSupabaseConfigured && supabase) {
-    try {
-      await supabase.from("blog_posts").delete().eq("id", id);
-    } catch (e) {
-      console.warn("Erro ao deletar post no Supabase:", e);
-    }
-  }
-
-  const index = blogPosts.findIndex((p) => p.id === id);
-  if (index !== -1) {
-    blogPosts.splice(index, 1);
-  }
-
-  res.status(204).send();
-});
-
-// Função auxiliar para disparar geração de IA via OpenRouter
-async function generatePostWithOpenRouter(options: {
-  apiKey: string;
-  topic: string;
-  model?: string;
-  region?: string;
-}) {
-  const { apiKey, topic, model = "google/gemini-2.5-flash", region = "Goiânia - GO" } = options;
-
-  const systemPrompt = `Você é um jornalista sênior especialista em mercado imobiliário de altíssimo padrão, investimentos imobiliários, arquitetura de luxo e urbanismo focado na região de ${region}.
-Escreva um artigo de blog completo, altamente relevante, refinado, convincente e com EXCELENTE ESTRUTURA DE SEO para o portal "Lopes Signature".
-Utilize obrigatoriamente um título principal H1, títulos de seção H2 e subtópicos H3 relevantes.
-Responda EXCLUSIVAMENTE em formato JSON válido com as seguintes chaves:
-{
-  "title": "Título impactante do artigo",
-  "category": "Categoria (ex: Investimentos, Arquitetura & Design, Tendências de Mercado, Lançamentos)",
-  "summary": "Resumo envolvente de 2 frases otimizado para meta-description e capa",
-  "content": "Conteúdo completo em Markdown formatado com # H1, ## H2, ### H3, negritos e listas de alto valor"
-}`;
-
-  const userPrompt = `Escreva um artigo de blog completo, com tom sofisticado e aprofundado sobre o tema: "${topic}" na região de ${region}. Foque em valorização, acabamentos nobres, exclusividade, liquidez e diferenciais dos bairros nobres (Setor Marista, Bueno, Oeste, etc.).`;
-
-  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-      "HTTP-Referer": "https://lopessignature.com.br",
-      "X-Title": "Lopes Signature IA Blog Agent",
-    },
-    body: JSON.stringify({
-      model: model,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-      temperature: 0.7,
-    }),
-  });
-
-  if (!response.ok) {
-    const errText = await response.text();
-    throw new Error(`OpenRouter API error ${response.status}: ${errText}`);
-  }
-
-  const data = (await response.json()) as any;
-  const rawContent = data.choices?.[0]?.message?.content || "";
-
-  let parsedJson: { title: string; category: string; summary: string; content: string };
   try {
-    const jsonMatch = rawContent.match(/\{[\s\S]*\}/);
-    parsedJson = JSON.parse(jsonMatch ? jsonMatch[0] : rawContent);
+    const { data, error } = await supabase
+      .from("blog_posts")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) {
+      unavailable(res);
+      return;
+    }
+    res.setHeader(
+      "Cache-Control",
+      "public, max-age=0, s-maxage=60, stale-while-revalidate=120",
+    );
+    res.json((data || []).filter((row) => isPublicPost(row)).map(mapPost));
   } catch {
-    parsedJson = {
-      title: `Mercado de Luxo: ${topic}`,
-      category: "Investimentos",
-      summary: "Uma análise aprofundada sobre o comportamento do mercado de alto padrão em Goiânia.",
-      content: rawContent,
-    };
-  }
-
-  const newPost: BlogPost = {
-    id: `post-ai-${Date.now()}`,
-    title: parsedJson.title || topic,
-    category: parsedJson.category || "Mercado Imobiliário",
-    author: "Agente IA OpenRouter Signature",
-    readTime: `${Math.max(4, Math.ceil((parsedJson.content?.length || 1000) / 450))} min de leitura`,
-    date: new Date().toLocaleDateString("pt-BR"),
-    summary: parsedJson.summary || "Artigo gerado por Inteligência Artificial sobre o mercado de luxo.",
-    content: parsedJson.content || rawContent,
-    image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80",
-    published: true,
-  };
-
-  if (isSupabaseConfigured && supabase) {
-    try {
-      await supabase.from("blog_posts").insert({
-        id: newPost.id,
-        title: newPost.title,
-        category: newPost.category,
-        summary: newPost.summary,
-        content: newPost.content,
-        image: newPost.image,
-        date: newPost.date,
-        read_time: newPost.readTime,
-        author: newPost.author,
-      });
-    } catch (e) {
-      console.warn("Erro ao salvar artigo gerado no Supabase:", e);
-    }
-  }
-
-  blogPosts.unshift(newPost);
-  return newPost;
-}
-
-// POST /api/blog/generate-ai - Gerar artigo manualmente via Admin
-router.post("/blog/generate-ai", async (req, res) => {
-  const apiKey = (req.body.apiKey || process.env.OPENROUTER_API_KEY || "").trim();
-  const { model = "google/gemini-2.5-flash", topic, region = "Goiânia - GO" } = req.body;
-
-  if (!apiKey) {
-    res.status(400).json({
-      message: "Chave de API do OpenRouter (OPENROUTER_API_KEY) não encontrada. Adicione no arquivo .env ou no formulário.",
-    });
-    return;
-  }
-
-  const selectedTopic = topic || "Tendências do Mercado Imobiliário de Luxo e Valorização de Imóveis de Alto Padrão";
-
-  try {
-    const newPost = await generatePostWithOpenRouter({ apiKey, topic: selectedTopic, model, region });
-    res.status(201).json(newPost);
-  } catch (error: any) {
-    res.status(500).json({
-      message: `Falha ao comunicar com a IA do OpenRouter: ${error?.message || error}`,
-    });
+    unavailable(res);
   }
 });
-
-// GET e POST /api/cron/generate-blog - Execução automática 2x por dia (Vercel Cron)
-const handleCron = async (_req: any, res: any) => {
-  const apiKey = (process.env.OPENROUTER_API_KEY || "").trim();
-  if (!apiKey) {
-    res.status(400).json({ message: "OPENROUTER_API_KEY não configurada no ambiente." });
+router.get("/blog/:id", async (req, res) => {
+  if (!supabase) {
+    unavailable(res);
     return;
   }
-
-  // Rotacionar tópicos com base na hora e dia atual
-  const randomIndex = Math.floor(Math.random() * curatedTopics.length);
-  const topic = curatedTopics[randomIndex];
-
   try {
-    const post = await generatePostWithOpenRouter({
-      apiKey,
-      topic,
-      model: "google/gemini-2.5-flash",
-      region: "Goiânia - GO",
-    });
-    res.status(201).json({ success: true, message: "Artigo gerado automaticamente via Cron com sucesso!", post });
-  } catch (err: any) {
-    res.status(500).json({ message: `Erro no Cron de IA: ${err?.message || err}` });
+    // Compatible with the original schema; once migrated, slug and id both work.
+    const { data, error } = await supabase.from("blog_posts").select("*");
+    if (error) {
+      unavailable(res);
+      return;
+    }
+    const row = data?.find(
+      (item) =>
+        (item.id === req.params.id || item.slug === req.params.id) &&
+        isPublicPost(item),
+    );
+    if (!row) {
+      res.status(404).json({ message: "Artigo não encontrado." });
+      return;
+    }
+    res.setHeader(
+      "Cache-Control",
+      "public, max-age=0, s-maxage=60, stale-while-revalidate=120",
+    );
+    res.json(mapPost(row));
+  } catch {
+    unavailable(res);
   }
-};
-
-router.get("/cron/generate-blog", handleCron);
-router.post("/cron/generate-blog", handleCron);
-
+});
+router.use("/admin/blog", requireAdmin);
+router.get("/admin/blog", async (_req, res) => {
+  try {
+    const { data, error } = await supabase!
+      .from("blog_posts")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) {
+      unavailable(res);
+      return;
+    }
+    res.json((data || []).map(mapPost));
+  } catch {
+    unavailable(res);
+  }
+});
+const text = (value: unknown, max: number) =>
+  typeof value === "string" ? value.trim().slice(0, max) : "";
+export const postSlug = (value: string) =>
+  value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+router.post("/admin/blog", async (req, res) => {
+  const body = req.body || {};
+  const title = text(body.title, 200),
+    content = text(body.content, 100_000),
+    summary = text(body.summary, 1000);
+  const slug = postSlug(text(body.slug || title, 200));
+  if (typeof body.content === "string" && body.content.length > 100_000) {
+    res.status(400).json({ message: "O artigo excede o tamanho permitido." });
+    return;
+  }
+  const status = body.status;
+  if (
+    !title ||
+    !content ||
+    !summary ||
+    !slug ||
+    !["draft", "published", "archived"].includes(status)
+  ) {
+    res
+      .status(400)
+      .json({
+        message:
+          "Preencha título, resumo, conteúdo e um estado editorial válido.",
+      });
+    return;
+  }
+  const sources = Array.isArray(body.sources) ? body.sources : [];
+  if (
+    sources.length > 30 ||
+    sources.some(
+      (s: any) =>
+        !s ||
+        typeof s.url !== "string" ||
+        !/^https?:\/\//i.test(s.url) ||
+        typeof s.title !== "string",
+    )
+  ) {
+    res
+      .status(400)
+      .json({
+        message: "Informe fontes com título e endereço HTTP ou HTTPS válidos.",
+      });
+    return;
+  }
+  const image = text(body.image, 2000);
+  if (image && !/^https?:\/\//i.test(image) && !/^\/(?!\/)/.test(image)) {
+    res
+      .status(400)
+      .json({ message: "Use uma imagem local ou um endereço HTTPS válido." });
+    return;
+  }
+  try {
+    let existing: any;
+    if (body.id) {
+      const result = await supabase!
+        .from("blog_posts")
+        .select("*")
+        .eq("id", text(body.id, 200))
+        .maybeSingle();
+      if (result.error) {
+        unavailable(res);
+        return;
+      }
+      existing = result.data;
+      if (!existing) {
+        res.status(404).json({ message: "Artigo não encontrado." });
+        return;
+      }
+      if (
+        body.updatedAt &&
+        body.updatedAt !== (existing.updated_at || existing.created_at)
+      ) {
+        res
+          .status(409)
+          .json({
+            message: "Este artigo foi alterado. Recarregue antes de salvar.",
+          });
+        return;
+      }
+    }
+    const now = new Date().toISOString();
+    const row = {
+      id: existing?.id || `post-${randomUUID()}`,
+      slug,
+      title,
+      summary,
+      content,
+      image,
+      category: text(body.category, 100) || "Journal",
+      author: text(body.author, 150) || "Lopes Signature",
+      status,
+      published: status === "published",
+      published_at:
+        status === "published"
+          ? existing?.published_at || now
+          : existing?.published_at || null,
+      updated_at: now,
+      seo_title: text(body.seoTitle, 200),
+      seo_description: text(body.seoDescription, 500),
+      sources: sources.map((s: any) => ({
+        title: text(s.title, 300),
+        url: text(s.url, 2000),
+      })),
+      read_time: `${Math.max(1, Math.ceil(content.split(/\s+/).length / 220))} min de leitura`,
+    };
+    let query = existing
+      ? supabase!.from("blog_posts").update(row).eq("id", existing.id)
+      : supabase!.from("blog_posts").insert(row);
+    if (existing?.updated_at)
+      query = query.eq("updated_at", existing.updated_at);
+    const { data, error } = await query.select("*").maybeSingle();
+    if (error) {
+      if (error.code === "23505") {
+        res
+          .status(409)
+          .json({ message: "Já existe um artigo com esse endereço." });
+        return;
+      }
+      res
+        .status(503)
+        .json({
+          message:
+            "Não foi possível salvar. Verifique a migração editorial no banco; seu texto foi mantido no formulário.",
+        });
+      return;
+    }
+    if (!data) {
+      res
+        .status(409)
+        .json({
+          message: "Este artigo foi alterado. Recarregue antes de salvar.",
+        });
+      return;
+    }
+    const rebuild =
+      status === "published" ||
+      existing?.status === "published" ||
+      (existing && !existing.status)
+        ? await requestSiteRebuild()
+        : "not_needed";
+    res.status(existing ? 200 : 201).json({ post: mapPost(data), rebuild });
+  } catch {
+    unavailable(res);
+  }
+});
+// The legacy generation endpoints are deliberately disabled while the editorial automation is being chosen.
+router.all(["/blog/generate-ai", "/cron/generate-blog"], (_req, res) => {
+  res
+    .status(501)
+    .json({ message: "A automação editorial ainda não foi configurada." });
+});
 export default router;

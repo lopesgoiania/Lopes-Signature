@@ -1,3 +1,4 @@
+import { requestSiteRebuild } from "../lib/site-rebuild.js";
 import { Router } from "express";
 import { randomUUID } from "node:crypto";
 import { supabase } from "../lib/supabase.js";
@@ -413,6 +414,8 @@ router.post("/admin/catalog/properties", async (req: any, res: any) => {
       })
     : await supabase!.from("properties").upsert(row).select().single();
   if (error) return res.status(400).json({ message: error.message });
+  const rebuild = await requestSiteRebuild();
+  res.setHeader("X-Site-Rebuild", rebuild);
   res.json(mapProperty(data));
 });
 router.post("/admin/catalog/taxonomies", async (req: any, res: any) => {
@@ -549,6 +552,8 @@ router.post("/admin/catalog/taxonomies", async (req: any, res: any) => {
           ? "Este slug já está cadastrado."
           : "Não foi possível salvar a taxonomia.",
     });
+  const rebuild = await requestSiteRebuild();
+  res.setHeader("X-Site-Rebuild", rebuild);
   res.json(data);
 });
 router.post("/admin/catalog/media", async (req: any, res: any) => {

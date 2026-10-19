@@ -1,0 +1,342 @@
+{
+  "/images/signature-hero-poster.jpg": {
+    "width": 1920,
+    "height": 1080,
+    "sources": [
+      {
+        "src": "/images/optimized/signature-hero-poster-98a163488c-768.webp",
+        "width": 768
+      },
+      {
+        "src": "/images/optimized/signature-hero-poster-98a163488c-1280.webp",
+        "width": 1280
+      },
+      {
+        "src": "/images/optimized/signature-hero-poster-98a163488c-1920.webp",
+        "width": 1920
+      }
+    ]
+  },
+  "/images/epic-signature-hero.jpg": {
+    "width": 1672,
+    "height": 941,
+    "sources": [
+      {
+        "src": "/images/optimized/epic-signature-hero-37ec3ee7c0-768.webp",
+        "width": 768
+      },
+      {
+        "src": "/images/optimized/epic-signature-hero-37ec3ee7c0-1280.webp",
+        "width": 1280
+      },
+      {
+        "src": "/images/optimized/epic-signature-hero-37ec3ee7c0-1672.webp",
+        "width": 1672
+      }
+    ]
+  },
+  "https://kzarqqcazoxslamzyjqc.supabase.co/storage/v1/object/public/signature-media/catalog/02132a2b-52c5-48bf-bccd-31f3fd7f3923-b-side-by-city-1-imagem-1.png": {
+    "width": 640,
+    "height": 913,
+    "sources": [
+      {
+        "src": "/images/optimized/catalog-c6bc4d924f4e-480.webp",
+        "width": 480
+      },
+      {
+        "src": "/images/optimized/catalog-c6bc4d924f4e-640.webp",
+        "width": 640
+      }
+    ]
+  },
+  "https://kzarqqcazoxslamzyjqc.supabase.co/storage/v1/object/public/signature-media/catalog/05a53a6d-d1ef-4327-b8c6-66b5b9d0d5c7-blanc-casa-design-1-fachada.jpg": {
+    "width": 640,
+    "height": 482,
+    "sources": [
+      {
+        "src": "/images/optimized/catalog-38c1a8a0f6a7-480.webp",
+        "width": 480
+      },
+      {
+        "src": "/images/optimized/catalog-38c1a8a0f6a7-640.webp",
+        "width": 640
+      }
+    ]
+  },
+  "https://kzarqqcazoxslamzyjqc.supabase.co/storage/v1/object/public/signature-media/catalog/240ef74a-7712-4b96-9ffa-6ae6961e5fe9-hub-compact-life-1-fachada.jpg": {
+    "width": 640,
+    "height": 640,
+    "sources": [
+      {
+        "src": "/images/optimized/catalog-a0b0e5e23249-480.webp",
+        "width": 480
+      },
+      {
+        "src": "/images/optimized/catalog-a0b0e5e23249-640.webp",
+        "width": 640
+      }
+    ]
+  },
+  "https://kzarqqcazoxslamzyjqc.supabase.co/storage/v1/object/public/signature-media/catalog/2bd2271c-5840-4bf8-8ae8-dace6423459c-city-23-1-fachada.jpg": {
+    "width": 640,
+    "height": 1067,
+    "sources": [
+      {
+        "src": "/images/optimized/catalog-31f25a86896e-480.webp",
+        "width": 480
+      },
+      {
+        "src": "/images/optimized/catalog-31f25a86896e-640.webp",
+        "width": 640
+      }
+    ]
+  },
+  "https://kzarqqcazoxslamzyjqc.supabase.co/storage/v1/object/public/signature-media/catalog/2c1555ca-06f4-4c67-8d17-766ffa2a976b-city-altier-ricardo-paranhos-1-fachada.png": {
+    "width": 513,
+    "height": 639,
+    "sources": [
+      {
+        "src": "/images/optimized/catalog-71157409329e-480.webp",
+        "width": 480
+      },
+      {
+        "src": "/images/optimized/catalog-71157409329e-513.webp",
+        "width": 513
+      }
+    ]
+  },
+  "https://kzarqqcazoxslamzyjqc.supabase.co/storage/v1/object/public/signature-media/catalog/49aecbae-a29c-41d4-835a-fd7b1a205c95-legacy-city-home-1-fachada.jpg": {
+    "width": 350,
+    "height": 500,
+    "sources": [
+      {
+        "src": "/images/optimized/catalog-7c43c13aa44e-350.webp",
+        "width": 350
+      }
+    ]
+  },
+  "https://kzarqqcazoxslamzyjqc.supabase.co/storage/v1/object/public/signature-media/catalog/4e0f5072-4bfe-4865-9be0-efdfbe9a6af5-city-house-1-fachada.jpg": {
+    "width": 640,
+    "height": 582,
+    "sources": [
+      {
+        "src": "/images/optimized/catalog-9996c823cc86-480.webp",
+        "width": 480
+      },
+      {
+        "src": "/images/optimized/catalog-9996c823cc86-640.webp",
+        "width": 640
+      }
+    ]
+  },
+  "https://kzarqqcazoxslamzyjqc.supabase.co/storage/v1/object/public/signature-media/catalog/555ccd9f-9ce3-493f-92d7-2f10aa0cbb7b-city-park-majestic-1-fachada.jpg": {
+    "width": 473,
+    "height": 792,
+    "sources": [
+      {
+        "src": "/images/optimized/catalog-14f7395ff85b-473.webp",
+        "width": 473
+      }
+    ]
+  },
+  "https://kzarqqcazoxslamzyjqc.supabase.co/storage/v1/object/public/signature-media/catalog/57b54dbe-9625-42ee-b856-4ecc072dab71-atmos-city-design-1-fachada.jpg": {
+    "width": 640,
+    "height": 480,
+    "sources": [
+      {
+        "src": "/images/optimized/catalog-d945238cd264-480.webp",
+        "width": 480
+      },
+      {
+        "src": "/images/optimized/catalog-d945238cd264-640.webp",
+        "width": 640
+      }
+    ]
+  },
+  "https://kzarqqcazoxslamzyjqc.supabase.co/storage/v1/object/public/signature-media/catalog/5edc0406-7d8f-4d2e-9f73-2d74a068a1a7-city-auten-1-imagem-1.jpg": {
+    "width": 640,
+    "height": 354,
+    "sources": [
+      {
+        "src": "/images/optimized/catalog-a29175e3363c-480.webp",
+        "width": 480
+      },
+      {
+        "src": "/images/optimized/catalog-a29175e3363c-640.webp",
+        "width": 640
+      }
+    ]
+  },
+  "https://kzarqqcazoxslamzyjqc.supabase.co/storage/v1/object/public/signature-media/catalog/601671d6-4469-47ba-bc2f-7d15c89731ec-city-park-palace-1-fachada.jpg": {
+    "width": 640,
+    "height": 1067,
+    "sources": [
+      {
+        "src": "/images/optimized/catalog-b618a700652c-480.webp",
+        "width": 480
+      },
+      {
+        "src": "/images/optimized/catalog-b618a700652c-640.webp",
+        "width": 640
+      }
+    ]
+  },
+  "https://kzarqqcazoxslamzyjqc.supabase.co/storage/v1/object/public/signature-media/catalog/81a6213d-aff4-4404-938e-35d27685425d-citage-sante-1-imagem-1.jpg": {
+    "width": 640,
+    "height": 401,
+    "sources": [
+      {
+        "src": "/images/optimized/catalog-9eb97fb79a8a-480.webp",
+        "width": 480
+      },
+      {
+        "src": "/images/optimized/catalog-9eb97fb79a8a-640.webp",
+        "width": 640
+      }
+    ]
+  },
+  "https://kzarqqcazoxslamzyjqc.supabase.co/storage/v1/object/public/signature-media/catalog/91722aee-b84d-4ca3-9e4b-f0201b60743a-city-ricardo-paranhos-1-fachada.jpg": {
+    "width": 640,
+    "height": 800,
+    "sources": [
+      {
+        "src": "/images/optimized/catalog-a794f059f21b-480.webp",
+        "width": 480
+      },
+      {
+        "src": "/images/optimized/catalog-a794f059f21b-640.webp",
+        "width": 640
+      }
+    ]
+  },
+  "https://kzarqqcazoxslamzyjqc.supabase.co/storage/v1/object/public/signature-media/catalog/929d9341-97da-476e-8987-637ba2144a38-haut-compact-life-1-fachada.jpg": {
+    "width": 640,
+    "height": 480,
+    "sources": [
+      {
+        "src": "/images/optimized/catalog-2dc2b1e2dcac-480.webp",
+        "width": 480
+      },
+      {
+        "src": "/images/optimized/catalog-2dc2b1e2dcac-640.webp",
+        "width": 640
+      }
+    ]
+  },
+  "https://kzarqqcazoxslamzyjqc.supabase.co/storage/v1/object/public/signature-media/catalog/9f0d54bf-9ae0-4bd2-9cf9-1bf78979e369-city-corporate-1-imagem-1.jpg": {
+    "width": 640,
+    "height": 1137,
+    "sources": [
+      {
+        "src": "/images/optimized/catalog-af4b4e77055e-480.webp",
+        "width": 480
+      },
+      {
+        "src": "/images/optimized/catalog-af4b4e77055e-640.webp",
+        "width": 640
+      }
+    ]
+  },
+  "https://kzarqqcazoxslamzyjqc.supabase.co/storage/v1/object/public/signature-media/catalog/b1973360-7467-48a9-9556-806b1db1d46e-city-code-areiao-1-imagem-1.jpg": {
+    "width": 640,
+    "height": 831,
+    "sources": [
+      {
+        "src": "/images/optimized/catalog-c299bc0fe363-480.webp",
+        "width": 480
+      },
+      {
+        "src": "/images/optimized/catalog-c299bc0fe363-640.webp",
+        "width": 640
+      }
+    ]
+  },
+  "https://kzarqqcazoxslamzyjqc.supabase.co/storage/v1/object/public/signature-media/catalog/c0018ccb-4aa6-4ba4-aacf-91531977eebd-city-park-royal-1-fachada.png": {
+    "width": 640,
+    "height": 914,
+    "sources": [
+      {
+        "src": "/images/optimized/catalog-735a92d0615f-480.webp",
+        "width": 480
+      },
+      {
+        "src": "/images/optimized/catalog-735a92d0615f-640.webp",
+        "width": 640
+      }
+    ]
+  },
+  "https://kzarqqcazoxslamzyjqc.supabase.co/storage/v1/object/public/signature-media/catalog/c944622a-e512-4fcd-b84d-c52847150d5b-azure-compact-life-1-fachada.jpg": {
+    "width": 640,
+    "height": 384,
+    "sources": [
+      {
+        "src": "/images/optimized/catalog-34bb822a60d8-480.webp",
+        "width": 480
+      },
+      {
+        "src": "/images/optimized/catalog-34bb822a60d8-640.webp",
+        "width": 640
+      }
+    ]
+  },
+  "https://kzarqqcazoxslamzyjqc.supabase.co/storage/v1/object/public/signature-media/catalog/e8f59c7e-5e0d-451a-9a70-662a2745eb27-infinity-business-by-pininfarina-1-fachada.jpg": {
+    "width": 640,
+    "height": 914,
+    "sources": [
+      {
+        "src": "/images/optimized/catalog-a4e85bdc1217-480.webp",
+        "width": 480
+      },
+      {
+        "src": "/images/optimized/catalog-a4e85bdc1217-640.webp",
+        "width": 640
+      }
+    ]
+  },
+  "https://kzarqqcazoxslamzyjqc.supabase.co/storage/v1/object/public/signature-media/catalog/eac7c7c6-5d84-4a65-a783-2186325fc9b8-city-garten-1-fachada.jpg": {
+    "width": 640,
+    "height": 1067,
+    "sources": [
+      {
+        "src": "/images/optimized/catalog-6c8e02c10ee4-480.webp",
+        "width": 480
+      },
+      {
+        "src": "/images/optimized/catalog-6c8e02c10ee4-640.webp",
+        "width": 640
+      }
+    ]
+  },
+  "https://kzarqqcazoxslamzyjqc.supabase.co/storage/v1/object/public/signature-media/catalog/f290d67e-a07f-4c1c-b0c8-88025ccdd8eb-city-way-1-fachada.jpg": {
+    "width": 640,
+    "height": 811,
+    "sources": [
+      {
+        "src": "/images/optimized/catalog-b03829b69880-480.webp",
+        "width": 480
+      },
+      {
+        "src": "/images/optimized/catalog-b03829b69880-640.webp",
+        "width": 640
+      }
+    ]
+  },
+  "https://lopessignature.vercel.app/images/epic-signature-hero.jpg": {
+    "width": 1672,
+    "height": 941,
+    "sources": [
+      {
+        "src": "/images/optimized/catalog-37ec3ee7c05f-480.webp",
+        "width": 480
+      },
+      {
+        "src": "/images/optimized/catalog-37ec3ee7c05f-960.webp",
+        "width": 960
+      },
+      {
+        "src": "/images/optimized/catalog-37ec3ee7c05f-1600.webp",
+        "width": 1600
+      }
+    ]
+  }
+}

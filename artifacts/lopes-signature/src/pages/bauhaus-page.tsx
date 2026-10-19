@@ -1,3 +1,4 @@
+import { ResponsiveImage } from '@/components/responsive-image';
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ArrowRight, ArrowUpRight, Check, MapPin } from "lucide-react";
 import { GooglePropertyMap } from "@/components/google-property-map";
@@ -126,7 +127,7 @@ export default function BauhausPage({property}: {property?:any}) {
           ref={heroRef}
           aria-labelledby="bauhaus-title"
         >
-          <img
+          <ResponsiveImage
             className="bh-hero-photo"
             src={image("1690586")}
             alt="Perspectiva artística do Bauhaus em frente ao lago e à vegetação do Parque Vaca Brava"
@@ -194,7 +195,7 @@ export default function BauhausPage({property}: {property?:any}) {
             </p>
           </div>
           <figure className="bh-wide-photo">
-            <img
+            <ResponsiveImage
               src={image("1690598")}
               alt="Perspectiva do living do Bauhaus, com madeira, mobiliário e ampla abertura para a paisagem"
               loading="lazy"
@@ -206,7 +207,7 @@ export default function BauhausPage({property}: {property?:any}) {
           </figure>
           <div className="bh-material-story">
             <figure>
-              <img
+              <ResponsiveImage
                 src={image("1690590")}
                 alt="Perspectiva de ambiente com painel de madeira, obra de arte e mobiliário modernista"
                 loading="lazy"
@@ -259,7 +260,7 @@ export default function BauhausPage({property}: {property?:any}) {
             {property && <GooglePropertyMap property={property} />}
           </div>
           <figure>
-            <img
+            <ResponsiveImage
               src={image("1690586")}
               alt="Perspectiva do Bauhaus visto do lago do Parque Vaca Brava"
               loading="lazy"
@@ -320,7 +321,7 @@ export default function BauhausPage({property}: {property?:any}) {
             </button>
           </div>
           <figure className="bh-space-photo">
-            <img
+            <ResponsiveImage
               src={image(leisure[space].id)}
               alt={leisure[space].alt}
               loading="lazy"
@@ -374,7 +375,7 @@ export default function BauhausPage({property}: {property?:any}) {
             </a>
           </div>
           <figure className="bh-plan-image" role="tabpanel" id="bauhaus-plan-panel" aria-labelledby={`bauhaus-plan-tab-${plan}`}>
-            <img
+            <ResponsiveImage
               src={plans[plan].image}
               alt={`Planta humanizada do apartamento Bauhaus de aproximadamente ${plans[plan].area} metros quadrados`}
               loading="lazy"

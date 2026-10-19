@@ -1,0 +1,115 @@
+{
+  "date": "2026-10-15",
+  "baseUrl": "https://lopessignature.vercel.app",
+  "domainConfirmedByUser": false,
+  "scope": "Somente leitura HTTP. HTML inicial, sem renderização. Contagens agregadas; nenhum registro pessoal armazenado.",
+  "results": [
+    {
+      "path": "/",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 2585,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "title": [
+        "Imóveis de alto padrão em Goiânia | Lopes Signature"
+      ],
+      "canonical": [
+        "<link rel=\"canonical\" href=\"https://lopessignature.vercel.app/\" />"
+      ],
+      "emptyRoot": true,
+      "jsonLdCount": 0
+    },
+    {
+      "path": "/journal",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 2585,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "title": [
+        "Imóveis de alto padrão em Goiânia | Lopes Signature"
+      ],
+      "canonical": [
+        "<link rel=\"canonical\" href=\"https://lopessignature.vercel.app/\" />"
+      ],
+      "emptyRoot": true,
+      "jsonLdCount": 0
+    },
+    {
+      "path": "/api/blog",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "bytes": 2,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "count": 0
+    },
+    {
+      "path": "/api/properties",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "bytes": 169680,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "count": 22
+    },
+    {
+      "path": "/api/specialists",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "bytes": 3776,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "count": 16
+    },
+    {
+      "path": "/sitemap.xml",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 2585,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "title": [
+        "Imóveis de alto padrão em Goiânia | Lopes Signature"
+      ],
+      "canonical": [
+        "<link rel=\"canonical\" href=\"https://lopessignature.vercel.app/\" />"
+      ],
+      "emptyRoot": true,
+      "jsonLdCount": 0
+    },
+    {
+      "path": "/pagina-inexistente-auditoria",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 2585,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "title": [
+        "Imóveis de alto padrão em Goiânia | Lopes Signature"
+      ],
+      "canonical": [
+        "<link rel=\"canonical\" href=\"https://lopessignature.vercel.app/\" />"
+      ],
+      "emptyRoot": true,
+      "jsonLdCount": 0
+    },
+    {
+      "path": "/robots.txt",
+      "status": 200,
+      "contentType": "text/plain; charset=utf-8",
+      "bytes": 23,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "body": "User-agent: *\nAllow: /\n"
+    },
+    {
+      "path": "/imoveis/epic-city-home",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 2585,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "title": [
+        "Imóveis de alto padrão em Goiânia | Lopes Signature"
+      ],
+      "canonical": [
+        "<link rel=\"canonical\" href=\"https://lopessignature.vercel.app/\" />"
+      ],
+      "emptyRoot": true,
+      "jsonLdCount": 0
+    }
+  ]
+}

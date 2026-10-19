@@ -5,8 +5,12 @@
       "destination": "/api"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "source": "/admin",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/previa/:path*",
+      "destination": "/app.html"
     }
   ],
   "redirects": [
@@ -29,6 +33,50 @@
       "source": "/property/:id",
       "destination": "/imoveis/:id",
       "permanent": true
+    },
+    {
+      "source": "/conteudos",
+      "destination": "/journal",
+      "permanent": true
+    }
+  ],
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "headers": [
+    {
+      "source": "/app.html",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/admin",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    },
+    {
+      "source": "/previa/:path*",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
     }
   ]
 }

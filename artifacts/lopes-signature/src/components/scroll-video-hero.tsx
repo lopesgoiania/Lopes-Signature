@@ -1,3 +1,4 @@
+import { ResponsiveImage } from '@/components/responsive-image';
 import { useEffect, useRef, useState } from 'react';
 
 export function ScrollVideoHero() {
@@ -24,7 +25,7 @@ export function ScrollVideoHero() {
 
   return (
     <section className="relative isolate overflow-hidden bg-[#121212]">
-      <img src={`${base}images/signature-hero-poster.jpg`} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" fetchPriority="high" />
+      <ResponsiveImage src={`${base}images/signature-hero-poster.jpg`} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" fetchPriority="high" />
       {!reduceMotion && !failed && (
         <video
           ref={videoRef}

@@ -1,0 +1,156 @@
+{
+  "date": "2026-10-15",
+  "scope": "local",
+  "totalBytes": 78968716,
+  "byFormat": {
+    ".png": {
+      "count": 20,
+      "bytes": 39112105
+    },
+    ".jpg": {
+      "count": 166,
+      "bytes": 28946514
+    },
+    ".jpeg": {
+      "count": 1,
+      "bytes": 75601
+    },
+    ".webp": {
+      "count": 74,
+      "bytes": 10834496
+    },
+    ".avif": {
+      "count": 0,
+      "bytes": 0
+    }
+  },
+  "largest": [
+    {
+      "path": "artifacts/lopes-signature/public/images/specialists/JAIRO.png",
+      "bytes": 9019111,
+      "width": 3222,
+      "height": 3402,
+      "mode": "RGBA"
+    },
+    {
+      "path": "artifacts/lopes-signature/public/images/specialists/Dariane.png",
+      "bytes": 7834401,
+      "width": 1792,
+      "height": 2390,
+      "mode": "RGBA"
+    },
+    {
+      "path": "artifacts/lopes-signature/public/images/image_1788303912918.png",
+      "bytes": 2231938,
+      "width": 2048,
+      "height": 1536,
+      "mode": "RGBA"
+    },
+    {
+      "path": "artifacts/lopes-signature/public/images/specialists/DIVINA.png",
+      "bytes": 2204356,
+      "width": 1856,
+      "height": 2304,
+      "mode": "RGBA"
+    },
+    {
+      "path": "artifacts/lopes-signature/public/images/banner-hero-2.png",
+      "bytes": 2198641,
+      "width": 1983,
+      "height": 950,
+      "mode": "RGB"
+    },
+    {
+      "path": "artifacts/lopes-signature/public/images/banner-hero.png",
+      "bytes": 1995020,
+      "width": 1983,
+      "height": 793,
+      "mode": "RGB"
+    },
+    {
+      "path": "artifacts/lopes-signature/public/images/specialists/TADEU.png",
+      "bytes": 1877460,
+      "width": 1075,
+      "height": 1417,
+      "mode": "RGBA"
+    },
+    {
+      "path": "artifacts/lopes-signature/public/images/image_1788303907167.png",
+      "bytes": 1510955,
+      "width": 2048,
+      "height": 1536,
+      "mode": "RGBA"
+    },
+    {
+      "path": "artifacts/lopes-signature/public/images/image_1788303895261.png",
+      "bytes": 1510955,
+      "width": 2048,
+      "height": 1536,
+      "mode": "RGBA"
+    },
+    {
+      "path": "artifacts/lopes-signature/public/images/specialists/CELMA.png",
+      "bytes": 1383976,
+      "width": 928,
+      "height": 1152,
+      "mode": "RGBA"
+    },
+    {
+      "path": "artifacts/lopes-signature/public/images/specialists/LEANDRO BENDER.png",
+      "bytes": 1362482,
+      "width": 991,
+      "height": 1247,
+      "mode": "RGBA"
+    },
+    {
+      "path": "artifacts/lopes-signature/public/images/specialists/ROOSEVALT.jpg",
+      "bytes": 1321550,
+      "width": 1855,
+      "height": 2036,
+      "mode": "RGB"
+    }
+  ],
+  "samples": [
+    {
+      "path": "artifacts/lopes-signature/public/images/specialists/LEANDRO BENDER.png",
+      "originalBytes": 1362482,
+      "candidateBytes": 73626,
+      "candidateWidth": 954,
+      "candidateHeight": 1200,
+      "reductionPercent": 94.6
+    },
+    {
+      "path": "artifacts/lopes-signature/public/images/specialists/ANNA PAULA.png",
+      "originalBytes": 1240238,
+      "candidateBytes": 62342,
+      "candidateWidth": 928,
+      "candidateHeight": 1152,
+      "reductionPercent": 95.0
+    },
+    {
+      "path": "artifacts/lopes-signature/public/images/banner-hero-2.png",
+      "originalBytes": 2198641,
+      "candidateBytes": 84064,
+      "candidateWidth": 1920,
+      "candidateHeight": 920,
+      "reductionPercent": 96.2
+    },
+    {
+      "path": "artifacts/lopes-signature/public/images/logo-signature.png",
+      "originalBytes": 10545,
+      "candidateBytes": 8644,
+      "candidateWidth": 716,
+      "candidateHeight": 513,
+      "reductionPercent": 18.0
+    },
+    {
+      "path": "artifacts/lopes-signature/public/images/signature-hero-poster.jpg",
+      "originalBytes": 218713,
+      "candidateBytes": 127426,
+      "candidateWidth": 1920,
+      "candidateHeight": 1080,
+      "reductionPercent": 41.7
+    }
+  ],
+  "note": "Conversões de teste em memória; originais preservados. Economia combina redimensionamento e WebP. Qualidade 85 não é garantia de equivalência visual."
+}

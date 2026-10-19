@@ -13,12 +13,14 @@ export function CatalogSearch({
   initialType = "",
   home = false,
   initialTerm,
+  showCount = true,
 }: {
   properties: any[];
   onResults: (items: any[]) => void;
   initialType?: string;
   home?: boolean;
   initialTerm?: Taxonomy;
+  showCount?: boolean;
 }) {
   const { data: terms = EMPTY_TERMS } = useQuery<Taxonomy[]>({
     queryKey: ["taxonomies"],
@@ -241,10 +243,10 @@ export function CatalogSearch({
         </div>
       )}
       <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-        <span aria-live="polite">
+        {showCount && <span aria-live="polite">
           {results.length}{" "}
           {results.length === 1 ? "imóvel encontrado" : "imóveis encontrados"}
-        </span>
+        </span>}
         <button
           onClick={() => {
             const next = {

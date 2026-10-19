@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { pageSeo, usePageSeo } from "@/lib/seo";
 import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -25,61 +25,14 @@ export default function TaxonomyCatalogPage() {
   const hasProperties =
     !!term &&
     !!properties.data?.some((p) => taxonomyMatches(p, term, query.data || []));
-  useEffect(() => {
-    const previous = document.title;
-    document.title =
-      term?.meta?.seoTitle || `${term?.label || "Catálogo"} | Lopes Signature`;
-    const restore: (() => void)[] = [];
-    for (const [name, value] of [
-      [
-        "robots",
-        term?.meta?.indexable && hasProperties
-          ? "index,follow"
-          : "noindex,follow",
-      ],
-      [
-        "description",
-        term?.meta?.seoDescription ||
-          term?.meta?.description ||
-          "Catálogo Lopes Signature",
-      ],
-    ]) {
-      let el = document.querySelector<HTMLMetaElement>(`meta[name="${name}"]`);
-      if (el) {
-        const old = el.content;
-        restore.push(() => {
-          el!.content = old;
-        });
-      } else {
-        el = document.createElement("meta");
-        el.name = name;
-        document.head.appendChild(el);
-        restore.push(() => el!.remove());
-      }
-      el.content = value;
-    }
-    let canonical = document.querySelector<HTMLLinkElement>(
-      'link[rel="canonical"]',
-    );
-    if (canonical) {
-      const old = canonical.href;
-      restore.push(() => {
-        canonical!.href = old;
-      });
-    } else {
-      canonical = document.createElement("link");
-      canonical.rel = "canonical";
-      document.head.appendChild(canonical);
-      restore.push(() => canonical!.remove());
-    }
-    canonical.href =
-      window.location.origin +
-      (term ? taxonomyHref(term) : window.location.pathname);
-    return () => {
-      document.title = previous;
-      restore.forEach((f) => f());
-    };
-  }, [term, hasProperties]);
+  usePageSeo(
+    pageSeo(`/imoveis/taxonomia/${kind}/${slug}`, {
+      properties: properties.data || [],
+      taxonomies: query.data || [],
+      specialists: [],
+      posts: [],
+    }),
+  );
   if (query.isLoading)
     return (
       <div className="signature-shell min-h-screen pt-40 text-center">
@@ -109,10 +62,8 @@ export default function TaxonomyCatalogPage() {
       taxonomy={term}
       title={term.label}
       description={
-        term.meta?.description ||
-        "Uma seleção à altura da sua exigência."
+        term.meta?.description || "Uma seleção à altura da sua exigência."
       }
     />
   );
 }
-

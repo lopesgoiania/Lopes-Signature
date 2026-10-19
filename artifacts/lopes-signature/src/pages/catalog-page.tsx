@@ -1,8 +1,11 @@
+import { SiteFooter } from "@/components/site-footer";
 import '@/components/property-listing.css';
-import { type Taxonomy } from "@/lib/catalog";
+import { taxonomyMatches, slugify, type Taxonomy } from "@/lib/catalog";
+import { useQuery } from "@tanstack/react-query";
+import { catalogRequest } from "@/lib/catalog";
 import { CatalogSearch } from "@/components/catalog-search";
 const EMPTY_PROPERTIES: any[] = [];
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useListProperties } from "@workspace/api-client-react";
 import {
   PublicNav,
@@ -30,15 +33,15 @@ export default function CatalogPage({
   description: string;
   taxonomy?: Taxonomy;
 }) {
-  const [search, setSearch] = useState(category || "");
-  const [saved, setSaved] = useState<string[]>(() => {
+  const [searchRevision, setSearchRevision] = useState(0);
+  const [sort, setSort] = useState("default");
+  const [saved, setSaved] = useState<string[]>([]);
+  useEffect(() => {
     try {
-      const parsed = JSON.parse(localStorage.getItem("lopes-saved") || "[]");
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  });
+      const parsed = JSON.parse(localStorage.getItem('lopes-saved') || '[]');
+      if (Array.isArray(parsed)) setSaved(parsed);
+    } catch { /* Favourites are optional when browser storage is unavailable. */ }
+  }, []);
   const [selectedRaioXProperty, setSelectedRaioXProperty] =
     useState<Property | null>(null);
 
@@ -49,7 +52,9 @@ export default function CatalogPage({
   const [filteredProperties, setFilteredProperties] = useState<any[] | null>(
     null,
   );
-  const properties = filteredProperties ?? allProperties;
+  const terms = useQuery<Taxonomy[]>({ queryKey: ['taxonomies'], queryFn: () => catalogRequest('taxonomies') });
+  const initial = allProperties.filter(p => (!taxonomy || taxonomyMatches(p, taxonomy, terms.data || [])) && (!category || category === 'empreendimento' || slugify((p as any).category || '').includes(slugify(category))));
+  const properties = [...(filteredProperties ?? initial)].sort((a,b) => sort === "price-asc" ? (a.price || Infinity)-(b.price || Infinity) : sort === "price-desc" ? (b.price || 0)-(a.price || 0) : sort === "area" ? b.area-a.area : 0);
 
   function toggleSave(id: string) {
     const next = saved.includes(id)
@@ -63,19 +68,12 @@ export default function CatalogPage({
     <div className="signature-shell catalog-layout min-h-[100dvh] text-foreground bg-background">
       <PublicNav />
       <main className="pt-32">
-          <section className="catalog-search-layout mx-auto max-w-[1280px] px-5 md:px-10">
-            <CatalogSearch
-              initialTerm={taxonomy}
-              properties={allProperties}
-              onResults={setFilteredProperties}
-              initialType={category === "empreendimento" ? "" : category || ""}
-            />
-          </section>
+
 
 
         <section className="property-listing mx-auto max-w-[1280px] px-5 md:px-10">
           <div className="listing-header mb-10 max-w-2xl">
-            <SectionLabel>CATÁLOGO SIGNATURE</SectionLabel>
+
             <h1 className="serif text-4xl text-foreground md:text-5xl mt-2 mb-4">
               {title}
             </h1>
@@ -84,6 +82,15 @@ export default function CatalogPage({
             </p>
           </div>
 
+          <section className="catalog-search-layout mx-auto max-w-[1280px] px-5 md:px-10">
+            <CatalogSearch showCount={false} key={searchRevision}
+              initialTerm={taxonomy}
+              properties={allProperties}
+              onResults={setFilteredProperties}
+              initialType={category === "empreendimento" ? "" : category || ""}
+            />
+          </section>
+<div className="catalog-results-toolbar"><p aria-live="polite">{properties.length} {properties.length === 1 ? "imóvel encontrado" : "imóveis encontrados"}</p><label>Ordenar por <select value={sort} onChange={e=>setSort(e.target.value)}><option value="default">Seleção Signature</option><option value="price-asc">Menor valor</option><option value="price-desc">Maior valor</option><option value="area">Maior área</option></select></label></div>
           {propertyQuery.isLoading ? (
             <SkeletonGrid />
           ) : propertyQuery.isError ? (
@@ -92,7 +99,7 @@ export default function CatalogPage({
             <EmptyState
               title="Nenhum imóvel encontrado"
               description="Refine sua busca ou fale com a equipe para mapear opções no mercado."
-              onReset={() => setSearch("")}
+              onReset={() => { setFilteredProperties(null); setSearchRevision(v=>v+1); }}
             />
           ) : (
             <div className="listing-grid grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -117,80 +124,7 @@ export default function CatalogPage({
         />
       )}
 
-      <footer className="border-t border-border bg-secondary text-secondary-foreground">
-        <div className="mx-auto grid max-w-[1280px] gap-12 px-5 py-14 md:grid-cols-[1.2fr_1fr_1.5fr] md:px-10">
-          <div>
-            <PageLogo />
-            <p className="mt-5 max-w-xs text-sm leading-6 text-[#D0D0D0]">
-              Casas, apartamentos e empreendimentos de alto padrão em Goiânia,
-              com o olhar dos especialistas Lopes Signature.
-            </p>
-            <div className="mt-6 flex gap-2">
-              <a
-                href="https://instagram.com"
-                aria-label="Instagram"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-primary hover:bg-white/5"
-              >
-                <Instagram size={16} />
-              </a>
-              <a
-                href="https://linkedin.com"
-                aria-label="LinkedIn"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-primary hover:bg-white/5"
-              >
-                <Linkedin size={16} />
-              </a>
-              <a
-                href="mailto:contato@lopessignature.com.br"
-                aria-label="Email"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-primary hover:bg-white/5"
-              >
-                <Mail size={16} />
-              </a>
-            </div>
-          </div>
-          <div>
-            <p className="mono-label mb-5 text-primary">Navegue</p>
-            <div className="flex flex-col gap-3 text-sm text-[#D0D0D0]">
-              <Link href="/imoveis" className="hover:text-primary">
-                Imóveis
-              </Link>
-              <Link href="/especialistas" className="hover:text-primary">
-                Especialistas
-              </Link>
-              <Link href="/conteudos" className="hover:text-primary">
-                Conteúdos
-              </Link>
-              <Link href="/contato" className="hover:text-primary">
-                Contato
-              </Link>
-            </div>
-          </div>
-          <div>
-            <p className="mono-label mb-5 text-primary">Contato</p>
-            <div className="text-sm text-[#D0D0D0] space-y-4">
-              <p>
-                <strong>Telefone:</strong> (62) 3921 9800
-                <br />
-                <strong>E-mail:</strong> contato@lopessignature.com.br
-              </p>
-              <div>
-                <strong>Endereços:</strong>
-                <ul className="mt-2 space-y-2 text-xs">
-                  <li>
-                    <span className="text-[#F7F5F0]">Lopes Marista:</span> R.
-                    146, 495 - Marista, Goiânia - GO
-                  </li>
-                  <li>
-                    <span className="text-[#F7F5F0]">Lopes Bueno:</span> Avenida
-                    T-11 Qd. 117 Lt. 20 - Nº 503 - St. Bueno
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

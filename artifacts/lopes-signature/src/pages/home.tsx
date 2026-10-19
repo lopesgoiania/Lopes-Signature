@@ -1,3 +1,6 @@
+import { SiteFooter } from "@/components/site-footer";
+import { useQuery } from '@tanstack/react-query';
+import { readPosts, postHref } from '@/lib/journal';
 import '@/components/property-listing.css';
 import { PublicNav } from "@/components/signature-ui";
 import './home-design-preview.css';
@@ -17,17 +20,17 @@ const categories = [
 
 export default function HomePage() {
   const [searchRevision, setSearchRevision] = useState(0);
-  const [saved, setSaved] = useState<string[]>(() => {
+  const [saved, setSaved] = useState<string[]>([]);
+  useEffect(() => {
     try {
       const parsed = JSON.parse(localStorage.getItem('lopes-saved') || '[]');
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  });
+      if (Array.isArray(parsed)) setSaved(parsed);
+    } catch { /* Favourites are optional when browser storage is unavailable. */ }
+  }, []);
   const [selectedRaioXProperty, setSelectedRaioXProperty] = useState<Property | null>(null);
-  const [blogPosts, setBlogPosts] = useState<any[]>([]);
-  const [loadingBlog, setLoadingBlog] = useState(true);
+  const blogQuery = useQuery({ queryKey: ['journal-posts'], queryFn: readPosts });
+  const blogPosts = blogQuery.data || [];
+  const loadingBlog = blogQuery.isLoading;
 
   const propertyQuery = useListProperties();
   const createLead = useCreateLead();
@@ -41,23 +44,6 @@ export default function HomePage() {
     return rank(a) - rank(b);
   }).slice(0, 6), [allProperties]);
   const properties = isFullCatalog ? curated : results;
-
-  // Buscar posts dinâmicos da API /api/blog e registrar visita real
-  useEffect(() => {
-    fetch('/api/analytics/event', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ eventType: 'page_view', pageUrl: '/' }),
-    }).catch(() => {});
-
-    fetch('/api/blog')
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) setBlogPosts(data.filter(post => post.published !== false));
-      })
-      .catch(() => {})
-      .finally(() => setLoadingBlog(false));
-  }, []);
 
   function toggleSave(id: string) {
     const next = saved.includes(id) ? saved.filter((item) => item !== id) : [...saved, id];
@@ -133,10 +119,10 @@ export default function HomePage() {
               <div key={i} className="skeleton h-80 rounded-3xl" />
             ))}
           </div>
-        ) : blogPosts.length === 0 ? <p className="text-muted-foreground">Em breve, novas leituras do Journal Signature.</p> : (
+        ) : blogQuery.isError ? <p role="alert">Não foi possível carregar as leituras. <button onClick={() => blogQuery.refetch()} className="underline">Tentar novamente</button></p> : blogPosts.length === 0 ? <p className="text-muted-foreground">Em breve, novas leituras do Journal Signature.</p> : (
           <div className="grid gap-8 md:grid-cols-3">
             {blogPosts.slice(0, 3).map((post) => (
-              <Link href={`/journal/${encodeURIComponent(post.id)}`} key={post.id} className="group cursor-pointer overflow-hidden rounded-3xl border border-border bg-card transition duration-300 hover:border-primary/50 hover:bg-muted">
+              <Link href={postHref(post)} key={post.id} className="group cursor-pointer overflow-hidden rounded-3xl border border-border bg-card transition duration-300 hover:border-primary/50 hover:bg-muted">
                 <div className="overflow-hidden">
                   <img
                     src={post.image || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'}
@@ -247,54 +233,6 @@ export default function HomePage() {
       />
     )}
 
-    <footer className="border-t border-border bg-secondary text-secondary-foreground">
-      <div className="mx-auto grid max-w-[1280px] gap-12 px-5 py-14 md:grid-cols-[1.2fr_1fr_1.5fr] md:px-10">
-        <div>
-          <PageLogo />
-          <p className="mt-5 max-w-xs text-sm leading-6 text-[#D0D0D0]">Casas, apartamentos e empreendimentos de alto padrão em Goiânia, com o olhar dos especialistas Lopes Signature.</p>
-          <div className="mt-6 flex gap-2">
-            <a href="https://instagram.com" aria-label="Instagram" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-primary hover:bg-white/5" data-testid="link-instagram"><Instagram size={16} /></a>
-            <a href="https://linkedin.com" aria-label="LinkedIn" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-primary hover:bg-white/5" data-testid="link-linkedin"><Linkedin size={16} /></a>
-            <a href="mailto:contato@lopessignature.com.br" aria-label="Email" className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-primary hover:bg-white/5" data-testid="link-email"><Mail size={16} /></a>
-          </div>
-        </div>
-        <div>
-          <p className="mono-label mb-5 text-primary">Navegue</p>
-          <div className="flex flex-col gap-3 text-sm text-[#D0D0D0]">
-            <a href="/imoveis" className="hover:text-primary">Imóveis</a>
-            <Link href="/sobre" className="hover:text-primary">Sobre nós</Link>
-            <Link href="/especialistas" className="hover:text-primary">Especialistas</Link>
-            <a href="/journal" className="hover:text-primary">Journal</a>
-            <Link href="/contato" className="hover:text-primary">Contato</Link>
-          </div>
-        </div>
-        <div>
-          <p className="mono-label mb-5 text-primary">Contato</p>
-          <div className="text-sm text-[#D0D0D0] space-y-4">
-            <p>
-              <strong>Telefone:</strong> (62) 3921 9800<br />
-              <strong>E-mail:</strong> contato@lopessignature.com.br
-            </p>
-            <div>
-              <strong>Endereços:</strong>
-              <ul className="mt-2 space-y-2 text-xs">
-                <li><span className="text-[#F7F5F0]">Lopes Marista:</span> R. 146, 495 - Marista, Goiânia - GO, 74170-090</li>
-                <li><span className="text-[#F7F5F0]">Lopes Bueno:</span> Avenida T-11 Qd. 117 Lt. 20 - Nº 503 - St. Bueno, Goiânia - GO, 74223-070</li>
-                <li><span className="text-[#F7F5F0]">Lopes Jardim Goiás:</span> R. 14, Térreo C-9 Lotes 02/05-15 - Jardim Goiás, Goiânia - GO, 74810-180</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="border-t border-white/10 px-5 py-5 md:px-10">
-        <div className="mx-auto flex max-w-[1280px] justify-between text-[10px] uppercase tracking-[.15em] text-[#595959]">
-          <span>© 2026 Lopes Signature</span>
-          <div className="flex gap-4">
-            <Link href="/privacidade" className="hover:text-primary">Privacidade</Link>
-            <Link href="/termos" className="hover:text-primary">Termos</Link>
-          </div>
-        </div>
-      </div>
-    </footer>
+    <SiteFooter />
   </div>;
 }

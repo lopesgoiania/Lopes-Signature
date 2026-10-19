@@ -37,7 +37,9 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, 'dist'),
     emptyOutDir: true,
+    cssCodeSplit: false,
   },
+  ssr: { noExternal: ['@workspace/api-client-react'] },
   server: {
     port,
     strictPort: false,

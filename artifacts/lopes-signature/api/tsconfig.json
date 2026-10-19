@@ -9,7 +9,8 @@
     "strict": false,
     "types": [
       "node"
-    ]
+    ],
+    "resolveJsonModule": true
   },
   "include": [
     "index.ts"

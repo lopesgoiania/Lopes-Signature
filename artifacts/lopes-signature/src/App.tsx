@@ -1,25 +1,43 @@
-import TaxonomyCatalogPage from "@/pages/taxonomy-catalog-page";
-import CatalogPropertyPage from "@/pages/catalog-property-page";
-import PropertyDesignPreview from "@/pages/property-design-preview";
-import { type ReactNode } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { catalogRequest } from "@/lib/catalog";
+import { pageSeo, usePageSeo } from "@/lib/seo";
+const TaxonomyCatalogPage = lazy(() => import("@/pages/taxonomy-catalog-page"));
+const CatalogPropertyPage = lazy(() => import("@/pages/catalog-property-page"));
+const PropertyDesignPreview = lazy(
+  () => import("@/pages/property-design-preview"),
+);
+import { type ReactNode, lazy, Suspense } from "react";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from "@tanstack/react-query";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/not-found";
-import HomePage from "@/pages/home";
-import PropertyDetailPage from "@/pages/property-detail";
-import AdminPage from "@/pages/admin";
-import AboutPage from "@/pages/about-page";
-import JournalPage from "@/pages/journal-page";
-import SpecialistsPage from "@/pages/specialists-page";
-import ContactPage from "@/pages/contact-page";
-import LandingPage from "@/pages/landing-page";
-import BauhausPage from "@/pages/bauhaus-page";
-import CatalogPage from "@/pages/catalog-page";
-import { Route, Switch, Redirect, useLocation, Router as WouterRouter } from "wouter";
+const NotFound = lazy(() => import("@/pages/not-found"));
+const HomePage = lazy(() => import("@/pages/home"));
+const AdminPage = lazy(() => import("@/pages/admin"));
+const AboutPage = lazy(() => import("@/pages/about-page"));
+const JournalPage = lazy(() => import("@/pages/journal-page"));
+const SpecialistsPage = lazy(() => import("@/pages/specialists-page"));
+const ContactPage = lazy(() => import("@/pages/contact-page"));
+const LandingPage = lazy(() => import("@/pages/landing-page"));
+const BauhausPage = lazy(() => import("@/pages/bauhaus-page"));
+const CatalogPage = lazy(() => import("@/pages/catalog-page"));
+import {
+  Route,
+  Switch,
+  Redirect,
+  useLocation,
+  Router as WouterRouter,
+} from "wouter";
 
-const queryClient = new QueryClient();
+export const createAppQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: { staleTime: 60_000, refetchOnWindowFocus: false },
+    },
+  });
 
 function Router() {
   return (
@@ -53,7 +71,10 @@ function Router() {
             description="Descubra casas, apartamentos e coberturas de alto padrão em Goiânia."
           />
         </Route>
-        <Route path="/empreendimentos" component={() => <Redirect to="/imoveis" />} />
+        <Route
+          path="/empreendimentos"
+          component={() => <Redirect to="/imoveis" />}
+        />
         <Route path="/casas-alto-padrao-goiania">
           <CatalogPage
             category="casa"
@@ -87,18 +108,62 @@ function RoutedErrorBoundary({ children }: { children: ReactNode }) {
   return <ErrorBoundary resetKey={location}>{children}</ErrorBoundary>;
 }
 
-function App() {
+function RouteMetadata() {
+  const [location] = useLocation();
+  const category =
+    /^(\/casas-alto-padrao-goiania|\/apartamentos-luxo-goiania|\/coberturas-goiania)$/.test(
+      location,
+    );
+  const properties = useQuery<any[]>({
+    queryKey: ["/api/properties"],
+    queryFn: () => catalogRequest("properties"),
+    enabled: category,
+  });
+  const pageOwnsMetadata = /^\/(imoveis|journal)\/.+/.test(location) || location === '/conteudos';
+  usePageSeo(
+    pageOwnsMetadata ? undefined : pageSeo(
+      location,
+      category && properties.data
+        ? {
+            properties: properties.data,
+            taxonomies: [],
+            specialists: [],
+            posts: [],
+          }
+        : undefined,
+    ),
+  );
+  return null;
+}
+
+function App({
+  queryClient = createAppQueryClient(),
+  ssrPath,
+}: {
+  queryClient?: QueryClient;
+  ssrPath?: string;
+}) {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <WouterRouter
+          ssrPath={ssrPath}
           base={
             import.meta.env.BASE_URL === "/"
               ? undefined
               : import.meta.env.BASE_URL.replace(/\/$/, "")
           }
         >
-          <Router />
+          <RouteMetadata />
+          <Suspense
+            fallback={
+              <main className="signature-shell min-h-screen p-10" role="status">
+                Carregando página…
+              </main>
+            }
+          >
+            <Router />
+          </Suspense>
         </WouterRouter>
         <Toaster />
       </TooltipProvider>

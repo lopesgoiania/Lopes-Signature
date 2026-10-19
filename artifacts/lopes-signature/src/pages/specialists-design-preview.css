@@ -52,3 +52,7 @@
 }
 @media(max-width:359px){.specialists-preview .specialists-directory-grid {grid-template-columns:1fr;}.specialists-preview .specialist-heading {font-size:44px;}}
 @media(prefers-reduced-motion:reduce){.specialists-preview *{transition:none!important;scroll-behavior:auto!important;}}
+
+/* Compact directory while the approved portraits are pending. */
+.specialists-preview .specialist-card[data-no-portrait="true"] {border-top:1px solid #d7d0c1;}
+.specialists-preview .specialist-card[data-no-portrait="true"] .specialists-profile-copy {padding-top:24px;}
