@@ -5,7 +5,7 @@ export async function requestSiteRebuild(): Promise<
   try {
     const response = await fetch(process.env.SITE_REBUILD_HOOK_URL, {
       method: "POST",
-      signal: AbortSignal.timeout(5000),
+      signal: AbortSignal.timeout(20_000),
     });
     if (response.ok) return "requested";
   } catch {

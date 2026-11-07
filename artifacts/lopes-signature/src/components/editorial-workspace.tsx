@@ -83,7 +83,7 @@ export function EditorialWorkspace() {
         .split("\n")
         .filter((s) => s.trim())
         .map((line) => {
-          const divider = line.indexOf("|");
+          const divider = line.lastIndexOf("|");
           return {
             title: divider >= 0 ? line.slice(0, divider).trim() : "",
             url: divider >= 0 ? line.slice(divider + 1).trim() : line.trim(),

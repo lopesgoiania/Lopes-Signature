@@ -7,9 +7,11 @@ import {
   researchSources,
   validateArticle,
   generateBlog,
+  isPrimarySource,
+  approvedReview,
 } from "../src/lib/blog-agent.js";
 const sources = [
-  { title: "Fonte primária", url: "https://example.org/dados" },
+  { title: "Fonte primária", url: "https://ademigo.com.br/dados" },
   { title: "Notícia", url: "https://news.example.com/goiania" },
 ];
 const article = () => ({
@@ -142,8 +144,10 @@ test("full pipeline publishes only after research and approval; failed rebuild d
         completed(
           JSON.stringify({
             approved: true,
+            luxuryFit: true,
             reason: "",
             primarySourceUrl: sources[0].url,
+            luxuryFit: true,
           }),
         ),
       ][calls++];
@@ -181,3 +185,29 @@ test("review rejection prevents any article write and records a failed run", asy
     assert.equal(db.writes.filter((w) => w.table === "blog_posts").length, 0);
     assert.ok(db.writes.some((w) => w.row.status === "failed"));
   }));
+
+test("review cannot treat a news portal as primary evidence or approve an out-of-segment topic", () => {
+  assert.equal(
+    isPrimarySource("https://www.autimob.com.br/noticias/test"),
+    false,
+  );
+  assert.equal(
+    isPrimarySource("https://avolli.com.br.fake.test/article"),
+    false,
+  );
+  assert.equal(isPrimarySource("https://ademigo.com.br/blog/test"), true);
+  assert.equal(
+    approvedReview(
+      { approved: true, luxuryFit: false, primarySourceUrl: sources[0].url },
+      sources,
+    ),
+    false,
+  );
+  assert.equal(
+    approvedReview(
+      { approved: true, luxuryFit: true, primarySourceUrl: sources[1].url },
+      sources,
+    ),
+    false,
+  );
+});
