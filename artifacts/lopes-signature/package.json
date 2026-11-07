@@ -11,7 +11,8 @@
     "build:client": "vite build --config vite.config.ts",
     "build:ssr": "vite build --config vite.config.ts --ssr src/entry-server.tsx --outDir .server",
     "serve:export": "node scripts/preview-static.mjs",
-    "test:seo": "node --test tests/seo.test.mjs"
+    "test:seo": "node --test tests/seo.test.mjs",
+    "test:campaigns": "node --test tests/campaigns.test.mjs"
   },
   "devDependencies": {
     "@hookform/resolvers": "^3.10.0",

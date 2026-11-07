@@ -1,0 +1,17 @@
+[
+  {
+    "slug": "city-park-majestic",
+    "title": "City Park Majestic",
+    "propertyId": "city-park-majestic"
+  },
+  {
+    "slug": "royal-city-park",
+    "title": "Royal City Park",
+    "propertyId": "city-park-royal"
+  },
+  {
+    "slug": "city-park-palace",
+    "title": "City Park Palace",
+    "propertyId": "city-park-palace"
+  }
+]

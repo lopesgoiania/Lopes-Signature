@@ -1,3 +1,4 @@
+import { campaignPages } from "./campaign-pages.mjs";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -6,7 +7,7 @@ import { render, publicPaths, specialistDirectory } from "../.server/entry-serve
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dist = path.join(root, "dist");
 const origin = new URL(
-  process.env.VITE_SITE_URL || "https://lopessignature.vercel.app",
+  process.env.VITE_SITE_URL || "https://www.lopessignature.com.br",
 ).origin;
 const contentOrigin = new URL(process.env.CONTENT_API_URL || origin);
 if (
@@ -109,6 +110,10 @@ for (const route of [...paths, "/404"]) {
     );
   }
 }
+const campaignRoutes = await campaignPages(root, dist, origin);
+for (const route of campaignRoutes) {
+  sitemap.push(`<url><loc>${escape(new URL(route, origin).href)}</loc></url>`);
+}
 // Only authenticated/admin previews retain client-only routing. Unknown public URLs use 404.html.
 await writeFile(
   path.join(dist, "app.html"),
@@ -131,11 +136,11 @@ await writeFile(
   path.join(dist, "build-content.json"),
   JSON.stringify({
     generatedAt: new Date().toISOString(),
-    pages: paths.length,
+    pages: paths.length + campaignRoutes.length,
     articles: data.posts.length,
     properties: data.properties.length,
   }),
 );
 console.log(
-  `HTML gerado para ${paths.length} páginas públicas; ${sitemap.length} URLs no sitemap. Nenhum conteúdo criado ou alterado no banco.`,
+  `HTML gerado para ${paths.length + campaignRoutes.length} páginas públicas; ${sitemap.length} URLs no sitemap. Nenhum conteúdo criado ou alterado no banco.`,
 );

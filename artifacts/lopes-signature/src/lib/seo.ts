@@ -10,7 +10,7 @@ import {
 import { postHref, type Post } from "./journal";
 
 export const SITE_URL = (
-  import.meta.env.VITE_SITE_URL || "https://lopessignature.vercel.app"
+  import.meta.env.VITE_SITE_URL || "https://www.lopessignature.com.br"
 ).replace(/\/$/, "");
 export type PublicSnapshot = {
   properties: any[];
