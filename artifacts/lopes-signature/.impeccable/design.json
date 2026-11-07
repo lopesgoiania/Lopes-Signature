@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-28T11:01:10.255517+00:00",
+  "generatedAt": "2026-11-07T15:04:02.074948+00:00",
   "title": "Design System: Lopes Signature",
   "extensions": {
     "shadows": [
@@ -25,6 +25,11 @@
         "name": "property-transform",
         "value": ".5s cubic-bezier(.16,1,.3,1)",
         "purpose": "Existing property card hover."
+      },
+      {
+        "name": "home-action-transition",
+        "value": ".2s ease-out",
+        "purpose": "Home-local action color/background and FAQ icon states; removed by home reduced-motion rules."
       }
     ],
     "breakpoints": [
@@ -47,8 +52,26 @@
       {
         "name": "bauhaus-wide-only",
         "value": "1700px"
+      },
+      {
+        "name": "home-tablet-only",
+        "value": "1000px"
+      },
+      {
+        "name": "home-mobile-only",
+        "value": "767px"
       }
-    ]
+    ],
+    "typographyMeta": {
+      "home-body": {
+        "displayName": "Home body — approved user reference",
+        "purpose": "Signature Manrope, sourced locally from LAVIERDOR; only .hp-body and .hp-home-footer. The opening and navigation retain their existing typography; not mandatory for LPs."
+      },
+      "home-headline": {
+        "displayName": "Home headline — approved user reference",
+        "purpose": "Home body section titles only; responsive sizing remains in home-lopes.css. Not the hero or a global display role."
+      }
+    }
   },
   "components": [
     {
@@ -124,23 +147,26 @@
     }
   ],
   "narrative": {
-    "overview": "This document records the existing shared site primitives from src/index.css and representative components. It does not establish one visual template for property landing pages. The site combines warm light surfaces, graphite, gold, rounded controls, and an existing dark institutional treatment.\n\nEvery landing page must be designed independently. Bauhaus has user-requested transparent hero navigation; no shared site header. Bauhaus is a scoped architectural editorial composition; its cream, forest, and clay palette, asymmetry, section sequence, and hero are not global identity or a template for subsequent developments.",
+    "overview": "This document records the existing shared site primitives from src/index.css and representative components. It does not establish one visual template for property landing pages. The site combines warm light surfaces, graphite, gold, rounded controls, and an existing dark institutional treatment.\n\nEvery landing page must be designed independently. Bauhaus has user-requested transparent hero navigation; no shared site header. Bauhaus is a scoped architectural editorial composition; its cream, forest, and clay palette, asymmetry, section sequence, and hero are not global identity or a template for subsequent developments.\n\nThe home body and footer have an approved, surface-local adaptation of the user-supplied Lopes references (Logic, LAVIERDOR and _MODELO), implemented in React on the existing Vercel site. The initial section and navigation are preserved in full. This addition does not replace the shared system or Bauhaus's independent direction. Its direction contract is `.impeccable/surfaces/src-pages-home-tsx.md`; content evidence is in `docs/redesign-home-2026-11-07/ANALISE.md` and `COPY.md`.",
     "keyCharacteristics": [
       "Shared semantic controls and font families.",
       "Independent, header-free landing pages.",
-      "Scoped visual identity for each development."
+      "Scoped visual identity for each development.",
+      "Home body and footer use an approved Lopes reference adaptation; opening and navigation remain preserved."
     ],
     "rules": [],
     "dos": [
       "Do design each property landing page independently, with its own content and real project imagery.",
       "Do omit the shared site header; Bauhaus has explicitly requested navigation within its hero.",
       "Do preserve the existing site outside the requested surface.",
-      "Do retain focus visibility, reduced-motion behavior, image provenance, and truthful form feedback."
+      "Do retain focus visibility, reduced-motion behavior, image provenance, and truthful form feedback.",
+      "Do preserve the home opening and navigation; apply its approved Manrope/reference grammar only to the body and home footer."
     ],
     "donts": [
       "Don't copy the Bauhaus palette, hero, or section sequence into the next landing page as a template.",
       "Don't promote scoped Bauhaus styles into global tokens.",
-      "Don't substitute generic property imagery for Bauhaus assets or invent prices, delivery, or availability."
+      "Don't substitute generic property imagery for Bauhaus assets or invent prices, delivery, or availability.",
+      "Don't promote home-local Manrope, palette, or layout into a mandatory LP template."
     ]
   }
 }

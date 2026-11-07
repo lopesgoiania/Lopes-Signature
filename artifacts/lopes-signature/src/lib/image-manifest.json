@@ -338,5 +338,19 @@
         "width": 1600
       }
     ]
+  },
+  "https://kzarqqcazoxslamzyjqc.supabase.co/storage/v1/object/public/signature-media/catalog/f215f54c-e3d2-4ded-8166-79eeecac2b0b-epic-city-home-17-piscina.jpg": {
+    "width": 640,
+    "height": 256,
+    "sources": [
+      {
+        "src": "/images/optimized/epic-piscina-fbf22bb8d3-480.webp",
+        "width": 480
+      },
+      {
+        "src": "/images/optimized/epic-piscina-fbf22bb8d3-640.webp",
+        "width": 640
+      }
+    ]
   }
 }
