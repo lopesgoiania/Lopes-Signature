@@ -27,7 +27,9 @@ app.use((req: any, res: any, next: any) => {
     );
   const editorial =
     ["GET", "POST"].includes(req.method) &&
-    /^\/api\/admin\/blog(?:\/(?:status|generate|rebuild))?$/.test(req.path);
+    /^\/api\/admin\/blog(?:\/(?:status|generate|rebuild|preview))?$/.test(
+      req.path,
+    );
   const cron = req.method === "GET" && req.path === "/api/cron/generate-blog";
   if (!publicRead && !lead && !admin && !editorial && !cron)
     return res.status(404).json({ message: "Rota não encontrada." });

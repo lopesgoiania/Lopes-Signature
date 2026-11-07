@@ -19,6 +19,8 @@ const empty = (): Draft => ({
 });
 export function EditorialWorkspace() {
   const readiness = useQuery<{
+    schedule?: string;
+    pipeline?: string[];
     openaiConfigured: boolean;
     serviceRoleConfigured: boolean;
     cronConfigured: boolean;
@@ -167,8 +169,8 @@ export function EditorialWorkspace() {
         <div>
           <h1 className="serif text-4xl">Journal Signature</h1>
           <p className="mt-3 text-sm text-muted-foreground">
-            Pesquisa e publicação sobre Goiânia e o mercado de alto padrão.
-            Segunda, quarta e sexta, às 9h (Brasília).
+            Pesquisa e publicação sobre Goiânia e o mercado de alto padrão. Um
+            artigo por dia, às 9h (Brasília).
           </p>
         </div>
         <button
@@ -184,8 +186,9 @@ export function EditorialWorkspace() {
       >
         <h2 className="serif text-2xl">Agente editorial</h2>
         <p className="text-sm">
-          Pesquisa tendências, consulta fontes e publica um artigo original. No
-          máximo um artigo por dia, incluindo gerações manuais.
+          Pesquisa pautas, apura fatos, escolhe uma imagem licenciada, produz e
+          revisa o artigo antes de publicar. Um artigo por dia, incluindo
+          gerações manuais.
         </p>
         {readiness.isLoading && (
           <p role="status" className="text-sm">

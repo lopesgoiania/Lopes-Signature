@@ -1,3 +1,5 @@
+import { HomeJournal } from "./journal-gallery";
+import "@/pages/journal-page.css";
 import { PhoneField } from "@/components/phone-field";
 import { useState, type FormEvent } from "react";
 import { Link } from "wouter";
@@ -11,7 +13,7 @@ import {
   taxonomyMatches,
   type Taxonomy,
 } from "@/lib/catalog";
-import { postHref, type Post } from "@/lib/journal";
+import { type Post } from "@/lib/journal";
 
 type Props = {
   properties: any[];
@@ -255,56 +257,12 @@ export function HomeEditorial({
           </div>
         </section>
       )}
-      {(postsLoading || postsError || posts.length > 0) && (
-        <section id="blog" className="hp-journal hp-container hp-section">
-          <div className="hp-section-heading">
-            <h2>
-              Informação para
-              <br />
-              <em>escolher melhor.</em>
-            </h2>
-            <div>
-              <p>
-                Leituras do Journal Signature sobre arquitetura e mercado
-                imobiliário.
-              </p>
-              <Link href="/journal" className="hp-text-link">
-                Explorar o Journal <ArrowRight size={19} />
-              </Link>
-            </div>
-          </div>
-          {postsLoading ? (
-            <p role="status">Carregando artigos…</p>
-          ) : postsError ? (
-            <p role="alert">
-              Não foi possível carregar os artigos.{" "}
-              <button onClick={retryPosts} className="hp-text-link">
-                Tentar novamente
-              </button>
-            </p>
-          ) : (
-            <div className="hp-journal-grid">
-              {posts.slice(0, 3).map((post) => (
-                <Link href={postHref(post)} key={post.id}>
-                  {post.image && (
-                    <ResponsiveImage
-                      src={post.image}
-                      alt={post.title}
-                      loading="lazy"
-                    />
-                  )}
-                  <p>{post.category}</p>
-                  <h3>{post.title}</h3>
-                  <p>{post.summary}</p>
-                  <span className="hp-text-link">
-                    Ler artigo <ArrowUpRight size={18} />
-                  </span>
-                </Link>
-              ))}
-            </div>
-          )}
-        </section>
-      )}
+      <HomeJournal
+        posts={posts}
+        loading={postsLoading}
+        error={postsError}
+        retry={retryPosts}
+      />
       <section id="contato" className="hp-contact hp-section">
         <div className="hp-container hp-contact-grid">
           <div className="hp-contact-copy">
@@ -374,7 +332,12 @@ export function HomeEditorial({
                       maxLength={200}
                     />
                   </label>
-                  <div className="signature-phone-group"><label htmlFor="home-contact-phone">Telefone / WhatsApp</label><PhoneField id="home-contact-phone" /></div>
+                  <div className="signature-phone-group">
+                    <label htmlFor="home-contact-phone">
+                      Telefone / WhatsApp
+                    </label>
+                    <PhoneField id="home-contact-phone" />
+                  </div>
                 </div>
                 <label htmlFor="home-contact-interest">
                   O que você procura? <span>(opcional)</span>

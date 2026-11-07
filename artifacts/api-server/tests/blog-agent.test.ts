@@ -1,6 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  editorialMedia,
+  commonsMedia,
+  permittedMediaHost,
+} from "../src/lib/editorial-media.js";
+import {
   cronAuthorized,
   localDay,
   responseText,
@@ -13,6 +18,7 @@ import {
 const sources = [
   { title: "Fonte primária", url: "https://ademigo.com.br/dados" },
   { title: "Notícia", url: "https://news.example.com/goiania" },
+  { title: "Dados públicos", url: "https://ibge.gov.br/dados" },
 ];
 const article = () => ({
   approved: true,
@@ -31,6 +37,9 @@ const article = () => ({
   seoDescription:
     "Entenda critérios de conforto e arquitetura para escolher uma residência de alto padrão em Goiânia com informações de fontes locais.",
   sourceUrls: sources.map((s) => s.url),
+  imageId: "vaca-brava",
+  inlineImageId: "flamboyant",
+  keywords: ["Goiânia", "arquitetura", "conforto"],
 });
 const completed = (text: string, annotations: any[] = []) => ({
   status: "completed",
@@ -54,9 +63,9 @@ test("extracts cited sources, rejects incomplete responses, unsupported links an
         sources.map((s) => ({ ...s, type: "url_citation" })),
       ),
     ).length,
-    2,
+    3,
   );
-  assert.equal(validateArticle(article(), sources, []).length, 2);
+  assert.equal(validateArticle(article(), sources, []).length, 3);
   assert.throws(() =>
     validateArticle(
       { ...article(), sourceUrls: [sources[0].url] },
@@ -136,6 +145,19 @@ test("full pipeline publishes only after research and approval; failed rebuild d
     let calls = 0;
     const request = async () =>
       [
+        completed("Radar com três pautas"),
+        completed(
+          JSON.stringify({
+            approved: true,
+            title: "Arquitetura e conforto em Goiânia",
+            angle:
+              "Como a arquitetura e as áreas verdes ajudam a comparar opções residenciais em Goiânia.",
+            category: "Arquitetura e vida",
+            score: 90,
+            companyPromotion: false,
+            imageQuery: "Parque Vaca Brava",
+          }),
+        ),
         completed(
           "Dossiê factual",
           sources.map((s) => ({ ...s, type: "url_citation" })),
@@ -147,13 +169,21 @@ test("full pipeline publishes only after research and approval; failed rebuild d
             luxuryFit: true,
             reason: "",
             primarySourceUrl: sources[0].url,
-            luxuryFit: true,
+            qualityScore: 90,
+            companyPromotion: false,
+            imageRelevant: true,
           }),
         ),
       ][calls++];
-    const result = await generateBlog(db as any, request, async () => "failed");
+    const result = await generateBlog(
+      db as any,
+      request,
+      async () => "failed",
+      async () => editorialMedia,
+      async (image) => image,
+    );
     assert.equal(result.status, "published");
-    assert.equal(calls, 3);
+    assert.equal(calls, 5);
     assert.equal(db.writes.filter((w) => w.table === "blog_posts").length, 1);
     assert.ok(db.writes.some((w) => w.row.status === "completed"));
     assert.ok(db.writes.some((w) => w.row.rebuild_status === "failed"));
@@ -168,6 +198,19 @@ test("review rejection prevents any article write and records a failed run", asy
     let calls = 0;
     const request = async () =>
       [
+        completed("Radar com três pautas"),
+        completed(
+          JSON.stringify({
+            approved: true,
+            title: "Arquitetura e conforto em Goiânia",
+            angle:
+              "Como a arquitetura e as áreas verdes ajudam a comparar opções residenciais em Goiânia.",
+            category: "Arquitetura e vida",
+            score: 90,
+            companyPromotion: false,
+            imageQuery: "Parque Vaca Brava",
+          }),
+        ),
         completed(
           "Dossiê",
           sources.map((s) => ({ ...s, type: "url_citation" })),
@@ -181,7 +224,16 @@ test("review rejection prevents any article write and records a failed run", asy
           }),
         ),
       ][calls++];
-    await assert.rejects(generateBlog(db as any, request), /Revisão editorial/);
+    await assert.rejects(
+      generateBlog(
+        db as any,
+        request,
+        undefined,
+        async () => editorialMedia,
+        async (image) => image,
+      ),
+      /Revisão bloqueou/,
+    );
     assert.equal(db.writes.filter((w) => w.table === "blog_posts").length, 0);
     assert.ok(db.writes.some((w) => w.row.status === "failed"));
   }));
@@ -211,3 +263,87 @@ test("review cannot treat a news portal as primary evidence or approve an out-of
     false,
   );
 });
+
+test("image discovery rejects restrictive licenses and unexpected hosts", () => {
+  assert.equal(
+    permittedMediaHost("https://upload.wikimedia.org/foto.jpg"),
+    true,
+  );
+  assert.equal(
+    permittedMediaHost("https://upload.wikimedia.org.fake.test/foto.jpg"),
+    false,
+  );
+  assert.deepEqual(
+    commonsMedia({
+      query: {
+        pages: {
+          x: {
+            pageid: 1,
+            title: "File:Foto.jpg",
+            imageinfo: [
+              {
+                width: 1600,
+                height: 900,
+                thumburl: "https://upload.wikimedia.org/foto.jpg",
+                extmetadata: { LicenseShortName: { value: "CC BY-NC 4.0" } },
+              },
+            ],
+          },
+        },
+      },
+    }),
+    [],
+  );
+});
+
+test("preview exercises the full operation without claiming a day, saving or publishing", async () =>
+  configured(async () => {
+    const db = fakeClient(null);
+    let calls = 0;
+    const responses = [
+      completed("Radar"),
+      completed(
+        JSON.stringify({
+          approved: true,
+          title: "Goiânia e a vida urbana",
+          angle:
+            "Como os parques de Goiânia ajudam a comparar o entorno dos bairros residenciais.",
+          category: "Goiânia e bairros",
+          score: 91,
+          companyPromotion: false,
+          imageQuery: "Parque Vaca Brava",
+        }),
+      ),
+      completed(
+        "Dossiê",
+        sources.map((s) => ({ ...s, type: "url_citation" })),
+      ),
+      completed(JSON.stringify(article())),
+      completed(
+        JSON.stringify({
+          approved: true,
+          luxuryFit: true,
+          primarySourceUrl: sources[0].url,
+          qualityScore: 90,
+          companyPromotion: false,
+          imageRelevant: true,
+          reason: "",
+        }),
+      ),
+    ];
+    const result = await generateBlog(
+      db as any,
+      async () => responses[calls++],
+      async () => {
+        throw new Error("No rebuild in preview");
+      },
+      async () => editorialMedia,
+      async () => {
+        throw new Error("No media upload in preview");
+      },
+      { preview: true },
+    );
+    assert.equal(result.status, "preview");
+    assert.equal(calls, 5);
+    assert.equal(db.writes.length, 0);
+  }));

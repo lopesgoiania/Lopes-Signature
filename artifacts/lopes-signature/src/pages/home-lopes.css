@@ -7,7 +7,7 @@
 .hp-body,
 .hp-home-footer {
   --hl-paper: #f5f1e9;
-  --hl-ink: #242424;
+  --hl-ink: #23251f;
   --hl-muted: #62645b;
   --hl-gold: #b89a5b;
   --hl-sand: #e3d4b5;
@@ -171,7 +171,7 @@
   font-size: 12px;
 }
 .hp-body .hp-benefit-strip {
-  background: #000;
+  background: var(--hl-sand);
   display: flex;
   justify-content: center;
   gap: 80px;
@@ -185,7 +185,7 @@
   font-size: 13px;
   min-height: 32px;
   text-decoration: none;
-  color: #fff;
+  color: var(--hl-ink);
 }
 .hp-benefit-strip a:hover {
   text-decoration: underline;
@@ -261,7 +261,7 @@
   color: var(--hl-sand);
 }
 .hp-body .hp-guidance p {
-  color: #d1d1d1;
+  color: #d1d1c8;
 }
 .hp-body .hp-guidance-grid > div:first-child > p {
   margin-top: 30px;
@@ -272,7 +272,7 @@
 }
 .hp-guidance-list article {
   padding-block: 24px 30px;
-  border-top: 1px solid #656565;
+  border-top: 1px solid #65675c;
 }
 .hp-body .hp-guidance-list h3 {
   font-size: 22px;
@@ -341,7 +341,7 @@
   margin-top: 20px;
 }
 .hp-body .hp-contact {
-  background: #323232;
+  background: #32372e;
   color: var(--hl-paper);
 }
 .hp-contact-grid {
@@ -354,7 +354,7 @@
   color: var(--hl-sand);
 }
 .hp-body .hp-contact-copy > p {
-  color: #d1d1d1;
+  color: #d1d1c8;
   margin-top: 30px;
   max-width: 36ch;
 }
@@ -369,10 +369,10 @@
 .hp-body .hp-contact-copy .hp-contact-offices {
   font-size: 12px;
   line-height: 1.9;
-  color: #d1d1d1;
+  color: #d1d1c8;
 }
 .hp-contact-panel {
-  background: #262626;
+  background: #252b22;
   padding: 36px;
 }
 .hp-body .hp-contact-panel h3 {
@@ -381,7 +381,7 @@
 }
 .hp-body .hp-contact-panel p {
   font-size: 13px;
-  color: #d1d1d1;
+  color: #d1d1c8;
   margin-top: 10px;
 }
 .hp-contact-panel form > label,
@@ -391,7 +391,7 @@
 .hp-contact-panel label {
   display: block;
   font-size: 12px;
-  color: #e1e1e1;
+  color: #e1e2d8;
 }
 .hp-contact-panel label > span {
   font-size: 11px;
@@ -399,8 +399,8 @@
 .hp-contact-panel :is(input:not([type="checkbox"]), textarea) {
   display: block;
   width: 100%;
-  border: 1px solid #8d8d8d;
-  background: #343434;
+  border: 1px solid #8d9586;
+  background: #32392e;
   color: #fff;
   padding: 13px;
   margin-top: 8px;
@@ -413,7 +413,7 @@
   min-height: 90px;
 }
 .hp-contact-panel textarea::placeholder {
-  color: #c8c8c8;
+  color: #c6cbbf;
 }
 .hp-contact-fields {
   display: grid;
@@ -505,7 +505,7 @@
     Signature Manrope,
     Arial,
     sans-serif;
-  background: #1b1b1b;
+  background: #191d17;
   padding-top: 56px;
 }
 .hp-home-footer .signature-footer h2 {
@@ -583,7 +583,7 @@
     gap: 35px;
   }
   .hp-benefit-strip a + a {
-    border-top: 1px solid #555;
+    border-top: 1px solid #b5a584;
   }
   .hp-body .hp-image-story {
     grid-template-columns: 1fr;

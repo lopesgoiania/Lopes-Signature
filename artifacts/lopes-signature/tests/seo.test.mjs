@@ -43,7 +43,7 @@ const fixture = {
 test("article is readable in HTML before JavaScript and unsafe HTML is removed", async () => {
   const result = await render("/journal/guia-de-teste", fixture);
   assert.match(result.html, /<h1[^>]*>Guia de teste<\/h1>/);
-  assert.match(result.html, /<h2>Localização<\/h2>/);
+  assert.match(result.html, /<h2[^>]*>Localização<\/h2>/);
   assert.match(result.html, /<strong>ênfase<\/strong>/);
   assert.doesNotMatch(
     result.html,
@@ -98,7 +98,7 @@ test("exported Journal has a unique canonical and a nonempty server root", async
   );
   assert.match(html, /rel="canonical" href="https:\/\/[^"/]+\/journal"/);
   assert.match(html, /data-ssr="true"/);
-  assert.match(html, /Um olhar estendido/);
+  assert.match(html, /Um olhar sobre a cidade/);
   assert.match(html, /id="page-schema"/);
 });
 test("production routing does not rewrite unknown public URLs to home", async () => {
@@ -113,4 +113,24 @@ test("production routing does not rewrite unknown public URLs to home", async ()
   );
   assert.match(html, /Página não encontrada/);
   assert.match(html, /noindex,follow/);
+});
+
+test("newest publication owns the large cover and archive grows into pagination", async () => {
+  const posts = Array.from({ length: 12 }, (_, i) => ({
+    ...fixture.posts[0],
+    id: `fixture-${i}`,
+    slug: `fixture-${i}`,
+    title: `Pauta de teste ${i}`,
+    category: i % 2 ? "Goiânia e bairros" : "Mercado e patrimônio",
+    publishedAt: new Date(Date.UTC(2026, 9, i + 1)).toISOString(),
+  }));
+  const result = await render("/journal", { ...fixture, posts });
+  const lead = result.html.indexOf("jr-recent");
+  assert.ok(
+    result.html.indexOf("Pauta de teste 11", lead) <
+      result.html.indexOf("Pauta de teste 10", lead),
+  );
+  assert.match(result.html, /Páginas do Journal/);
+  assert.match(result.html, /pagina=2/);
+  assert.equal((result.html.match(/jr-story-link/g) || []).length, 12);
 });

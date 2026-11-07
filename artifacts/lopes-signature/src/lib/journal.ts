@@ -6,6 +6,15 @@ export type Post = {
   summary: string;
   content: string;
   image?: string;
+  imageMeta?: {
+    src: string;
+    alt: string;
+    caption: string;
+    credit: string;
+    license: string;
+    licenseUrl: string;
+    sourceUrl: string;
+  };
   date?: string;
   readTime?: string;
   author?: string;

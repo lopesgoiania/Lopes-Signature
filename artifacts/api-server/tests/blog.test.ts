@@ -25,7 +25,7 @@ test("only published, due articles are public; drafts and archives stay private"
   );
   assert.equal(isPublicPost({ title: "Artigo legado sem estado" }, now), true);
 });
-test("legacy mapping does not manufacture a stock image or omit the article body", () => {
+test("legacy mapping includes a licensed contextual photo with attribution and the complete body", () => {
   const post = mapPost({
     id: "p1",
     title: "Título",
@@ -33,7 +33,8 @@ test("legacy mapping does not manufacture a stock image or omit the article body
     created_at: "2026-10-01T12:00:00Z",
   });
   assert.equal(post.slug, "p1");
-  assert.equal(post.image, "");
+  assert.equal(post.image, "/images/journal/vaca-brava.jpg");
+  assert.equal(post.imageMeta?.license, "CC BY-SA 4.0");
   assert.equal(post.content, "Conteúdo");
   assert.equal(post.author, "Lopes Signature");
   assert.equal(postSlug("Arquitetura em Goiânia!"), "arquitetura-em-goiania");

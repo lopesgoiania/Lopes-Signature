@@ -1,4 +1,9 @@
-import { cronAuthorized, generateBlog } from "../lib/blog-agent.js";
+import { editorialMedia } from "../lib/editorial-media.js";
+import {
+  cronAuthorized,
+  generateBlog,
+  previewBlog,
+} from "../lib/blog-agent.js";
 import { editorialStatus } from "../lib/editorial-status.js";
 import { requestSiteRebuild } from "../lib/site-rebuild.js";
 import { Router, type IRouter } from "express";
@@ -10,42 +15,62 @@ export const isPublicPost = (row: any, now = Date.now()) =>
   row.published !== false &&
   (!row.status || row.status === "published") &&
   (!row.published_at || new Date(row.published_at).getTime() <= now);
-export const mapPost = (row: any) => ({
-  id: row.id,
-  slug: row.slug || row.id,
-  title: row.title,
-  category: row.category,
-  summary: row.summary,
-  content: row.content,
-  image: row.image || "",
-  author: row.author || "Lopes Signature",
-  date:
-    row.date ||
-    (row.published_at || row.created_at
-      ? new Date(row.published_at || row.created_at).toLocaleDateString(
-          "pt-BR",
-          { timeZone: "America/Sao_Paulo" },
+export const mapPost = (row: any) => {
+  const provenance = Array.isArray(row.sources) ? row.sources : [];
+  const imageMeta =
+    provenance.find(
+      (s: any) => s.kind === "image" && s.media?.src === row.image,
+    )?.media ||
+    editorialMedia.find((m) => m.src === row.image) ||
+    (!row.image
+      ? editorialMedia.find(
+          (m) =>
+            m.id ===
+            (/flamboyant|jardim goi[aá]s/i.test(row.title || "")
+              ? "flamboyant"
+              : "vaca-brava"),
         )
-      : ""),
-  readTime:
-    row.read_time ||
-    `${Math.max(1, Math.ceil(String(row.content || "").split(/\s+/).length / 220))} min de leitura`,
-  status: row.status || (row.published === false ? "draft" : "published"),
-  published: isPublicPost(row),
-  publishedAt: row.published_at || row.created_at,
-  updatedAt: row.updated_at || row.created_at,
-  seoTitle: row.seo_title || "",
-  seoDescription: row.seo_description || "",
-  sources: Array.isArray(row.sources)
-    ? row.sources.filter(
-        (source: any) =>
-          source &&
-          typeof source.url === "string" &&
-          /^https?:\/\//i.test(source.url) &&
-          typeof source.title === "string",
-      )
-    : [],
-});
+      : undefined);
+  return {
+    id: row.id,
+    slug: row.slug || row.id,
+    title: row.title,
+    category: row.category,
+    summary: row.summary,
+    content: row.content,
+    image: row.image || imageMeta?.src || "",
+    imageMeta,
+    editorial: provenance.find((s: any) => s.kind === "editorial"),
+    author: row.author || "Lopes Signature",
+    date:
+      row.date ||
+      (row.published_at || row.created_at
+        ? new Date(row.published_at || row.created_at).toLocaleDateString(
+            "pt-BR",
+            { timeZone: "America/Sao_Paulo" },
+          )
+        : ""),
+    readTime:
+      row.read_time ||
+      `${Math.max(1, Math.ceil(String(row.content || "").split(/\s+/).length / 220))} min de leitura`,
+    status: row.status || (row.published === false ? "draft" : "published"),
+    published: isPublicPost(row),
+    publishedAt: row.published_at || row.created_at,
+    updatedAt: row.updated_at || row.created_at,
+    seoTitle: row.seo_title || "",
+    seoDescription: row.seo_description || "",
+    sources: Array.isArray(row.sources)
+      ? row.sources.filter(
+          (source: any) =>
+            source &&
+            !["image", "editorial"].includes(source.kind) &&
+            typeof source.url === "string" &&
+            /^https?:\/\//i.test(source.url) &&
+            typeof source.title === "string",
+        )
+      : [],
+  };
+};
 const unavailable = (res: any) =>
   res.status(503).json({
     message: "O Journal está temporariamente indisponível. Tente novamente.",
@@ -229,10 +254,19 @@ router.post("/admin/blog", async (req, res) => {
       updated_at: now,
       seo_title: text(body.seoTitle, 200),
       seo_description: text(body.seoDescription, 500),
-      sources: sources.map((s: any) => ({
-        title: text(s.title, 300),
-        url: text(s.url, 2000),
-      })),
+      sources: [
+        ...sources.map((s: any) => ({
+          title: text(s.title, 300),
+          url: text(s.url, 2000),
+        })),
+        ...(Array.isArray(existing?.sources)
+          ? existing.sources.filter(
+              (s: any) =>
+                s.kind === "editorial" ||
+                (s.kind === "image" && s.media?.src === image),
+            )
+          : []),
+      ],
       read_time: `${Math.max(1, Math.ceil(content.split(/\s+/).length / 220))} min de leitura`,
     };
     let query = existing
@@ -282,6 +316,19 @@ async function generate(_req: any, res: any) {
   }
 }
 router.post("/admin/blog/generate", generate);
+router.post("/admin/blog/preview", async (_req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  try {
+    res.json(await previewBlog());
+  } catch (error) {
+    res
+      .status(503)
+      .json({
+        message:
+          error instanceof Error ? error.message : "Falha na prévia editorial.",
+      });
+  }
+});
 router.post("/admin/blog/rebuild", async (_req, res) => {
   res.setHeader("Cache-Control", "no-store");
   const rebuild = await requestSiteRebuild();

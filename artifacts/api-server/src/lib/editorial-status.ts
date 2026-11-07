@@ -5,6 +5,16 @@ export async function editorialStatus(
   rebuildConfigured = Boolean(process.env.SITE_REBUILD_HOOK_URL),
 ) {
   const automation = {
+    schedule: "Todos os dias, às 9h de Brasília",
+    pipeline: [
+      "Pesquisa",
+      "Seleção de pauta",
+      "Apuração",
+      "Imagens licenciadas",
+      "Redação e SEO",
+      "Revisão",
+      "Publicação",
+    ],
     openaiConfigured: Boolean(process.env.OPENAI_API_KEY),
     serviceRoleConfigured: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
     cronConfigured: Boolean(process.env.CRON_SECRET),

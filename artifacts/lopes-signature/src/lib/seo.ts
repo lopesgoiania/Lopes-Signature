@@ -220,6 +220,18 @@ export function seoSchemas(seo: PageSeo, origin = SITE_URL) {
           }
         : {}),
       publisher: { "@id": `${origin}/#organization` },
+      ...(post.imageMeta
+        ? {
+            associatedMedia: {
+              "@type": "ImageObject",
+              contentUrl: absolute(post.image || post.imageMeta.src),
+              caption: post.imageMeta.caption,
+              creditText: post.imageMeta.credit,
+              license: post.imageMeta.licenseUrl || post.imageMeta.sourceUrl,
+              acquireLicensePage: post.imageMeta.sourceUrl,
+            },
+          }
+        : {}),
       datePublished: iso(post.publishedAt),
       dateModified: iso(post.updatedAt) || iso(post.publishedAt),
     });
