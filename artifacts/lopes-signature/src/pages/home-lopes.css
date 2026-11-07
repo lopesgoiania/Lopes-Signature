@@ -313,9 +313,6 @@
   flex-shrink: 0;
   color: #846b39;
 }
-.hp-body .hp-journal {
-  padding-top: 0;
-}
 .hp-journal-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -641,9 +638,6 @@
   .hp-journal-grid {
     grid-template-columns: 1fr;
     gap: 36px;
-  }
-  .hp-body .hp-journal {
-    padding-top: 0;
   }
   .hp-contact-panel {
     padding: 26px 20px;
