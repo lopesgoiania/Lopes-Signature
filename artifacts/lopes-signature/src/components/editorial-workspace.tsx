@@ -33,10 +33,12 @@ export function EditorialWorkspace() {
     databaseAvailable: boolean;
     rebuildConfigured: boolean;
   }>({
+    retry: false,
     queryKey: ["admin-blog-status"],
     queryFn: () => catalogRequest("admin/blog/status"),
   });
   const query = useQuery<(Post & { status: string })[]>({
+    retry: false,
     queryKey: ["admin-blog"],
     queryFn: () => catalogRequest("admin/blog"),
   });
@@ -184,6 +186,17 @@ export function EditorialWorkspace() {
           Pesquisa tendências, consulta fontes e publica um artigo original. No
           máximo um artigo por dia, incluindo gerações manuais.
         </p>
+        {readiness.isLoading && (
+          <p role="status" className="text-sm">
+            Conferindo acesso e configurações do agente…
+          </p>
+        )}
+        {readiness.isError && (
+          <p role="alert" className="text-sm">
+            O diagnóstico das configurações está indisponível. Consulte o motivo
+            abaixo; os botões ficam bloqueados até o acesso ser restabelecido.
+          </p>
+        )}
         {readiness.data && (
           <p className="text-sm">
             OpenAI:{" "}
@@ -244,8 +257,9 @@ export function EditorialWorkspace() {
       ) : readiness.isError ? (
         <div role="alert" className="rounded-xl border border-border p-5">
           <p>
-            Não foi possível verificar o editor. Seu texto pode ser preparado
-            abaixo.
+            {readiness.error instanceof Error
+              ? readiness.error.message
+              : "Não foi possível verificar o editor. Tente novamente."}
           </p>
           <button
             type="button"
@@ -287,7 +301,11 @@ export function EditorialWorkspace() {
         <p role="status">Carregando artigos…</p>
       ) : query.isError ? (
         <div role="alert">
-          <p>Não foi possível carregar os artigos.</p>
+          <p>
+            {query.error instanceof Error
+              ? query.error.message
+              : "Não foi possível carregar os artigos."}
+          </p>
           <button
             className="min-h-11 underline"
             onClick={() => query.refetch()}
