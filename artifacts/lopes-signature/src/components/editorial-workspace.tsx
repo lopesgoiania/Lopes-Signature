@@ -145,6 +145,7 @@ export function EditorialWorkspace() {
     setError("");
     try {
       const result = await catalogRequest("admin/blog/rebuild", {});
+      await readiness.refetch();
       setMessage(
         result.rebuild === "requested"
           ? "Atualização do site solicitada."

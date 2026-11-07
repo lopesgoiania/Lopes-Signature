@@ -276,17 +276,23 @@ async function generate(_req: any, res: any) {
   try {
     res.json(await generateBlog());
   } catch (error) {
-    res
-      .status(503)
-      .json({
-        message: error instanceof Error ? error.message : "Falha na geração.",
-      });
+    res.status(503).json({
+      message: error instanceof Error ? error.message : "Falha na geração.",
+    });
   }
 }
 router.post("/admin/blog/generate", generate);
 router.post("/admin/blog/rebuild", async (_req, res) => {
   res.setHeader("Cache-Control", "no-store");
-  res.json({ rebuild: await requestSiteRebuild() });
+  const rebuild = await requestSiteRebuild();
+  if (rebuild === "requested") {
+    await supabase!
+      .from("blog_generation_runs")
+      .update({ rebuild_status: "requested" })
+      .eq("status", "completed")
+      .eq("rebuild_status", "failed");
+  }
+  res.json({ rebuild });
 });
 router.get(
   "/cron/generate-blog",
