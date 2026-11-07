@@ -9,8 +9,6 @@ import { ResponsiveImage } from "./responsive-image";
 import {
   propertyHref,
   propertyLocation,
-  taxonomyHref,
-  taxonomyMatches,
   type Taxonomy,
 } from "@/lib/catalog";
 import { type Post } from "@/lib/journal";
@@ -44,7 +42,6 @@ const FAQ = [
 
 export function HomeEditorial({
   properties,
-  taxonomies,
   posts,
   postsLoading,
   postsError,
@@ -59,15 +56,6 @@ export function HomeEditorial({
   const pool =
     gallery.find((src) => /-17-piscina\./i.test(src)) ||
     gallery.find((src) => /piscina/i.test(src));
-  const neighborhoods = taxonomies
-    .filter((t) => t.active && t.kind === "neighborhood")
-    .map((t) => ({
-      term: t,
-      count: properties.filter((p) => taxonomyMatches(p, t, taxonomies)).length,
-    }))
-    .filter((t) => t.count > 0)
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 3);
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (lead.isPending || submitted) return;
@@ -103,7 +91,7 @@ export function HomeEditorial({
         <a href="#como-escolher">
           Plantas e metragens <ArrowUpRight size={17} />
         </a>
-        <a href={neighborhoods.length ? "#hp-bairros" : "/imoveis"}>
+        <a href="/imoveis">
           Bairros e localização <ArrowUpRight size={17} />
         </a>
         <a href="#contato">
@@ -225,38 +213,6 @@ export function HomeEditorial({
           </div>
         </div>
       </section>
-      {neighborhoods.length > 0 && (
-        <section
-          id="hp-bairros"
-          className="hp-neighborhoods hp-container hp-section"
-        >
-          <div className="hp-section-heading">
-            <h2>
-              Por onde você
-              <br />
-              <em>quer começar?</em>
-            </h2>
-            <p>
-              Explore os bairros que têm imóveis no catálogo e encontre os
-              endereços que fazem sentido para você.
-            </p>
-          </div>
-          <div className="hp-neighborhood-list">
-            {neighborhoods.map(({ term, count }) => (
-              <Link href={taxonomyHref(term)} key={term.id}>
-                <div>
-                  <h3>{term.label}</h3>
-                  <span>
-                    {count}{" "}
-                    {count === 1 ? "imóvel no catálogo" : "imóveis no catálogo"}
-                  </span>
-                </div>
-                <ArrowUpRight size={28} />
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
       <HomeJournal
         posts={posts}
         loading={postsLoading}
