@@ -1,3 +1,4 @@
+import { PhoneField } from "@/components/phone-field";
 import { SiteFooter } from "@/components/site-footer";
 import { useState, type FormEvent } from 'react';
 import { ArrowRight, CheckCircle2, Mail, MapPin, Phone, Send, Sparkles } from 'lucide-react';
@@ -184,12 +185,7 @@ export default function ContactPage() {
                   <div className="grid gap-5 md:grid-cols-2">
                     <div>
                       <label htmlFor="contact-phone" className="mb-2 block text-sm text-[#bcb8af]">Telefone / WhatsApp *</label>
-                      <input
-                        id="contact-phone" name="phone" type="tel" autoComplete="tel"
-                        required
-                        placeholder="(62) 99999-9999"
-                        className="h-12 w-full rounded-xl border border-white/15 bg-black/40 px-4 text-base text-white placeholder:text-[#aaa69e] outline-none focus:border-[#d4af37]"
-                      />
+                      <PhoneField id="contact-phone" />
                     </div>
                     <div>
                       <label htmlFor="contact-subject" className="mb-2 block text-sm text-[#bcb8af]">Assunto de Interesse</label>

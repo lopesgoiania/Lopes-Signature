@@ -1,3 +1,4 @@
+import { visitorCountry } from "./lib/phone.js";
 import express from "express";
 import catalog from "./routes/signature-catalog.js";
 import specialists from "./routes/specialists.js";
@@ -6,6 +7,11 @@ import blog from "./routes/blog.js";
 // Keep legacy CRM/webhook routes outside this public deployment.
 const app = express();
 app.get("/api/healthz", (_req, res) => res.json({ status: "ok" }));
+app.get("/api/visitor-country", (req, res) => {
+  res.set("Cache-Control", "private, no-store, max-age=0");
+  res.set("Vary", "X-Vercel-IP-Country");
+  res.json({ country: visitorCountry(req.headers["x-vercel-ip-country"]) });
+});
 app.use(express.json({ limit: "4mb" }));
 app.use((req: any, res: any, next: any) => {
   const publicRead =

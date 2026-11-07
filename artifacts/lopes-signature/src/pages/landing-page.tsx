@@ -1,3 +1,4 @@
+import { PhoneField } from "@/components/phone-field";
 import { PropertyPlans } from '@/components/property-plans';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useRoute, Link } from 'wouter';
@@ -196,12 +197,7 @@ export default function LandingPage({property: suppliedProperty}: {property?:any
                   placeholder="seu@email.com"
                   className="h-12 w-full rounded-xl border border-white/15 bg-black/40 px-4 text-sm text-white outline-none focus:border-[#d4af37]"
                 />
-                <input
-                  name="phone"
-                  required
-                  placeholder="Seu WhatsApp (11) 99999-9999"
-                  className="h-12 w-full rounded-xl border border-white/15 bg-black/40 px-4 text-sm text-white outline-none focus:border-[#d4af37]"
-                />
+                <PhoneField />
                 <button
                   type="submit"
                   disabled={createLead.isPending}

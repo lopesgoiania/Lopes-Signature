@@ -1,3 +1,4 @@
+import { PhoneField } from "@/components/phone-field";
 import { GooglePropertyMap } from "@/components/google-property-map";
 function youtubeEmbed(url: string) {
   try {
@@ -328,13 +329,7 @@ export default function PropertyDetailPage({
                   className="h-12 w-full rounded-xl border border-border bg-background px-4 text-sm text-foreground outline-none focus:border-[#d4af37]"
                   data-testid="input-lead-email"
                 />
-                <input
-                  name="phone"
-                  required
-                  placeholder="WhatsApp"
-                  className="h-12 w-full rounded-xl border border-border bg-background px-4 text-sm text-foreground outline-none focus:border-[#d4af37]"
-                  data-testid="input-lead-phone"
-                />
+                <PhoneField id="input-lead-phone" />
                 <textarea
                   name="message"
                   placeholder="Como podemos preparar sua visita?"

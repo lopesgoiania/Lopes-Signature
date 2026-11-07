@@ -1,3 +1,4 @@
+import { PhoneField } from "@/components/phone-field";
 import {
   ResponsiveImage,
   imageDimensions,
@@ -679,17 +680,7 @@ export function Presentation({
                   placeholder="Como podemos chamar você?"
                 />
               </label>
-              <label>
-                Telefone ou WhatsApp
-                <input
-                  name="phone"
-                  required
-                  minLength={10}
-                  type="tel"
-                  autoComplete="tel"
-                  placeholder="(62) 99999-9999"
-                />
-              </label>
+              <div className="signature-phone-group"><label htmlFor="property-contact-phone">Telefone ou WhatsApp</label><PhoneField id="property-contact-phone" /></div>
               <label>
                 E-mail
                 <input

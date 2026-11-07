@@ -10,6 +10,10 @@ const types = { '.html': 'text/html; charset=utf-8', '.xml': 'application/xml; c
 const server = http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url || '/', 'http://localhost');
+    if (req.method === 'GET' && url.pathname === '/api/visitor-country') {
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'private, no-store' });
+      res.end(JSON.stringify({ country: process.env.PREVIEW_VISITOR_COUNTRY || 'BR' })); return;
+    }
     if (url.pathname.startsWith('/api/')) {
       if (req.method !== 'GET' || !/^\/api\/(properties(?:\/[^/]+)?|taxonomies|maps-config|specialists|blog(?:\/[^/]+)?)$/.test(url.pathname)) { res.writeHead(503, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ message: 'A prévia local não envia dados. Configure o backend para testar gravações em staging.' })); return; }
       const response = await fetch(new URL(url.pathname + url.search, origin), { signal: AbortSignal.timeout(15000) });

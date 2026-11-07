@@ -1,3 +1,4 @@
+import { PhoneField } from "@/components/phone-field";
 import { useState, type FormEvent } from "react";
 import { Link } from "wouter";
 import { ArrowRight, ArrowUpRight, Check, ChevronDown } from "lucide-react";
@@ -373,19 +374,7 @@ export function HomeEditorial({
                       maxLength={200}
                     />
                   </label>
-                  <label htmlFor="home-contact-phone">
-                    Telefone / WhatsApp
-                    <input
-                      id="home-contact-phone"
-                      name="phone"
-                      autoComplete="tel"
-                      type="tel"
-                      inputMode="tel"
-                      required
-                      minLength={10}
-                      maxLength={24}
-                    />
-                  </label>
+                  <div className="signature-phone-group"><label htmlFor="home-contact-phone">Telefone / WhatsApp</label><PhoneField id="home-contact-phone" /></div>
                 </div>
                 <label htmlFor="home-contact-interest">
                   O que você procura? <span>(opcional)</span>

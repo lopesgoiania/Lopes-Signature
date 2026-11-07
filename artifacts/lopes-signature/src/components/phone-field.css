@@ -1,0 +1,128 @@
+.signature-phone {
+  min-width: 0;
+  width: 100%;
+  --PhoneInputCountryFlag-height: 18px;
+  --PhoneInput-color--focus: #d9c69f;
+}
+.signature-phone .PhoneInput {
+  width: 100%;
+  gap: 10px;
+}
+.signature-phone .PhoneInputCountry {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 10px 4px;
+}
+.signature-phone .PhoneInputCountrySelect {
+  color: #171717;
+  background: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+.signature-phone .PhoneInputCountryIcon {
+  width: 27px;
+  height: 18px;
+}
+.signature-phone .PhoneInputCountrySelectArrow {
+  color: currentColor;
+  opacity: 0.85;
+}
+.signature-phone .PhoneInputInput {
+  min-width: 0;
+  width: 100%;
+  height: 48px;
+  border: 1px solid #ffffff40;
+  border-radius: 8px;
+  background: #343434;
+  color: #fff;
+  padding: 12px;
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+}
+.signature-phone .PhoneInputInput:focus {
+  border-color: #d9c69f;
+}
+.signature-phone .PhoneInputCountry:focus-within {
+  outline: 2px solid #d9c69f;
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+.signature-phone .signature-phone-error {
+  display: block;
+  color: #ffb6ac;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-top: 6px;
+}
+.signature-phone .signature-country-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  width: auto;
+  min-height: 48px;
+  padding: 8px 4px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.signature-country-trigger > svg:first-child,
+.signature-country-option > svg {
+  width: 26px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.signature-country-trigger:focus-visible {
+  outline: 2px solid #d9c69f;
+  outline-offset: 3px;
+}
+.signature-country-list {
+  z-index: 10000;
+  width: min(330px, calc(100vw - 24px));
+  max-height: min(340px, var(--radix-select-content-available-height));
+  overflow: hidden;
+  background: #242424;
+  color: #fff;
+  border: 1px solid #666;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px #0004;
+  font: 14px/1.4 sans-serif;
+}
+.signature-country-option {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  cursor: pointer;
+  outline: none;
+}
+.signature-country-option > span:last-child {
+  margin-left: auto;
+  color: #ddd;
+}
+.signature-country-option[data-highlighted] {
+  background: #444;
+}
+.signature-country-scroll {
+  text-align: center;
+  padding: 4px;
+  background: #333;
+}
+.signature-phone-group {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+.signature-phone-group > label {
+  margin: 0;
+}
+.signature-country-scroll {
+  display: flex;
+  justify-content: center;
+}
+.hp-contact-panel .signature-phone .PhoneInputInput {
+  margin-top: 0;
+}

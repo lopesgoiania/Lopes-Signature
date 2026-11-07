@@ -1,3 +1,4 @@
+import { PhoneField } from "@/components/phone-field";
 import { useState } from 'react';
 import { Bath, BedDouble, Car, Download, ExternalLink, MapPin, MessageSquare, Ruler, X } from 'lucide-react';
 import { useCreateLead, type Property } from '@workspace/api-client-react';
@@ -126,7 +127,7 @@ export function RaioXModal({ property, onClose }: RaioXModalProps) {
                     <button type="button" onClick={() => setShowLeadForm(false)} className="text-[#9a9a9a] hover:text-white"><X size={14} /></button>
                   </div>
                   <input name="name" required placeholder="Seu nome" className="h-10 rounded-lg border border-white/15 bg-black/20 px-3 text-xs text-white outline-none focus:border-[#d4af37]" />
-                  <input name="phone" required placeholder="Seu telefone" className="h-10 rounded-lg border border-white/15 bg-black/20 px-3 text-xs text-white outline-none focus:border-[#d4af37]" />
+                  <PhoneField />
                   <input name="email" type="email" required placeholder="seu@email.com" className="h-10 rounded-lg border border-white/15 bg-black/20 px-3 text-xs text-white outline-none focus:border-[#d4af37]" />
                   <button type="submit" className="mt-1 flex items-center justify-center gap-2 rounded-lg bg-[#d4af37] px-4 py-2.5 text-xs font-bold text-black hover:bg-[#e8c766] transition">
                     {createLead.isPending ? 'Enviando...' : 'Enviar Solicitação'}

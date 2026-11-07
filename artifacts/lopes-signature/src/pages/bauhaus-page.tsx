@@ -1,3 +1,4 @@
+import { PhoneField } from "@/components/phone-field";
 import { ResponsiveImage } from '@/components/responsive-image';
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ArrowRight, ArrowUpRight, Check, MapPin } from "lucide-react";
@@ -446,18 +447,7 @@ export default function BauhausPage({property}: {property?:any}) {
                     placeholder="Como podemos chamar você?"
                   />
                 </label>
-                <label htmlFor="bh-phone">
-                  Telefone ou WhatsApp
-                  <input
-                    id="bh-phone"
-                    name="phone"
-                    required
-                    type="tel"
-                    autoComplete="tel"
-                    minLength={10}
-                    placeholder="(62) 99999-9999"
-                  />
-                </label>
+                <div className="signature-phone-group"><label htmlFor="bh-phone">Telefone ou WhatsApp</label><PhoneField id="bh-phone" /></div>
                 <label htmlFor="bh-email">
                   E-mail
                   <input

@@ -1,3 +1,4 @@
+import { internationalPhone } from "../lib/phone.js";
 import { requestSiteRebuild } from "../lib/site-rebuild.js";
 import { Router } from "express";
 import { randomUUID } from "node:crypto";
@@ -593,6 +594,9 @@ router.post("/leads", async (req: any, res: any) => {
   const b = req.body;
   if (!b.name?.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(b.email || ""))
     return res.status(400).json({ message: "Informe nome e e-mail válidos." });
+  const phone = b.phone ? internationalPhone(b.phone) : "";
+  if (phone === null || (!phone && (b.propertyId || b.source === "pagina-contato")))
+    return res.status(400).json({ message: "Informe um telefone válido com DDI (ex.: +5562999999999)." });
   let property: any = null;
   if (b.propertyId) {
     const { data } = await supabase!
@@ -609,7 +613,7 @@ router.post("/leads", async (req: any, res: any) => {
     id: randomUUID(),
     name: b.name.trim(),
     email: b.email.trim(),
-    phone: b.phone || "",
+    phone,
     property_id: property?.id || "",
     property_title: property?.title || "",
     status: "new",
