@@ -262,7 +262,8 @@ const jsonSchema = (name: string, properties: Record<string, any>) => ({
   },
 });
 export function validatePitch(pitch: any, previous: any[]) {
-  const subject = `${pitch.title || ""} ${pitch.angle || ""}`;
+  // The reporting angle may mention subjects to exclude; screen the actual headline.
+  const subject = pitch.title || "";
   if (
     /lan[cç]amento|meeting|corretor(?:es)?\b|imobili[aá]ria(?:s)?\b|incorporadora|construtora|campanha comercial|primeir[oa]s? penthouses/i.test(
       subject,

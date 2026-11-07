@@ -380,3 +380,21 @@ test("metadata length repair preserves complete words and does not discard a res
   assert.ok(text.startsWith("Goiânia"));
   assert.equal(fitSeoText("Goiânia e bairros", 70), "Goiânia e bairros");
 });
+
+test("institutional reporting can explicitly exclude commercial launches in its angle", () => {
+  assert.doesNotThrow(() =>
+    validatePitch(
+      {
+        approved: true,
+        score: 90,
+        companyPromotion: false,
+        category: "Goiânia e bairros",
+        title: "Revitalização do Centro de Goiânia",
+        angle:
+          "Apurar política urbana com dados públicos, sem lançamentos de construtoras ou imobiliárias.",
+        imageQuery: "Centro Goiânia",
+      },
+      [],
+    ),
+  );
+});
