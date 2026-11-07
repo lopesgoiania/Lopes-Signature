@@ -15,6 +15,7 @@ import {
   isPrimarySource,
   approvedReview,
   validatePitch,
+  fitSeoText,
 } from "../src/lib/blog-agent.js";
 const sources = [
   { title: "Fonte primária", url: "https://ademigo.com.br/dados" },
@@ -367,4 +368,15 @@ test("commercial launch angles are discarded before reporting or writing", () =>
       ),
     /fora do escopo/,
   );
+});
+
+test("metadata length repair preserves complete words and does not discard a researched article", () => {
+  const text = fitSeoText(
+    "Goiânia e seus bairros: uma análise detalhada sobre arquitetura e qualidade de vida na cidade",
+    70,
+  );
+  assert.ok(text.length <= 70);
+  assert.ok(text.endsWith("…"));
+  assert.ok(text.startsWith("Goiânia"));
+  assert.equal(fitSeoText("Goiânia e bairros", 70), "Goiânia e bairros");
 });

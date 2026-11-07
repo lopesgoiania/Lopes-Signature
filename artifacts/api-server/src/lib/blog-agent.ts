@@ -159,6 +159,16 @@ const articleSchema = {
     "keywords",
   ],
 };
+export function fitSeoText(value: string, max: number) {
+  const text = String(value || "").trim();
+  if (text.length <= max) return text;
+  return (
+    text
+      .slice(0, max - 1)
+      .replace(/\s+\S*$/, "")
+      .trimEnd() + "…"
+  );
+}
 export function validateArticle(
   article: any,
   sources: { title: string; url: string }[],
@@ -399,6 +409,8 @@ export async function generateBlog(
       max_output_tokens: 6500,
     });
     const article = JSON.parse(responseText(writing));
+    article.seoTitle = fitSeoText(article.seoTitle, 70);
+    article.seoDescription = fitSeoText(article.seoDescription, 180);
     const used = validateArticle(article, sources, existing.data || []);
     if (used.length < 3)
       throw new Error("O artigo não sustentou três referências de apuração.");
