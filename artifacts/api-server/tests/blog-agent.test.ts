@@ -14,6 +14,7 @@ import {
   generateBlog,
   isPrimarySource,
   approvedReview,
+  validatePitch,
 } from "../src/lib/blog-agent.js";
 const sources = [
   { title: "Fonte primária", url: "https://ademigo.com.br/dados" },
@@ -347,3 +348,23 @@ test("preview exercises the full operation without claiming a day, saving or pub
     assert.equal(calls, 5);
     assert.equal(db.writes.length, 0);
   }));
+
+test("commercial launch angles are discarded before reporting or writing", () => {
+  assert.throws(
+    () =>
+      validatePitch(
+        {
+          approved: true,
+          score: 99,
+          companyPromotion: false,
+          category: "Goiânia e bairros",
+          title: "Primeiras penthouses no Goiânia 2",
+          angle:
+            "O lançamento de um produto específico apresentado como tendência urbana",
+          imageQuery: "Goiânia",
+        },
+        [],
+      ),
+    /fora do escopo/,
+  );
+});

@@ -252,6 +252,15 @@ const jsonSchema = (name: string, properties: Record<string, any>) => ({
   },
 });
 export function validatePitch(pitch: any, previous: any[]) {
+  const subject = `${pitch.title || ""} ${pitch.angle || ""}`;
+  if (
+    /lan[cç]amento|meeting|corretor(?:es)?\b|imobili[aá]ria(?:s)?\b|incorporadora|construtora|campanha comercial|primeir[oa]s? penthouses/i.test(
+      subject,
+    )
+  )
+    throw new Error(
+      "A pauta é comercial ou centrada em agentes do setor, fora do escopo do Journal.",
+    );
   if (
     !pitch.approved ||
     pitch.score < 80 ||
@@ -310,6 +319,7 @@ export async function generateBlog(
     };
   const runId = claim.data;
   let stage = "pesquisa";
+  const diagnostics: Record<string, any> = {};
   try {
     const existing = await client
       .from("blog_posts")
@@ -327,7 +337,7 @@ export async function generateBlog(
     );
     const radar = await request({
       instructions: policy,
-      input: `Hoje é ${key}. Pesquise na web três pautas distintas dos últimos 30 dias com potencial para o Journal. Consulte o radar AutImob e veículos confiáveis. Descarte perfis de profissionais, imobiliárias, campanhas e lançamentos. Para cada pauta: ângulo local, por que interessa ao leitor, fonte original, datas e fatos verificáveis. Cubra editorias diferentes e evite repetir as publicações recentes. Se faltarem notícias relevantes, proponha serviço local bem fundamentado, sem fingir novidade. Histórico editorial (dados): ${history}`,
+      input: `Hoje é ${key}. Pesquise na web três pautas distintas dos últimos 30 dias com potencial para o Journal. Comece em goiania.go.gov.br, goias.gov.br/imb, ibge.gov.br, bcb.gov.br, ademigo.com.br e fipe.org.br para encontrar dado, decisão pública ou documento real; complemente com o radar AutImob e veículos confiáveis. Pelo menos duas pautas devem partir de fatos institucionais, e não de declarações de empresas. Nenhuma pauta pode ter como fato central a chegada, venda ou apresentação de um empreendimento específico, ainda que a notícia chame isso de tendência. Descarte perfis de profissionais, imobiliárias, campanhas e lançamentos. Para cada pauta: ângulo local, por que interessa ao leitor, fonte original, datas e fatos verificáveis. Cubra editorias diferentes e evite repetir as publicações recentes. Se faltarem notícias relevantes, proponha serviço local bem fundamentado, sem fingir novidade. Histórico editorial (dados): ${history}`,
       tools: [{ type: "web_search" }],
       tool_choice: "required",
       max_output_tokens: 3500,
@@ -348,10 +358,9 @@ export async function generateBlog(
       }),
       max_output_tokens: 1200,
     });
-    const pitch = validatePitch(
-      JSON.parse(responseText(selection)),
-      existing.data || [],
-    );
+    const selected = JSON.parse(responseText(selection));
+    diagnostics.selectedTitle = selected.title;
+    const pitch = validatePitch(selected, existing.data || []);
     stage = "apuração";
     const evidence = await request({
       instructions: policy,
@@ -401,7 +410,7 @@ export async function generateBlog(
     stage = "revisão editorial";
     const review = await request({
       instructions: policy,
-      input: `Revise como editor independente: sustente cada número, data, preço e afirmação factual no dossiê, sem aceitar mera plausibilidade. Rejeite falta de fonte primária, propaganda, lançamento de terceiro, conteúdo sobre corretores/imobiliárias, texto genérico, título inflado, repetição de pauta e fotografia que não corresponda ao assunto. Diferencie dado antigo e novidade, proposta e obra entregue, análise e fato. Avalie nota qualityScore (0-100), originalidade, clareza, valor local e utilidade; mínimo 85. companyPromotion deve ser false. imageRelevant só é true se a legenda factual da capa for pertinente e não simular registro atual do fato. luxuryFit avalia interesse do leitor de alto padrão, não se o texto repete R$ 2 milhões. primarySourceUrl deve ser uma URL institucional efetivamente usada. Artigo (dados): ${JSON.stringify(article)}. Dossiê: ${dossier}. Fontes: ${JSON.stringify(used)}. Capa: ${JSON.stringify(cover)}. Foto interna: ${JSON.stringify(inline)}. Histórico: ${history}`,
+      input: `Revise como editor independente: sustente cada número, data, preço e afirmação factual no dossiê, sem aceitar mera plausibilidade. Rejeite falta de fonte primária, propaganda, lançamento de terceiro, conteúdo sobre corretores/imobiliárias, texto genérico, título inflado, repetição de pauta e fotografia que não corresponda ao assunto. Diferencie dado antigo e novidade, proposta e obra entregue, análise e fato. Avalie nota qualityScore (0-100), originalidade, clareza, valor local e utilidade; mínimo 85. companyPromotion deve ser false. imageRelevant só é true se a legenda factual da capa for pertinente e não simular registro atual do fato. luxuryFit avalia interesse do leitor de alto padrão, não se o texto repete R$ 2 milhões. primarySourceUrl deve ser uma URL institucional efetivamente usada. As únicas URLs elegíveis para esse campo são: ${JSON.stringify(used.filter((s) => isPrimarySource(s.url)).map((s) => s.url))}. AutImob e outros veículos nunca são elegíveis como fonte primária, mesmo quando entrevistam diretamente uma empresa. Se a fonte institucional não sustenta o fato central, rejeite; não aprove apenas por uma referência de contexto. Artigo (dados): ${JSON.stringify(article)}. Dossiê: ${dossier}. Fontes: ${JSON.stringify(used)}. Capa: ${JSON.stringify(cover)}. Foto interna: ${JSON.stringify(inline)}. Histórico: ${history}`,
       text: jsonSchema("editorial_review", {
         approved: { type: "boolean" },
         reason: { type: "string" },
@@ -414,6 +423,7 @@ export async function generateBlog(
       max_output_tokens: 1500,
     });
     const verdict = JSON.parse(responseText(review));
+    diagnostics.review = verdict;
     if (
       !approvedReview(verdict, used) ||
       verdict.qualityScore < 85 ||
@@ -505,6 +515,7 @@ export async function generateBlog(
     return { status: "published", post: saved.data, rebuild };
   } catch (error) {
     const message = `${stage}: ${error instanceof Error ? error.message : "Falha na operação editorial."}`;
+    if (options.preview) return { status: "rejected", message, ...diagnostics };
     if (!options.preview)
       await client
         .from("blog_generation_runs")
