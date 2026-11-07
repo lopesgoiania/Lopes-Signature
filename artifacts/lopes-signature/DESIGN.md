@@ -85,7 +85,7 @@ Frontmatter records the light root semantic palette in its source HSL notation, 
 
 Bauhaus-only overrides live under `.bauhaus-page` in src/pages/bauhaus-page.css: paper `#f2eee5`, ink `#29342c`, muted `#616459`, clay `#83503b`, and line `#c9c9ba`. These are page-local values, deliberately excluded from the global token frontmatter.
 
-Home-only palette primitives live on `.hp-body` and `.hp-home-footer` in `src/pages/home-lopes.css`: warm paper (`--hl-paper: #f5f1e9`), ink (`--hl-ink: #23251f`), muted text (`--hl-muted: #62645b`), matte gold (`--hl-gold: #b89a5b`), sand (`--hl-sand: #e3d4b5`) and divider (`--hl-line: #cbc7bc`). They are deliberately scoped rather than replacements for the global semantic colors.
+Home-only palette primitives live on `.hp-body` and `.hp-home-footer` in `src/pages/home-lopes.css`: warm paper (`--hl-paper: #f5f1e9`), ink (`--hl-ink: #242424`), muted text (`--hl-muted: #62645b`), matte gold (`--hl-gold: #b89a5b`), sand (`--hl-sand: #e3d4b5`) and divider (`--hl-line: #cbc7bc`). They are deliberately scoped rather than replacements for the global semantic colors.
 
 ## Typography
 
@@ -147,3 +147,5 @@ Home verification evidence is stored in `.impeccable/review/home-20261107` (1440
 - Don't substitute generic property imagery for Bauhaus assets or invent prices, delivery, or availability.
 
 Hero revision: supplied LP BAUHAUS.png is composition reference only, never a shipping asset. Background uses existing 1690586.webp, with a distinct mobile crop. No other page section was redesigned.
+
+Home amendment (07/11/2026): dark sections and fields now use neutral grays (#242424, #323232, #262626, #343434); the navigation strip is black with white text/arrows. The user requested removal of the background-video pause control; reduced-motion preference and poster fallback remain. All other opening content and layout are preserved.

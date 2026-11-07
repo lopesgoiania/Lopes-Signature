@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from 'react';
 
 export function ScrollVideoHero() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [paused, setPaused] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(true);
   const [failed, setFailed] = useState(false);
   const base = import.meta.env.BASE_URL;
@@ -19,9 +18,9 @@ export function ScrollVideoHero() {
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-    if (paused || reduceMotion) video.pause();
-    else video.play().catch(() => setPaused(true));
-  }, [paused, reduceMotion]);
+    if (reduceMotion) video.pause();
+    else video.play().catch(() => setFailed(true));
+  }, [reduceMotion]);
 
   return (
     <section className="relative isolate overflow-hidden bg-[#121212]">
@@ -61,13 +60,7 @@ export function ScrollVideoHero() {
             </div>
           </div>
       </div>
-      {!reduceMotion && !failed && (
-        <button type="button" onClick={() => setPaused(!paused)}
-          className="absolute bottom-12 right-6 z-20 rounded-full border border-white/40 bg-black/40 px-4 py-2 text-xs text-white hover:bg-black/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
-          aria-label={paused ? 'Reproduzir vídeo de fundo' : 'Pausar vídeo de fundo'}>
-          {paused ? 'Reproduzir vídeo' : 'Pausar vídeo'}
-        </button>
-      )}
+
     </section>
   );
 }

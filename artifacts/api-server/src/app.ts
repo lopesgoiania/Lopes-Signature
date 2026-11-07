@@ -19,8 +19,11 @@ app.use((req: any, res: any, next: any) => {
     /^\/api\/admin\/catalog\/(properties|taxonomies|media|maps)$/.test(
       req.path,
     );
-  const editorial = ["GET", "POST"].includes(req.method) && /^\/api\/admin\/blog(?:\/status)?$/.test(req.path);
-  if (!publicRead && !lead && !admin && !editorial)
+  const editorial =
+    ["GET", "POST"].includes(req.method) &&
+    /^\/api\/admin\/blog(?:\/(?:status|generate|rebuild))?$/.test(req.path);
+  const cron = req.method === "GET" && req.path === "/api/cron/generate-blog";
+  if (!publicRead && !lead && !admin && !editorial && !cron)
     return res.status(404).json({ message: "Rota não encontrada." });
   next();
 });

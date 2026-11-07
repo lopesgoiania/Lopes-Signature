@@ -19,6 +19,16 @@ const empty = (): Draft => ({
 });
 export function EditorialWorkspace() {
   const readiness = useQuery<{
+    openaiConfigured: boolean;
+    serviceRoleConfigured: boolean;
+    cronConfigured: boolean;
+    automationSchemaReady: boolean;
+    lastRun: {
+      status: string;
+      error?: string;
+      rebuild_status?: string;
+      started_at: string;
+    } | null;
     schemaReady: boolean;
     databaseAvailable: boolean;
     rebuildConfigured: boolean;
@@ -103,6 +113,47 @@ export function EditorialWorkspace() {
       setPending(false);
     }
   }
+  async function generateArticle() {
+    setPending(true);
+    setError("");
+    setMessage(
+      "Pesquisando fontes e preparando o artigo. Isso pode levar alguns minutos…",
+    );
+    try {
+      const result = await catalogRequest("admin/blog/generate", {});
+      setMessage(
+        result.status === "skipped"
+          ? result.message
+          : result.rebuild === "requested"
+            ? "Artigo publicado no banco. Atualização das páginas solicitada."
+            : "Artigo salvo, mas a atualização das páginas falhou. Use Atualizar site para repetir.",
+      );
+      await Promise.all([query.refetch(), readiness.refetch()]);
+    } catch (e) {
+      setMessage("");
+      setError(
+        e instanceof Error ? e.message : "Não foi possível gerar o artigo.",
+      );
+    } finally {
+      setPending(false);
+    }
+  }
+  async function retryPublication() {
+    setPending(true);
+    setError("");
+    try {
+      const result = await catalogRequest("admin/blog/rebuild", {});
+      setMessage(
+        result.rebuild === "requested"
+          ? "Atualização do site solicitada."
+          : "Não foi possível solicitar a atualização. Confira o hook da Vercel.",
+      );
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Falha ao atualizar o site.");
+    } finally {
+      setPending(false);
+    }
+  }
   const field = (key: keyof Draft, value: string) => {
     setDraft((d) => ({ ...d, [key]: value }));
     setDirty(true);
@@ -113,8 +164,8 @@ export function EditorialWorkspace() {
         <div>
           <h1 className="serif text-4xl">Journal Signature</h1>
           <p className="mt-3 text-sm text-muted-foreground">
-            Edite, revise e publique artigos. A automação com IA será conectada
-            após a definição do fluxo editorial.
+            Pesquisa e publicação sobre Goiânia e o mercado de alto padrão.
+            Segunda, quarta e sexta, às 9h (Brasília).
           </p>
         </div>
         <button
@@ -124,6 +175,70 @@ export function EditorialWorkspace() {
           Novo artigo
         </button>
       </div>
+      <section
+        className="rounded-xl border p-5 space-y-3"
+        aria-label="Agente editorial"
+      >
+        <h2 className="serif text-2xl">Agente editorial</h2>
+        <p className="text-sm">
+          Pesquisa tendências, consulta fontes e publica um artigo original. No
+          máximo um artigo por dia, incluindo gerações manuais.
+        </p>
+        {readiness.data && (
+          <p className="text-sm">
+            OpenAI:{" "}
+            {readiness.data.openaiConfigured ? "configurada" : "pendente"} ·
+            Banco da automação:{" "}
+            {readiness.data.automationSchemaReady &&
+            readiness.data.serviceRoleConfigured
+              ? "pronto"
+              : "pendente"}{" "}
+            · Agendamento:{" "}
+            {readiness.data.cronConfigured
+              ? "chave configurada"
+              : "chave pendente"}{" "}
+            · Publicação:{" "}
+            {readiness.data.rebuildConfigured ? "configurada" : "pendente"}
+          </p>
+        )}
+        {readiness.data?.lastRun && (
+          <p className="text-sm">
+            Última execução:{" "}
+            {readiness.data.lastRun.status === "completed"
+              ? "concluída"
+              : readiness.data.lastRun.status === "failed"
+                ? "falhou"
+                : "em andamento"}
+            . {readiness.data.lastRun.error}{" "}
+            {readiness.data.lastRun.rebuild_status === "failed"
+              ? "A atualização do site precisa ser repetida."
+              : ""}
+          </p>
+        )}
+        <button
+          type="button"
+          className="min-h-11 rounded-xl border px-5 disabled:opacity-50"
+          onClick={generateArticle}
+          disabled={
+            pending ||
+            !readiness.data?.schemaReady ||
+            !readiness.data?.automationSchemaReady ||
+            !readiness.data?.openaiConfigured ||
+            !readiness.data?.serviceRoleConfigured ||
+            !readiness.data?.rebuildConfigured
+          }
+        >
+          {pending ? "Aguarde…" : "Pesquisar e publicar com IA"}
+        </button>
+        <button
+          type="button"
+          className="min-h-11 rounded-xl border px-5 ml-2 disabled:opacity-50"
+          onClick={retryPublication}
+          disabled={pending || !readiness.data?.rebuildConfigured}
+        >
+          Atualizar site
+        </button>
+      </section>
       {readiness.isLoading ? (
         <p role="status">Verificando o editor…</p>
       ) : readiness.isError ? (

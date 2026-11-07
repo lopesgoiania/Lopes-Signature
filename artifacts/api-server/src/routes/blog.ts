@@ -1,3 +1,4 @@
+import { cronAuthorized, generateBlog } from "../lib/blog-agent.js";
 import { editorialStatus } from "../lib/editorial-status.js";
 import { requestSiteRebuild } from "../lib/site-rebuild.js";
 import { Router, type IRouter } from "express";
@@ -46,11 +47,9 @@ export const mapPost = (row: any) => ({
     : [],
 });
 const unavailable = (res: any) =>
-  res
-    .status(503)
-    .json({
-      message: "O Journal está temporariamente indisponível. Tente novamente.",
-    });
+  res.status(503).json({
+    message: "O Journal está temporariamente indisponível. Tente novamente.",
+  });
 const router: IRouter = Router();
 router.get("/blog", async (_req, res) => {
   if (!supabase) {
@@ -107,8 +106,11 @@ router.get("/blog/:id", async (req, res) => {
 });
 router.use("/admin/blog", requireAdmin);
 router.get("/admin/blog/status", async (_req, res) => {
-  try { res.json(await editorialStatus()); }
-  catch { unavailable(res); }
+  try {
+    res.json(await editorialStatus());
+  } catch {
+    unavailable(res);
+  }
 });
 router.get("/admin/blog", async (_req, res) => {
   try {
@@ -152,12 +154,10 @@ router.post("/admin/blog", async (req, res) => {
     !slug ||
     !["draft", "published", "archived"].includes(status)
   ) {
-    res
-      .status(400)
-      .json({
-        message:
-          "Preencha título, resumo, conteúdo e um estado editorial válido.",
-      });
+    res.status(400).json({
+      message:
+        "Preencha título, resumo, conteúdo e um estado editorial válido.",
+    });
     return;
   }
   const sources = Array.isArray(body.sources) ? body.sources : [];
@@ -171,11 +171,9 @@ router.post("/admin/blog", async (req, res) => {
         typeof s.title !== "string",
     )
   ) {
-    res
-      .status(400)
-      .json({
-        message: "Informe fontes com título e endereço HTTP ou HTTPS válidos.",
-      });
+    res.status(400).json({
+      message: "Informe fontes com título e endereço HTTP ou HTTPS válidos.",
+    });
     return;
   }
   const image = text(body.image, 2000);
@@ -206,11 +204,9 @@ router.post("/admin/blog", async (req, res) => {
         body.updatedAt &&
         body.updatedAt !== (existing.updated_at || existing.created_at)
       ) {
-        res
-          .status(409)
-          .json({
-            message: "Este artigo foi alterado. Recarregue antes de salvar.",
-          });
+        res.status(409).json({
+          message: "Este artigo foi alterado. Recarregue antes de salvar.",
+        });
         return;
       }
     }
@@ -252,20 +248,16 @@ router.post("/admin/blog", async (req, res) => {
           .json({ message: "Já existe um artigo com esse endereço." });
         return;
       }
-      res
-        .status(503)
-        .json({
-          message:
-            "Não foi possível salvar. Verifique a migração editorial no banco; seu texto foi mantido no formulário.",
-        });
+      res.status(503).json({
+        message:
+          "Não foi possível salvar. Verifique a migração editorial no banco; seu texto foi mantido no formulário.",
+      });
       return;
     }
     if (!data) {
-      res
-        .status(409)
-        .json({
-          message: "Este artigo foi alterado. Recarregue antes de salvar.",
-        });
+      res.status(409).json({
+        message: "Este artigo foi alterado. Recarregue antes de salvar.",
+      });
       return;
     }
     const rebuild =
@@ -279,10 +271,33 @@ router.post("/admin/blog", async (req, res) => {
     unavailable(res);
   }
 });
-// The legacy generation endpoints are deliberately disabled while the editorial automation is being chosen.
-router.all(["/blog/generate-ai", "/cron/generate-blog"], (_req, res) => {
-  res
-    .status(501)
-    .json({ message: "A automação editorial ainda não foi configurada." });
+async function generate(_req: any, res: any) {
+  res.setHeader("Cache-Control", "no-store");
+  try {
+    res.json(await generateBlog());
+  } catch (error) {
+    res
+      .status(503)
+      .json({
+        message: error instanceof Error ? error.message : "Falha na geração.",
+      });
+  }
+}
+router.post("/admin/blog/generate", generate);
+router.post("/admin/blog/rebuild", async (_req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  res.json({ rebuild: await requestSiteRebuild() });
 });
+router.get(
+  "/cron/generate-blog",
+  (req, res, next) => {
+    res.setHeader("Cache-Control", "no-store");
+    if (!cronAuthorized(req.headers.authorization)) {
+      res.status(401).json({ message: "Acesso não autorizado." });
+      return;
+    }
+    next();
+  },
+  generate,
+);
 export default router;

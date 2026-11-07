@@ -62,7 +62,7 @@ test("backend does not pretend an unconfigured database is an empty Journal or a
     );
     assert.equal(
       (await fetch(`${base}/api/blog/generate-ai`, { method: "POST" })).status,
-      501,
+      404,
     );
   } finally {
     await new Promise<void>((resolve) => server.close(() => resolve()));
