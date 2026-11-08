@@ -1,3 +1,4 @@
+import { campaignCatalog } from "@/lib/campaign-catalog";
 import { SiteFooter } from "@/components/site-footer";
 import "@/components/property-listing.css";
 import { taxonomyMatches, slugify, type Taxonomy } from "@/lib/catalog";
@@ -5,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { catalogRequest } from "@/lib/catalog";
 import { CatalogSearch } from "@/components/catalog-search";
 const EMPTY_PROPERTIES: any[] = [];
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useListProperties } from "@workspace/api-client-react";
 import {
   PublicNav,
@@ -44,9 +45,13 @@ export default function CatalogPage({
     useState<Property | null>(null);
 
   const propertyQuery = useListProperties();
-  const allProperties = Array.isArray(propertyQuery.data)
-    ? propertyQuery.data
-    : EMPTY_PROPERTIES;
+  const allProperties = useMemo(
+    () =>
+      Array.isArray(propertyQuery.data)
+        ? campaignCatalog(propertyQuery.data)
+        : EMPTY_PROPERTIES,
+    [propertyQuery.data],
+  );
   const [filteredProperties, setFilteredProperties] = useState<any[] | null>(
     null,
   );

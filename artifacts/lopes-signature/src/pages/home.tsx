@@ -1,3 +1,4 @@
+import { campaignCatalog } from "@/lib/campaign-catalog";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
@@ -20,14 +21,6 @@ import "./home-design-preview.css";
 import "./home-lopes.css";
 
 const EMPTY_PROPERTIES: any[] = [];
-const PREFERRED = [
-  "Epic City Home",
-  "City Park Palace",
-  "City Park Royal",
-  "B. Side",
-  "Legacy City Home",
-  "City Park Majestic",
-];
 
 export default function HomePage() {
   const [searchRevision, setSearchRevision] = useState(0);
@@ -45,9 +38,13 @@ export default function HomePage() {
     }
   }, []);
   const propertyQuery = useListProperties();
-  const allProperties = Array.isArray(propertyQuery.data)
-    ? propertyQuery.data
-    : EMPTY_PROPERTIES;
+  const allProperties = useMemo(
+    () =>
+      Array.isArray(propertyQuery.data)
+        ? campaignCatalog(propertyQuery.data)
+        : EMPTY_PROPERTIES,
+    [propertyQuery.data],
+  );
   const blogQuery = useQuery({
     queryKey: ["journal-posts"],
     queryFn: readPosts,
@@ -60,21 +57,7 @@ export default function HomePage() {
   const isFullCatalog =
     results.length === allProperties.length &&
     results.every((p, i) => p.id === allProperties[i]?.id);
-  const curated = useMemo(
-    () =>
-      [...allProperties]
-        .sort((a, b) => {
-          const rank = (p: any) => {
-            const index = PREFERRED.findIndex((title) =>
-              p.title?.toLowerCase().includes(title.toLowerCase()),
-            );
-            return index < 0 ? PREFERRED.length : index;
-          };
-          return rank(a) - rank(b);
-        })
-        .slice(0, 6),
-    [allProperties],
-  );
+  const curated = allProperties;
   const properties = isFullCatalog ? curated : results;
   function toggleSave(id: string) {
     setSaved((current) => {
@@ -130,7 +113,7 @@ export default function HomePage() {
             {!propertyQuery.isLoading && !propertyQuery.isError && (
               <p className="hp-results-note" aria-live="polite">
                 {isFullCatalog
-                  ? `${properties.length} destaques de um catálogo com ${allProperties.length} imóveis`
+                  ? `${properties.length} empreendimentos selecionados`
                   : `${properties.length} ${properties.length === 1 ? "imóvel encontrado" : "imóveis encontrados"} para sua busca`}
               </p>
             )}

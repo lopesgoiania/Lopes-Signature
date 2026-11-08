@@ -50,8 +50,8 @@ export function HomeEditorial({
   const lead = useCreateLead();
   const [submitted, setSubmitted] = useState(false);
   const highlight = properties.find(
-    (p) => p.slug === "epic-city-home" || p.title === "Epic City Home",
-  );
+    (p) => p.sourcePropertyId === "city-park-majestic",
+  ) || properties[0];
   const gallery: string[] = highlight?.gallery || [];
   const pool =
     gallery.find((src) => /-17-piscina\./i.test(src)) ||
@@ -142,9 +142,9 @@ export function HomeEditorial({
                 Veja as imagens e as características de cada projeto antes de
                 conhecer de perto.
               </p>
-              <Link href={propertyHref(highlight)} className="hp-text-link">
+              <a href={propertyHref(highlight)} className="hp-text-link">
                 Conhecer {highlight.title} <ArrowUpRight size={19} />
-              </Link>
+              </a>
             </div>
           </div>
         )}

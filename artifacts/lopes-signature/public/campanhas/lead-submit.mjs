@@ -3,6 +3,11 @@ const properties = Object.freeze({
   'city-park-majestic': 'city-park-majestic',
   'royal-city-park': 'city-park-royal',
   'city-park-palace': 'city-park-palace',
+  'citage-sante-comercial': 'citage-sante',
+  'citage-sante-residencial': 'citage-sante',
+  'legacy-city-home': 'legacy-city-home',
+  'city-way': 'city-way',
+  'city-23-by-pininfarina': 'city-23',
 });
 const campaignFields = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_id', 'utm_term', 'utm_content', 'gclid', 'gbraid', 'wbraid'];
 const pending = new WeakSet();
@@ -12,12 +17,13 @@ export function campaignLead(payload, slug, search = globalThis.location?.search
   const query = new URLSearchParams(search);
   const attribution = campaignFields.filter(key => query.get(key)).map(key => `${key}: ${query.get(key).slice(0, 512)}`);
   return {
-    name: payload.name, email: payload.email, phone: payload.phone,
+    name: payload.name, email: payload.email, phone: payload.phone || payload.phone_e164,
     propertyId: properties[slug],
     note: [
       `Landing page: /${slug}`,
       `País do telefone: ${payload.country || payload.phone_country || ''}`,
       payload.plan ? `Planta: ${payload.plan}` : '',
+      payload.interest ? `Interesse: ${payload.interest}` : '',
       payload.consent === true ? 'Solicitou e autorizou contato sobre o empreendimento.' : '',
       ...attribution,
     ].filter(Boolean).join('\n'),
@@ -49,4 +55,17 @@ export async function submitCampaignLead(form, payload, slug, request = fetch) {
     button.disabled = false;
     button.removeAttribute('aria-busy');
   }
+}
+
+export function bindCampaignForm(form, slug, validate) {
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    try {
+      const payload = await validate();
+      if (payload) await submitCampaignLead(form, payload, slug);
+    } catch {
+      const status = form.querySelector('#form-status');
+      if (status) status.textContent = 'Confira os campos do formulário antes de enviar. Se a validação não carregar, atualize a página.';
+    }
+  });
 }

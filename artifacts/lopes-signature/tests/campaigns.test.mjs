@@ -66,3 +66,35 @@ test('duplicate submits while a request is pending create only one request',asyn
   await submitCampaignLead(form,contact,'city-park-palace',request);
   assert.equal(calls,1); release(); await first;
 });
+
+test('public galleries contain exactly the campaign products with unique cards', async () => {
+  const { campaignCatalog } = await import('../.server/entry-server.js');
+  const fixtures = [...new Set(manifest.map(c => c.propertyId))].map(id => ({id,title:id,images:[],area:10}));
+  const legacy = {id:'unfocused-product',title:'Other product'};
+  const cards = campaignCatalog([...fixtures,legacy]);
+  assert.equal(cards.length,8);
+  assert.equal(new Set(cards.map(c=>c.id)).size,8);
+  assert.deepEqual(cards.map(c=>c.landingPath),manifest.map(c=>`/${c.slug}`));
+  assert.ok(!cards.some(c=>c.id===legacy.id));
+  assert.equal(cards.find(c=>c.id==='citage-sante-comercial').area,762);
+  assert.equal(cards.find(c=>c.id==='citage-sante-residencial').area,501);
+  assert.equal(fixtures.find(c=>c.id==='citage-sante').area,10);
+});
+
+test('commercial and residential leads share the real record but retain their distinct campaign', () => {
+  for (const slug of ['citage-sante-comercial','citage-sante-residencial']) {
+    const payload=campaignLead({name:'Teste',email:'teste@example.com',phone_e164:'+5562999999999',interest:'Lote',consent:true},slug,'?utm_campaign=terrenos');
+    assert.equal(payload.propertyId,'citage-sante');
+    assert.equal(payload.phone,'+5562999999999');
+    assert.ok(payload.note.includes(slug));
+    assert.match(payload.note,/Interesse: Lote/);
+  }
+});
+test('home and catalog exports expose only the eight campaign cards',async()=>{
+  for (const page of ['index.html','imoveis.html']) {
+    const html=await readFile(path.join(root,'dist',page),'utf8');
+    assert.equal((html.match(/data-testid="card-property-/g)||[]).length,8);
+    assert.doesNotMatch(html,/data-testid="card-property-(?:epic-city-home|atmos-city-design|blanc-casa-design)"/);
+    for (const campaign of manifest) assert.ok(html.includes(`href="/${campaign.slug}"`));
+  }
+});

@@ -4,13 +4,14 @@ import path from 'node:path';
 export async function campaignPages(root, dist, origin) {
   const manifest = JSON.parse(await readFile(path.join(root, 'campaigns/manifest.json'), 'utf8'));
   const routes = [];
-  for (const { slug } of manifest) {
+  for (const { slug, card } of manifest) {
     const route = `/${slug}`;
     const url = new URL(route, origin).href;
-    const image = new URL(`/campanhas/${slug}/assets/fachada.webp`, origin).href;
+    const image = new URL(card?.images?.[0] || `/campanhas/${slug}/assets/fachada.webp`, origin).href;
     let html = await readFile(path.join(root, 'campaigns', slug, 'index.html'), 'utf8');
     const title = html.match(/<title>(.*?)<\/title>/s)[1];
     const description = html.match(/<meta name="description" content="([^"]*)"/)[1];
+    if (!/<meta name="robots"/.test(html)) html = html.replace('</head>', '<meta name="robots" content="index,follow,max-image-preview:large"></head>');
     html = html.replace(/<meta name="robots"[^>]*>/, '<meta name="robots" content="index,follow,max-image-preview:large">')
       .replace('<head>', `<head>\n  <base href="/campanhas/${slug}/">`)
       .replace(/href="#([^"]*)"/g, `href="${route}#$1"`)

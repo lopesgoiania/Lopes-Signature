@@ -1,3 +1,4 @@
+export { campaignCatalog } from "./lib/campaign-catalog";
 export { default as specialistDirectory } from "../../api-server/src/data/specialists.json";
 import { PassThrough } from "node:stream";
 import { renderToPipeableStream } from "react-dom/server";

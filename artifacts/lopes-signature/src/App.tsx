@@ -68,7 +68,7 @@ function Router() {
         <Route path="/imoveis">
           <CatalogPage
             title="Explore o catálogo Lopes Signature"
-            description="Descubra casas, apartamentos e coberturas de alto padrão em Goiânia."
+            description="Conheça os empreendimentos selecionados: apartamentos e terrenos, com plantas, condições e atendimento Lopes."
           />
         </Route>
         <Route

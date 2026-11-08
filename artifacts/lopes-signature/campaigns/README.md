@@ -1,4 +1,4 @@
-# Landing pages City Park
+# Landing pages dos empreendimentos
 
 Publicadas como páginas HTML independentes para preservar o design e não carregar o aplicativo React nas campanhas.
 
@@ -17,3 +17,12 @@ Os validadores de telefone originais foram preservados. A consulta de país util
 UTMs e identificadores gclid/gbraid/wbraid são preservados na observação do contato, junto ao caminho da página e à planta quando disponível. Nenhuma chave secreta ou ID de conversão foi adicionado. O evento local `signature:lead-saved` ocorre apenas após resposta de sucesso com ID; conectar pixels exige os IDs da operação. Não implica rastreamento de anúncios já configurado.
 
 Verificações: build, typecheck, `test:campaigns`, `test:seo` e navegação em desktop/celular. Os testes de persistência confirmada e erro usam respostas simuladas, sem criar contatos fictícios no banco de produção.
+
+
+## Seleção de campanhas — novembro de 2026
+
+O manifesto contém oito páginas. As galerias da home e do catálogo usam `campaignCatalog` para selecionar os cadastros correspondentes. A seleção não apaga nem despublica registros históricos. Links dos cards são navegações HTML completas para preservar as aplicações estáticas independentes.
+
+As páginas adicionadas são Citàge Santé Comercial, Citàge Santé Residencial, Legacy City Home, City Way e City 23 by Pininfarina, importadas de `site/dist` nas respectivas pastas em `Projeto-Sites-Lopes/empreendimentos`, sem modificar os originais. As duas campanhas Citàge têm cards próprios e apontam ao cadastro real `citage-sante`; observações de contato registram a campanha e o interesse separadamente. City 23 corresponde ao cadastro `city-23`.
+
+Os valores e características em `card` reproduzem a unidade de referência apresentada na landing page, sem modificar o cadastro geral nem combinar ofertas de unidades distintas. Atualize os dois em conjunto quando houver nova tabela comercial.

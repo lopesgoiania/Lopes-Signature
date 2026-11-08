@@ -32,7 +32,7 @@ export const slugify = (s: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 export const propertyHref = (p: any) =>
-  `/imoveis/${encodeURIComponent(p.slug || p.id)}`;
+  p.landingPath || `/imoveis/${encodeURIComponent(p.slug || p.id)}`;
 export function deliveryLabel(p: any) {
   if (p.condition === "Pronto") return "Entregue";
   if (!/^\d{4}-\d{2}$/.test(p.delivery || "")) return "";

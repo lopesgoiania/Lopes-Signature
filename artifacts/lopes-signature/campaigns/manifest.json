@@ -13,5 +13,81 @@
     "slug": "city-park-palace",
     "title": "City Park Palace",
     "propertyId": "city-park-palace"
+  },
+  {
+    "slug": "citage-sante-comercial",
+    "title": "Citàge Santé Comercial",
+    "propertyId": "citage-sante",
+    "card": {
+      "area": 762,
+      "price": 3091343,
+      "suites": 0,
+      "images": [
+        "/campanhas/citage-sante-comercial/assets/comercial.webp"
+      ],
+      "parking": 0,
+      "category": "Lotes",
+      "delivery": "2030-05"
+    }
+  },
+  {
+    "slug": "legacy-city-home",
+    "title": "Legacy City Home",
+    "propertyId": "legacy-city-home",
+    "card": {
+      "area": 270,
+      "price": 4116479,
+      "suites": 3,
+      "images": [
+        "/campanhas/legacy-city-home/assets/facade.webp"
+      ],
+      "delivery": "",
+      "condition": ""
+    }
+  },
+  {
+    "slug": "citage-sante-residencial",
+    "title": "Citàge Santé Residencial",
+    "propertyId": "citage-sante",
+    "card": {
+      "area": 501,
+      "price": 1368318,
+      "suites": 0,
+      "images": [
+        "/campanhas/citage-sante-residencial/assets/hero.webp"
+      ],
+      "parking": 0,
+      "category": "Lotes",
+      "delivery": "2030-05"
+    }
+  },
+  {
+    "slug": "city-way",
+    "title": "City Way",
+    "propertyId": "city-way",
+    "card": {
+      "area": 49,
+      "price": 766669,
+      "suites": 0,
+      "images": [
+        "/campanhas/city-way/assets/facade.webp"
+      ],
+      "delivery": "2028-05",
+      "parking": 0
+    }
+  },
+  {
+    "slug": "city-23-by-pininfarina",
+    "title": "City 23 by Pininfarina",
+    "propertyId": "city-23",
+    "card": {
+      "area": 308,
+      "price": 6001881,
+      "suites": 4,
+      "images": [
+        "/campanhas/city-23-by-pininfarina/assets/fachada.webp"
+      ],
+      "parking": 0
+    }
   }
 ]
