@@ -74,6 +74,7 @@ test('public galleries contain exactly the campaign products with unique cards',
   const cards = campaignCatalog([...fixtures,legacy]);
   assert.equal(cards.length,8);
   assert.equal(new Set(cards.map(c=>c.id)).size,8);
+  assert.equal(cards.find(c=>c.landingPath==='/royal-city-park').id,'city-park-royal');
   assert.deepEqual(cards.map(c=>c.landingPath),manifest.map(c=>`/${c.slug}`));
   assert.ok(!cards.some(c=>c.id===legacy.id));
   assert.equal(cards.find(c=>c.id==='citage-sante-comercial').area,762);

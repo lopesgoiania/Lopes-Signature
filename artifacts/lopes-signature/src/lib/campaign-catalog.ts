@@ -9,7 +9,8 @@ export function campaignCatalog(properties: any[]): any[] {
       {
         ...property,
         ...("card" in campaign ? campaign.card : {}),
-        id: campaign.slug,
+        id: campaigns.filter((item) => item.propertyId === campaign.propertyId).length > 1
+          ? campaign.slug : property.id,
         title: campaign.title,
         landingPath: `/${campaign.slug}`,
         sourcePropertyId: property.id,
