@@ -1,13 +1,13 @@
+import { useSignatureLead } from "@/lib/signature-lead";
 import { PhoneField } from "@/components/phone-field";
 import { SiteFooter } from "@/components/site-footer";
 import { useState, type FormEvent } from 'react';
 import { ArrowRight, CheckCircle2, Mail, MapPin, Phone, Send, Sparkles } from 'lucide-react';
 import { Link } from 'wouter';
-import { useCreateLead } from '@workspace/api-client-react';
 import { PageLogo, PublicNav } from '@/components/signature-ui';
 
 export default function ContactPage() {
-  const createLead = useCreateLead();
+  const createLead = useSignatureLead();
   const [submitted, setSubmitted] = useState(false);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {

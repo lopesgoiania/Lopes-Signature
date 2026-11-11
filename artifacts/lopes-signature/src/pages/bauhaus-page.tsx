@@ -1,9 +1,9 @@
+import { useSignatureLead, launchId } from "@/lib/signature-lead";
 import { PhoneField } from "@/components/phone-field";
 import { ResponsiveImage } from '@/components/responsive-image';
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ArrowRight, ArrowUpRight, Check, MapPin } from "lucide-react";
 import { GooglePropertyMap } from "@/components/google-property-map";
-import { useCreateLead } from "@workspace/api-client-react";
 import "./bauhaus-page.css";
 
 const image = (id: string) => `/images/bauhaus/${id}.webp`;
@@ -46,7 +46,7 @@ export default function BauhausPage({property}: {property?:any}) {
   const [showDock, setShowDock] = useState(false);
   const heroRef = useRef<HTMLElement>(null);
   const contactRef = useRef<HTMLElement>(null);
-  const createLead = useCreateLead();
+  const createLead = useSignatureLead();
 
   useEffect(() => {
     const description = document.querySelector<HTMLMetaElement>(
@@ -62,6 +62,7 @@ export default function BauhausPage({property}: {property?:any}) {
       body: JSON.stringify({
         eventType: "lp_view",
         pageUrl: window.location.pathname,
+
         propertyId: "bauhaus",
       }),
     }).catch(() => {});
@@ -104,6 +105,7 @@ export default function BauhausPage({property}: {property?:any}) {
           name: String(data.get("name") || "").trim(),
           email: String(data.get("email") || "").trim(),
           phone: String(data.get("phone") || "").trim(),
+          "100bug_id_lanc": String(data.get("100bug_id_lanc") || ""),
           propertyId: "bauhaus",
           propertyTitle: "Bauhaus",
           status: "new",
@@ -437,6 +439,7 @@ export default function BauhausPage({property}: {property?:any}) {
               </div>
             ) : (
               <form onSubmit={submit}>
+                <input type="hidden" name="100bug_id_lanc" value={launchId("bauhaus")} />
                 <label htmlFor="bh-name">
                   Seu nome
                   <input
@@ -482,6 +485,7 @@ export default function BauhausPage({property}: {property?:any}) {
                   type="submit"
                   disabled={createLead.isPending}
                 >
+
                   {createLead.isPending
                     ? "Enviando solicitação…"
                     : "Receber atendimento"}

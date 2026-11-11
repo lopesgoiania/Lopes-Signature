@@ -1,5 +1,6 @@
 import { visitorCountry } from "./lib/phone.js";
 import express from "express";
+import { eventIdPattern, sendMetaEvent, signaturePage } from "./lib/meta.js";
 import catalog from "./routes/signature-catalog.js";
 import specialists from "./routes/specialists.js";
 import blog from "./routes/blog.js";
@@ -13,6 +14,21 @@ app.get("/api/visitor-country", (req, res) => {
   res.json({ country: visitorCountry(req.headers["x-vercel-ip-country"]) });
 });
 app.use(express.json({ limit: "4mb" }));
+app.post("/api/page-view", async (req, res) => {
+  res.set("Cache-Control", "no-store");
+  const page = signaturePage(req.body?.page_url);
+  const id = req.body?.event_id;
+  if (!page || typeof id !== "string" || !eventIdPattern.test(id)) {
+    res.status(422).end();
+    return;
+  }
+  if (req.get("origin") !== new URL(page).origin || req.get("sec-fetch-site") !== "same-origin") {
+    res.status(403).end();
+    return;
+  }
+  const accepted = await sendMetaEvent(req, { name: "PageView", id, url: page });
+  res.status(accepted ? 204 : 503).end();
+});
 app.use((req: any, res: any, next: any) => {
   const publicRead =
     req.method === "GET" &&

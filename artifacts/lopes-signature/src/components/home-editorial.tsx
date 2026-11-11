@@ -1,10 +1,10 @@
+import { useSignatureLead } from "@/lib/signature-lead";
 import { HomeJournal } from "./journal-gallery";
 import "@/pages/journal-page.css";
 import { PhoneField } from "@/components/phone-field";
 import { useState, type FormEvent } from "react";
 import { Link } from "wouter";
 import { ArrowRight, ArrowUpRight, Check, ChevronDown } from "lucide-react";
-import { useCreateLead } from "@workspace/api-client-react";
 import { ResponsiveImage } from "./responsive-image";
 import {
   propertyHref,
@@ -47,7 +47,7 @@ export function HomeEditorial({
   postsError,
   retryPosts,
 }: Props) {
-  const lead = useCreateLead();
+  const lead = useSignatureLead();
   const [submitted, setSubmitted] = useState(false);
   const highlight = properties.find(
     (p) => p.sourcePropertyId === "city-park-majestic",

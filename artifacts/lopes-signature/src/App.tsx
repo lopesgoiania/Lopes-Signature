@@ -5,7 +5,7 @@ const CatalogPropertyPage = lazy(() => import("@/pages/catalog-property-page"));
 const PropertyDesignPreview = lazy(
   () => import("@/pages/property-design-preview"),
 );
-import { type ReactNode, lazy, Suspense } from "react";
+import { type ReactNode, lazy, Suspense, useEffect } from "react";
 import {
   QueryClient,
   QueryClientProvider,
@@ -110,6 +110,7 @@ function RoutedErrorBoundary({ children }: { children: ReactNode }) {
 
 function RouteMetadata() {
   const [location] = useLocation();
+  useEffect(() => { window.SignatureTracking?.pageView(); }, [location]);
   const category =
     /^(\/casas-alto-padrao-goiania|\/apartamentos-luxo-goiania|\/coberturas-goiania)$/.test(
       location,

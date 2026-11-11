@@ -1,9 +1,10 @@
+import { useSignatureLead, launchId } from "@/lib/signature-lead";
 import { PhoneField } from "@/components/phone-field";
 import { PropertyPlans } from '@/components/property-plans';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useRoute, Link } from 'wouter';
 import { ArrowUpRight, Bath, BedDouble, Building2, Car, CheckCircle2, Download, ExternalLink, MapPin, MessageSquare, Phone, Ruler, Send, ShieldCheck, Sparkles, Waves } from 'lucide-react';
-import { useGetProperty, useCreateLead } from '@workspace/api-client-react';
+import { useGetProperty } from '@workspace/api-client-react';
 import { PageLogo, SectionLabel, money } from '@/components/signature-ui';
 import { RaioXModal } from '@/components/raio-x-modal';
 
@@ -11,7 +12,7 @@ export default function LandingPage({property: suppliedProperty}: {property?:any
   const [, params] = useRoute('/lp/:id');
   const id = suppliedProperty?.id || params?.id || '';
   const { data: property, isLoading } = useGetProperty(id, {query:{queryKey:["/api/properties",id],enabled:!suppliedProperty}});
-  const createLead = useCreateLead();
+  const createLead = useSignatureLead();
 
   const [showRaioX, setShowRaioX] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -20,7 +21,8 @@ export default function LandingPage({property: suppliedProperty}: {property?:any
     fetch('/api/analytics/event', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ eventType: 'lp_view', pageUrl: `/lp/${id}`, propertyId: id }),
+      body: JSON.stringify({ eventType: 'lp_view', pageUrl: `/lp/${id}`,
+           propertyId: id }),
     }).catch(() => {});
   }, [id]);
 
@@ -47,7 +49,8 @@ export default function LandingPage({property: suppliedProperty}: {property?:any
         name: String(form.get('name') || ''),
         email: String(form.get('email') || ''),
         phone: String(form.get('phone') || ''),
-        propertyId: p.id,
+        "100bug_id_lanc": String(form.get("100bug_id_lanc") || ""),
+          propertyId: p.id,
         propertyTitle: `Landing Page: ${p.title}`,
         status: 'new',
         source: 'landing-page',
@@ -184,6 +187,7 @@ export default function LandingPage({property: suppliedProperty}: {property?:any
               </div>
             ) : (
               <form onSubmit={handleLeadSubmit} className="space-y-4">
+                <input type="hidden" name="100bug_id_lanc" value={launchId(p.id, p["100bug_id_lanc"])} />
                 <input
                   name="name"
                   required
@@ -203,6 +207,7 @@ export default function LandingPage({property: suppliedProperty}: {property?:any
                   disabled={createLead.isPending}
                   className="metal-button w-full rounded-xl py-4 text-xs font-bold"
                 >
+
                   {createLead.isPending ? 'Cadastrando...' : 'Receber Material Exclusivo'}
                 </button>
               </form>

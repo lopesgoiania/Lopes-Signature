@@ -1,3 +1,4 @@
+import { useSignatureLead, launchId } from "@/lib/signature-lead";
 import { PhoneField } from "@/components/phone-field";
 import {
   ResponsiveImage,
@@ -36,7 +37,6 @@ import {
 import { catalogRequest, deliveryLabel, propertyLocation } from "@/lib/catalog";
 import { Lightbox, money } from "@/components/signature-ui";
 import { getFeatureIcon } from "@/lib/feature-icons";
-import { useCreateLead } from "@workspace/api-client-react";
 
 import "./property-design-preview.css";
 import "./property-refinement.css";
@@ -92,7 +92,7 @@ export function Presentation({
     queryKey: ["taxonomies"],
     queryFn: () => catalogRequest("taxonomies"),
   });
-  const createLead = useCreateLead();
+  const createLead = useSignatureLead();
   const [submitted, setSubmitted] = useState(false);
   const plans: any[] = p.floorplans || [];
   const [selected, setSelected] = useState(0);
@@ -149,6 +149,7 @@ export function Presentation({
           name: String(data.get("name") || "").trim(),
           email: String(data.get("email") || "").trim(),
           phone: String(data.get("phone") || "").trim(),
+          "100bug_id_lanc": String(data.get("100bug_id_lanc") || ""),
           propertyId: p.id,
           propertyTitle: p.title,
           status: "new",
@@ -671,6 +672,7 @@ export function Presentation({
               </p>
             </div>
             <form onSubmit={submit}>
+                <input type="hidden" name="100bug_id_lanc" value={launchId(p.id, p["100bug_id_lanc"])} />
               <label>
                 Seu nome
                 <input
@@ -701,6 +703,7 @@ export function Presentation({
                   className="sp-primary"
                   disabled={preview || createLead.isPending}
                 >
+
                   {createLead.isPending ? "Enviando…" : "Receber atendimento"}
                   <ArrowUpRight size={18} />
                 </button>

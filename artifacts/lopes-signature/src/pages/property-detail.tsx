@@ -1,3 +1,4 @@
+import { useSignatureLead, launchId } from "@/lib/signature-lead";
 import { PhoneField } from "@/components/phone-field";
 import { GooglePropertyMap } from "@/components/google-property-map";
 function youtubeEmbed(url: string) {
@@ -33,7 +34,6 @@ import {
 } from "lucide-react";
 import { Link, useLocation, useParams } from "wouter";
 import {
-  useCreateLead,
   useGetProperty,
   useListSpecialists,
 } from "@workspace/api-client-react";
@@ -58,7 +58,7 @@ export default function PropertyDetailPage({
     query: { queryKey: ["/api/properties", id], enabled: !suppliedProperty },
   });
 
-  const createLead = useCreateLead();
+  const createLead = useSignatureLead();
   const [activeImage, setActiveImage] = useState(0);
   const [lightbox, setLightbox] = useState(false);
   const property = suppliedProperty || query.data;
@@ -82,6 +82,7 @@ export default function PropertyDetailPage({
           name: String(form.get("name") || ""),
           email: String(form.get("email") || ""),
           phone: String(form.get("phone") || ""),
+          "100bug_id_lanc": String(form.get("100bug_id_lanc") || ""),
           propertyId: property?.id || id,
           propertyTitle: property?.title || "",
           status: "new",
@@ -314,6 +315,7 @@ export default function PropertyDetailPage({
                 className="space-y-3"
                 data-testid="form-property-lead"
               >
+                  <input type="hidden" name="100bug_id_lanc" value={launchId(property?.id || id, (property as (typeof property & {"100bug_id_lanc"?: string}) | undefined)?.["100bug_id_lanc"])} />
                 <input
                   name="name"
                   required

@@ -1,7 +1,8 @@
+import { useSignatureLead, launchId } from "@/lib/signature-lead";
 import { PhoneField } from "@/components/phone-field";
 import { useState } from 'react';
 import { Bath, BedDouble, Car, Download, ExternalLink, MapPin, MessageSquare, Ruler, X } from 'lucide-react';
-import { useCreateLead, type Property } from '@workspace/api-client-react';
+import { type Property } from '@workspace/api-client-react';
 import { money } from '@/components/signature-ui';
 
 export interface LocalFloorplan {
@@ -43,7 +44,7 @@ export function RaioXModal({ property, onClose }: RaioXModalProps) {
   const [activeFloorplan, setActiveFloorplan] = useState<LocalFloorplan>(floorplans[0]);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [showLeadForm, setShowLeadForm] = useState(false);
-  const createLead = useCreateLead();
+  const createLead = useSignatureLead();
 
   const gallery: string[] = (property as any).gallery && (property as any).gallery.length > 0
     ? (property as any).gallery
@@ -112,6 +113,7 @@ export function RaioXModal({ property, onClose }: RaioXModalProps) {
                         name: String(form.get('name') || ''),
                         email: String(form.get('email') || ''),
                         phone: String(form.get('phone') || ''),
+          "100bug_id_lanc": String(form.get("100bug_id_lanc") || ""),
                         propertyId: property.id,
                         propertyTitle: property.title,
                         status: 'new',
@@ -122,6 +124,7 @@ export function RaioXModal({ property, onClose }: RaioXModalProps) {
                   }}
                   className="flex flex-col gap-2 rounded-xl bg-[#161619] p-4 border border-white/10 shadow-lg min-w-[280px]"
                 >
+                  <input type="hidden" name="100bug_id_lanc" value={launchId(property.id, (property as Property & {"100bug_id_lanc"?: string})["100bug_id_lanc"])} />
                   <div className="flex justify-between items-center mb-1">
                     <span className="text-xs font-bold text-white">Receber Informações</span>
                     <button type="button" onClick={() => setShowLeadForm(false)} className="text-[#9a9a9a] hover:text-white"><X size={14} /></button>

@@ -12,7 +12,7 @@
 
 .life-gallery .image-credit{font-size:12px;margin-top:9px;color:#c9ded3}.life-gallery .image-credit+h3{margin-top:13px}
 /* International telephone control, matching the Legacy form. */
-.contact .iti{width:100%;margin:0 0 8px;--iti-border-color:#91a28f;--iti-hover-color:#e8e6dc;--iti-dropdown-bg:#f6f3ec;--iti-text-color:#163f35;--iti-dialcode-color:#4f5e51;--iti-search-background-color:#fff;--iti-path-flags-1x:url('/assets/vendor/intl-tel-input/dist/img/flags.png');--iti-path-flags-2x:url('/assets/vendor/intl-tel-input/dist/img/flags@2x.png')}
+.contact .iti{width:100%;margin:0 0 8px;--iti-border-color:#91a28f;--iti-hover-color:#e8e6dc;--iti-dropdown-bg:#f6f3ec;--iti-text-color:#163f35;--iti-dialcode-color:#4f5e51;--iti-search-background-color:#fff;--iti-path-flags-1x:url('/campanhas/citage-sante-residencial/vendor/intl-tel-input/img/flags.png');--iti-path-flags-2x:url('/campanhas/citage-sante-residencial/vendor/intl-tel-input/img/flags@2x.png')}
 .contact .iti input#phone{margin-bottom:0;width:100%;min-height:49px;font-size:15px}
 .contact .iti__selected-country{background:#e8e6dc;color:#163f35;border:0;border-right:1px solid #91a28f;min-height:47px;padding:0 10px;font-size:14px}
 .contact .iti__selected-country:hover{background:#f6f3ec}

@@ -1,5 +1,5 @@
 import { bindCampaignForm } from '../lead-submit.mjs';
-import pt from './vendor/intl-tel-input/dist/js/locale/pt.js';
+import pt from '/campanhas/citage-sante-residencial/vendor/intl-tel-input/js/locale/pt.js';
 'use strict';
 const plans = {
   '762': {price:'R$ 3.091.343', description:'Opções na quadra 24: lotes 4, 5, 7 e 8. Na quadra 25: lotes 3, 4 e 8.'},

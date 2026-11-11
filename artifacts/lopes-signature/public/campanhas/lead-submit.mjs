@@ -9,8 +9,9 @@ const properties = Object.freeze({
   'city-way': 'city-way',
   'city-23-by-pininfarina': 'city-23',
 });
-const campaignFields = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_id', 'utm_term', 'utm_content', 'gclid', 'gbraid', 'wbraid'];
+const campaignFields = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_id', 'utm_term', 'utm_content', 'gclid', 'gbraid', 'wbraid', 'fbclid', 'msclkid'];
 const pending = new WeakSet();
+const attempts = new WeakMap();
 
 export function campaignLead(payload, slug, search = globalThis.location?.search || '') {
   if (!Object.hasOwn(properties, slug)) throw new Error('Empreendimento inválido.');
@@ -39,13 +40,22 @@ export async function submitCampaignLead(form, payload, slug, request = fetch) {
   button.setAttribute('aria-busy', 'true');
   status.textContent = 'Enviando sua solicitação…';
   try {
+    const data = {
+      ...campaignLead(payload, slug),
+      ...globalThis.SignatureTracking?.pageContext(),
+      '100bug_id_lanc': form.elements?.namedItem('100bug_id_lanc')?.value || '',
+    };
+    const key = JSON.stringify(data);
+    if (attempts.get(form)?.key !== key) attempts.set(form, {key, id: crypto.randomUUID()});
     const response = await request('/api/leads', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(campaignLead(payload, slug)), signal: AbortSignal.timeout(15000),
+      body: JSON.stringify({...data, event_id: attempts.get(form).id}), signal: AbortSignal.timeout(15000),
     });
     const result = await response.json();
     if (!response.ok || !result.id) throw new Error('Não foi possível enviar agora. Tente novamente em instantes.');
+    attempts.delete(form);
     form.reset();
+    if (result.event_id) globalThis.SignatureTracking?.lead(result.event_id);
     status.textContent = 'Solicitação recebida. Nossa equipe entrará em contato para apresentar plantas e condições.';
     form.dispatchEvent(new CustomEvent('signature:lead-saved', { detail: { id: result.id, product: slug } }));
   } catch {

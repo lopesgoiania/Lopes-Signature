@@ -2,9 +2,14 @@ import { internationalPhone } from "../lib/phone.js";
 import { requestSiteRebuild } from "../lib/site-rebuild.js";
 import { Router } from "express";
 import { randomUUID } from "node:crypto";
+import { parsePhoneNumberFromString } from "libphonenumber-js/max";
+import launchIds from "../lib/signature-launches.json" with { type: "json" };
+import { eventIdPattern, sendMetaEvent, signaturePage } from "../lib/meta.js";
 import { supabase } from "../lib/supabase.js";
 
 const router = Router();
+const verifiedLaunchId = (id: string) =>
+  Object.hasOwn(launchIds, id) ? launchIds[id as keyof typeof launchIds] : "";
 router.use((_req: any, res: any, next: any) => {
   if (!supabase)
     return res
@@ -15,7 +20,7 @@ router.use((_req: any, res: any, next: any) => {
 const publicProperty = (row: any) => {
   const p = mapProperty(row);
   delete p.signature_meta;
-  delete p["100bug_id_lanc"];
+  p["100bug_id_lanc"] = verifiedLaunchId(p.id) || p["100bug_id_lanc"];
   return p;
 };
 const slug = (value: string) =>
@@ -591,58 +596,85 @@ router.post("/admin/catalog/media", async (req: any, res: any) => {
   });
 });
 router.post("/leads", async (req: any, res: any) => {
-  const b = req.body;
-  if (!b.name?.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(b.email || ""))
+  const b = req.body ?? {};
+  const field = (value: unknown, max: number) => typeof value === "string" ? value.trim().slice(0, max) : "";
+  const name = field(b.name, 120);
+  const email = field(b.email, 254).toLowerCase();
+  if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
     return res.status(400).json({ message: "Informe nome e e-mail válidos." });
+  const propertyId = field(b.propertyId, 128);
   const phone = b.phone ? internationalPhone(b.phone) : "";
-  if (phone === null || (!phone && (b.propertyId || b.source === "pagina-contato")))
-    return res.status(400).json({ message: "Informe um telefone válido com DDI (ex.: +5562999999999)." });
-  let property: any = null;
-  if (b.propertyId) {
-    const { data } = await supabase!
-      .from("properties")
-      .select("*")
-      .eq("id", b.propertyId)
-      .single();
-    property = data;
-    if (!property || property.signature_meta?.published === false)
+  if (phone === null || (!phone && (propertyId || b.source === "pagina-contato")))
+    return res.status(400).json({ message: "Informe um telefone válido com DDI." });
+
+  let propertyTitle = "";
+  let crmId = "";
+  if (propertyId) {
+    const { data, error } = await supabase!
+      .from("properties").select("id,title,signature_meta").eq("id", propertyId).maybeSingle();
+    if (error) return res.status(503).json({ message: "Não foi possível confirmar o imóvel." });
+    if ((!data && propertyId !== "bauhaus") || data?.signature_meta?.published === false)
       return res.status(400).json({ message: "Imóvel não encontrado." });
+    propertyTitle = data?.title || "Bauhaus";
+    const expected = verifiedLaunchId(propertyId) || String(data?.signature_meta?.["100bug_id_lanc"] || "");
+    crmId = field(b["100bug_id_lanc"], 12);
+    if (!/^\d{1,10}$/.test(crmId) || crmId !== expected)
+      return res.status(422).json({ message: "Não foi possível confirmar o lançamento deste formulário." });
   }
-  const crmId = property?.signature_meta?.["100bug_id_lanc"] || "";
+  const page = signaturePage(b.page_url);
+  const pageTitle = field(b.page_title, 250);
+  const formSource = field(b.source, 100);
+  const id = typeof b.event_id === "string" && eventIdPattern.test(b.event_id) ? b.event_id : randomUUID();
   const lead = {
-    id: randomUUID(),
-    name: b.name.trim(),
-    email: b.email.trim(),
-    phone,
-    property_id: property?.id || "",
-    property_title: property?.title || "",
+    id, name, email, phone,
+    property_id: propertyId,
+    property_title: propertyTitle,
     status: "new",
-    source: property
-      ? "property"
-      : b.source === "pagina-contato"
-        ? "pagina-contato"
-        : "newsletter",
-    note: [b.note || "", crmId ? `100bug_id_lanc=${crmId}` : ""]
-      .filter(Boolean)
-      .join("\n"),
+    source: propertyId ? "property" : formSource === "pagina-contato" ? "pagina-contato" : "newsletter",
+    note: [
+      pageTitle && "Página: " + pageTitle,
+      page && "URL: " + page,
+      formSource && "Origem do formulário: " + formSource,
+      phone && "Telefone informado (E.164): " + phone,
+      field(b.note, 2500),
+      crmId && "100bug_id_lanc=" + crmId,
+    ].filter(Boolean).join("\n"),
   };
-  const { error } = await supabase!.from("leads").insert(lead);
-  if (error)
-    return res
-      .status(503)
-      .json({ message: "Não foi possível registrar o contato." });
-  if (process.env.CRM_100BUG_WEBHOOK_URL && crmId) {
+  const { error } = await supabase!.from("leads").upsert(lead, { onConflict: "id", ignoreDuplicates: true });
+  if (error) return res.status(503).json({ message: "Não foi possível registrar o contato." });
+
+  if (phone) {
+    const webhook = process.env.CRM_100BUG_WEBHOOK_URL?.trim();
+    if (!webhook || !/^https:\/\/api\.100bug\.app\/webhook\/leads\/[a-f0-9-]+$/i.test(webhook))
+      return res.status(503).json({ message: "O envio ao CRM está temporariamente indisponível." });
     try {
-      const forwarded = await fetch(process.env.CRM_100BUG_WEBHOOK_URL, {
+      const number = parsePhoneNumberFromString(phone);
+      const response = await fetch(webhook, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...lead, "100bug_id_lanc": crmId }),
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          ...lead, page_url: page, page_title: pageTitle, form_source: formSource,
+          phone_country: number?.country, phone_dial_code: number?.countryCallingCode,
+          ...(crmId ? { "100bug_id_lanc": crmId } : {}),
+        }),
+        redirect: "error",
+        signal: AbortSignal.timeout(7000),
       });
-      if (!forwarded.ok) throw new Error("CRM indisponível");
+      const confirmation = await response.json() as {success?: boolean; id?: number; imovel?: {id?: number}};
+      if (!response.ok || confirmation?.success !== true || !confirmation.id ||
+          (crmId && String(confirmation.imovel?.id) !== crmId))
+        throw new Error("CRM não confirmou o cadastro e o vínculo.");
     } catch {
       console.error("Falha no encaminhamento CRM; contato preservado.");
+      return res.status(502).json({ message: "Não foi possível confirmar o envio ao CRM." });
+    }
+    if (page) {
+      await sendMetaEvent(req, {
+        name: "Lead", id, url: page,
+        lead: { name, email, phone, form_id: "form", form_source: formSource },
+      });
     }
   }
-  res.status(201).json({ id: lead.id, status: "new" });
+  return res.status(201).json({ id, status: "new", event_id: phone && page ? id : undefined });
 });
 export default router;

@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { campaignLead, submitCampaignLead } from '../public/campanhas/lead-submit.mjs';
 const root = fileURLToPath(new URL('..', import.meta.url));
+const launchIds = JSON.parse(await readFile(path.join(root, '../api-server/src/lib/signature-launches.json'), 'utf8'));
 const manifest = JSON.parse(await readFile(path.join(root, 'campaigns/manifest.json'), 'utf8'));
 
 for (const {slug, propertyId} of manifest) {
@@ -14,11 +15,14 @@ for (const {slug, propertyId} of manifest) {
     assert.ok(html.includes(`rel="canonical" href="https://www.lopessignature.com.br/${slug}"`));
     assert.match(html, /name="robots" content="index,follow/);
     assert.doesNotMatch(html, /noindex|Prévia|prévia|captação inativa|href="#/);
+    assert.ok(html.includes('name="100bug_id_lanc" value="' + launchIds[propertyId] + '"'));
+    assert.ok(html.includes('src="/signature-tracking.js"'));
     assert.equal((html.match(/<h1\b/g) || []).length, 1);
     const sitemap = await readFile(path.join(root, 'dist/sitemap.xml'), 'utf8');
     assert.ok(sitemap.includes(`https://www.lopessignature.com.br/${slug}</loc>`));
     for (const match of html.matchAll(/(?:src|href)="([^"#]+)"/g)) {
       const value = match[1];
+      if (value.startsWith('/campanhas/')) await access(path.join(root, 'public', value));
       if (/^(?:https?:|\/|data:|mailto:|tel:)/.test(value)) continue;
       await access(path.resolve(root, 'public/campanhas', slug, value));
     }
@@ -33,7 +37,7 @@ for (const {slug, propertyId} of manifest) {
 function fixture() {
   const button = {disabled:false, setAttribute(){}, removeAttribute(){}};
   const status = {textContent:''};
-  const form = {resets:0, events:[], querySelector: selector => selector === '#form-status' ? status : button,
+  const form = {elements:{namedItem: name => name === '100bug_id_lanc' ? {value:'471'} : null},resets:0, events:[], querySelector: selector => selector === '#form-status' ? status : button,
     reset(){this.resets++;}, dispatchEvent(event){this.events.push(event);}};
   return {form,button,status};
 }
@@ -46,6 +50,8 @@ test('confirmed persistence alone resets the form and emits the saved event', as
     return Response.json({id:'test-lead'},{status:201});
   });
   assert.equal(sent.propertyId,'city-park-majestic');
+  assert.equal(sent['100bug_id_lanc'],'471');
+  assert.match(sent.event_id,/^[a-f0-9-]{36}$/);
   assert.equal(form.resets,1);
   assert.equal(form.events[0].type,'signature:lead-saved');
   assert.match(status.textContent,/Solicitação recebida/);
