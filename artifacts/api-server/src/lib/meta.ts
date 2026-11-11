@@ -82,9 +82,16 @@ export async function sendMetaEvent(request: Request, { name, id, url, lead }: {
       redirect: 'error',
       signal: AbortSignal.timeout(4000),
     });
-    const confirmation = result.ok ? await result.json() as {events_received?: number} : null;
-    if ((confirmation?.events_received ?? 0) > 0) return true;
-    console.warn(`Meta ${name}: recebimento não confirmado.`, result.status);
+    const confirmation = await result.json().catch(() => null) as {
+      events_received?: number;
+      error?: { code?: number; error_subcode?: number };
+    } | null;
+    if (result.ok && (confirmation?.events_received ?? 0) > 0) return true;
+    console.warn(`Meta ${name}: recebimento não confirmado.`, {
+      status: result.status,
+      code: typeof confirmation?.error?.code === "number" ? confirmation.error.code : undefined,
+      subcode: typeof confirmation?.error?.error_subcode === "number" ? confirmation.error.error_subcode : undefined,
+    });
   } catch {
     console.warn(`Meta ${name}: falha na comunicação.`);
   }
