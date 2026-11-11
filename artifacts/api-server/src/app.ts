@@ -13,8 +13,7 @@ app.get("/api/visitor-country", (req, res) => {
   res.set("Vary", "X-Vercel-IP-Country");
   res.json({ country: visitorCountry(req.headers["x-vercel-ip-country"]) });
 });
-app.use(express.json({ limit: "4mb" }));
-app.post("/api/page-view", async (req, res) => {
+app.post("/api/page-view", express.json({ limit: "4kb" }), async (req, res) => {
   res.set("Cache-Control", "no-store");
   const page = signaturePage(req.body?.page_url);
   const id = req.body?.event_id;
@@ -29,6 +28,7 @@ app.post("/api/page-view", async (req, res) => {
   const accepted = await sendMetaEvent(req, { name: "PageView", id, url: page });
   res.status(accepted ? 204 : 503).end();
 });
+app.use(express.json({ limit: "4mb" }));
 app.use((req: any, res: any, next: any) => {
   const publicRead =
     req.method === "GET" &&
