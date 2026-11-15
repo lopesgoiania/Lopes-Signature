@@ -1,3 +1,4 @@
+import { lookupVisitorCountry } from '../visitor-country.mjs';
 // A single country-only lookup. Contact fields never enter this request.
 export async function lookupCountry({request = fetch, timeoutMs = 2500, supported = []} = {}) {
   const controller = new AbortController();
@@ -5,15 +6,7 @@ export async function lookupCountry({request = fetch, timeoutMs = 2500, supporte
   try {
     const country = await Promise.race([
       (async () => {
-        const response = await request('/api/visitor-country', {
-          signal: controller.signal,
-          credentials: 'omit',
-          referrerPolicy: 'no-referrer',
-          cache: 'no-store',
-        });
-        if (!response.ok) throw new Error('Country lookup failed');
-        const result = await response.json();
-        return typeof result.country === 'string' ? result.country.toLowerCase() : '';
+        return (await lookupVisitorCountry({ signal: controller.signal, request })).toLowerCase();
       })(),
       new Promise((_, reject) => {
         timer = setTimeout(() => {

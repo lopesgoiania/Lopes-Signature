@@ -1,3 +1,4 @@
+import { lookupVisitorCountry } from '../visitor-country.mjs';
 import { bindCampaignForm } from '../lead-submit.mjs';
 import intlTelInput from './vendor/intl-tel-input/js/intlTelInputWithUtils.mjs';
 import pt from './vendor/intl-tel-input/js/locale/pt.js';
@@ -30,9 +31,7 @@ function syncPhone(){
 async function suggestCountry(){
   const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),3500);
   try{
-    const response=await fetch('/api/visitor-country',{signal:controller.signal,credentials:'omit',referrerPolicy:'no-referrer'});
-    if(!response.ok)throw new Error('Country lookup failed');
-    const data=await response.json();const code=String(data.country||'').toLowerCase();
+    const code=(await lookupVisitorCountry({signal:controller.signal})).toLowerCase();
     if(!/^[a-z]{2}$/.test(code)||!intlTelInput.getAllCountries().some(country=>country.iso2===code))throw new Error('Unknown country');
     if(!visitorInteracted&&!phone.value.trim()){telephone.setSelectedCountry(code);syncPhone()}
   }catch{/* Brazil remains selected, and manual selection always works. */}

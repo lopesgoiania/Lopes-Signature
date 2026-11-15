@@ -1,3 +1,4 @@
+import { lookupVisitorCountry } from '../visitor-country.mjs';
 import { bindCampaignForm } from '../lead-submit.mjs';
 import pt from '/campanhas/citage-sante-residencial/vendor/intl-tel-input/js/locale/pt.js';
 'use strict';
@@ -119,12 +120,7 @@ async function detectCountry() {
   const abort = new AbortController();
   const timer = setTimeout(() => abort.abort(), 3500);
   try {
-    const response = await fetch('/api/visitor-country', {
-      signal: abort.signal, credentials: 'omit', referrerPolicy: 'no-referrer', cache: 'no-store'
-    });
-    if (!response.ok) throw new Error('Country lookup unavailable');
-    const data = await response.json();
-    const iso2 = typeof data.country === 'string' ? data.country.trim().toLowerCase() : ''; 
+    const iso2 = (await lookupVisitorCountry({ signal: abort.signal })).toLowerCase();
     const supported = window.intlTelInput.getAllCountries().some(country => country.iso2 === iso2);
     if (supported && !phoneTouched && !countryChosen && !phone.value.trim()) {
       settingDetectedCountry = true;

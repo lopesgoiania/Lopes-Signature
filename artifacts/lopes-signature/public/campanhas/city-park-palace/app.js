@@ -1,3 +1,4 @@
+import { lookupVisitorCountry } from '../visitor-country.mjs';
 import { submitCampaignLead } from '../lead-submit.mjs';
 import { site } from './site-config.js';
 import intlTelInput from './assets/phone/intlTelInput.mjs';
@@ -90,14 +91,7 @@ phone.closest('.iti').addEventListener('keydown', () => { visitorInteracted = tr
 
 async function detectCountry() {
   try {
-    const response = await fetch('/api/visitor-country', {
-      signal: AbortSignal.timeout(3500),
-      credentials: 'omit',
-      referrerPolicy: 'no-referrer',
-      cache: 'no-store',
-    });
-    if (!response.ok) return;
-    const code = String((await response.json()).country || '').toLowerCase();
+    const code = (await lookupVisitorCountry({ signal: AbortSignal.timeout(3500) })).toLowerCase();
     const supported = intlTelInput.getAllCountries().some(country => country.iso2 === code);
     if (supported && !visitorInteracted && !phone.value) {
       telephone.setSelectedCountry(code);

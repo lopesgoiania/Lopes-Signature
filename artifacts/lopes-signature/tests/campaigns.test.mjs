@@ -4,9 +4,30 @@ import { readFile, access } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { campaignLead, submitCampaignLead } from '../public/campanhas/lead-submit.mjs';
+import { lookupVisitorCountry } from '../public/campanhas/visitor-country.mjs';
 const root = fileURLToPath(new URL('..', import.meta.url));
 const launchIds = JSON.parse(await readFile(path.join(root, '../api-server/src/lib/signature-launches.json'), 'utf8'));
 const manifest = JSON.parse(await readFile(path.join(root, 'campaigns/manifest.json'), 'utf8'));
+
+test('country detection uses the browser IP and falls back on IPAPI rate limits', async () => {
+  assert.equal(await lookupVisitorCountry({
+    request: async (url, options) => {
+      assert.equal(url, 'https://ipapi.co/country/');
+      assert.equal(options.credentials, 'omit');
+      assert.equal(options.referrerPolicy, 'no-referrer');
+      return new Response(' PT\n');
+    },
+  }), 'PT');
+
+  const calls = [];
+  assert.equal(await lookupVisitorCountry({
+    request: async url => {
+      calls.push(url);
+      return url.startsWith('https:') ? new Response('', { status: 429 }) : Response.json({ country: 'BR' });
+    },
+  }), 'BR');
+  assert.deepEqual(calls, ['https://ipapi.co/country/', '/api/visitor-country']);
+});
 
 for (const {slug, propertyId, focusKeywords} of manifest) {
   test(`${slug}: exported page is indexable, self-contained and scoped to its product`, async () => {

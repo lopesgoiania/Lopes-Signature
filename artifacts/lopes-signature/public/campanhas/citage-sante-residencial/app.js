@@ -1,3 +1,4 @@
+import { lookupVisitorCountry } from '../visitor-country.mjs';
 import { bindCampaignForm } from '../lead-submit.mjs';
 import intlTelInput from './vendor/intl-tel-input/js/intlTelInputWithUtils.mjs';
 import pt from './vendor/intl-tel-input/js/locale/pt.js';
@@ -28,7 +29,7 @@ function syncPhone(){const valid=iti.isValidNumberPrecise()===true;fullPhone.val
 function validatePhone(){if(syncPhone())return true;const message='Confira o telefone e o código de área para o país selecionado.';phoneError.textContent=message;phoneInput.setCustomValidity(message);phoneInput.setAttribute('aria-invalid','true');return false}
 phoneInput.addEventListener('blur',()=>{if(phoneInput.value.trim())validatePhone()});
 // This lookup sends no form values, uses no browser geolocation and has a bounded timeout.
-async function detectCountry(){const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),3500);try{const response=await fetch('/api/visitor-country',{signal:controller.signal,credentials:'omit',referrerPolicy:'no-referrer'});if(!response.ok)throw new Error('lookup');const result=await response.json();const country=String(result.country||'').toLowerCase();if(!intlTelInput.getAllCountries().some(item=>item.iso2===country))throw new Error('country');if(!userInteracted&&!phoneInput.value)iti.setSelectedCountry(country)}catch{/* Brasil remains selected when the lookup is unavailable. */}finally{clearTimeout(timer)}}
+async function detectCountry(){const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),3500);try{const country=(await lookupVisitorCountry({signal:controller.signal})).toLowerCase();if(!intlTelInput.getAllCountries().some(item=>item.iso2===country))throw new Error('country');if(!userInteracted&&!phoneInput.value)iti.setSelectedCountry(country)}catch{/* Brasil remains selected when the lookup is unavailable. */}finally{clearTimeout(timer)}}
 void detectCountry();
 // The backend adapter will receive only validated E.164 in `phone`.
 export function buildLeadPayload(){if(!validatePhone()||!form.reportValidity())return null;return {name:form.elements.namedItem('name').value.trim(),email:form.elements.namedItem('email').value.trim(),phone:fullPhone.value,country:countryInput.value,interest:form.elements.namedItem('interest').value,consent:form.elements.namedItem('consent').checked,product:'citage-sante-residencial'};}

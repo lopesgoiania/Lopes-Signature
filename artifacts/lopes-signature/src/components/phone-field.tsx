@@ -14,14 +14,11 @@ import "react-phone-number-input/style.css";
 import "./phone-field.css";
 
 let countryRequest: Promise<CountryCode> | undefined;
+const countryModuleUrl = "/campanhas/visitor-country.mjs";
 function visitorCountry() {
-  return (countryRequest ??= fetch("/api/visitor-country", {
-    cache: "no-store",
-    signal: AbortSignal.timeout(4000),
-  })
-    .then(async (response) => {
-      if (!response.ok) throw new Error("Country unavailable");
-      const { country } = await response.json();
+  return (countryRequest ??= import(/* @vite-ignore */ countryModuleUrl)
+    .then(async ({ lookupVisitorCountry }) => {
+      const country = await lookupVisitorCountry({ signal: AbortSignal.timeout(4000) });
       return getCountries().includes(country) ? (country as CountryCode) : "BR";
     })
     .catch(() => "BR" as CountryCode));

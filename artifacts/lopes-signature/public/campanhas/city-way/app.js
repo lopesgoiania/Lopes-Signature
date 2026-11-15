@@ -1,3 +1,4 @@
+import { lookupVisitorCountry } from '../visitor-country.mjs';
 import { bindCampaignForm } from '../lead-submit.mjs';
 'use strict';
 const plans={studio:{title:'Studio · 49,88 m²',description:'Ambientes integrados, ventilação natural no banho e infraestrutura de ar-condicionado. Final 03.'},'two-bed':{title:'2 quartos · 71,69 m²',description:'Dois quartos, sendo uma suíte. Persianas integradas nos dormitórios e infraestrutura de ar-condicionado no living e quartos. Final 07.'},suites:{title:'2 suítes · 77,79 m²',description:'Duas suítes e ventilação natural nos banhos. Infraestrutura de ar-condicionado no living e nas suítes. Final 02.'},'pool-suite':{title:'2 suítes · 97,26 m²',description:'Varanda com piscina e pé-direito duplo em parte do espaço. Configuração do final 05 em pavimentos específicos. Consulte disponibilidade.'}};
@@ -97,11 +98,7 @@ if (typeof window.intlTelInput === 'function') {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 3500);
     try {
-      const response = await fetch('/api/visitor-country', {
-        signal: controller.signal, credentials: 'omit', referrerPolicy: 'no-referrer', cache: 'no-store'
-      });
-      if (!response.ok) return;
-      const country = String((await response.json()).country || '').toLowerCase();
+      const country = (await lookupVisitorCountry({ signal: controller.signal })).toLowerCase();
       const supported = window.intlTelInput.getAllCountries().some(item => item.iso2 === country);
       if (supported && !countryTouched && !phoneTouched && !phone.value.trim()) {
         phoneInput.setSelectedCountry(country);

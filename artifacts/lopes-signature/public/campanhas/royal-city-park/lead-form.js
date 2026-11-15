@@ -1,5 +1,5 @@
+import { lookupVisitorCountry } from '../visitor-country.mjs';
 import { submitCampaignLead } from '../lead-submit.mjs';
-const countryEndpoint = '/api/visitor-country';
 const attributionFields = [
   'utm_source', 'utm_medium', 'utm_campaign', 'utm_id',
   'utm_term', 'utm_content', 'gclid', 'gbraid', 'wbraid',
@@ -108,20 +108,11 @@ export function initialiseLeadForm() {
     status.textContent = '';
   });
 
-  // Same-origin country lookup, without contact fields or browser geolocation.
+  // Country lookup uses the visitor's public IP without form data.
   const timeout = setTimeout(() => controller.abort(), 3500);
-  fetch(countryEndpoint, {
-    signal: controller.signal,
-    credentials: 'omit',
-    referrerPolicy: 'no-referrer',
-    cache: 'no-store',
-  })
-    .then(response => {
-      if (!response.ok) throw new Error('Country lookup failed');
-      return response.json();
-    })
-    .then(data => {
-      const country = typeof data.country === 'string' ? data.country.toLowerCase() : '';
+  lookupVisitorCountry({ signal: controller.signal })
+    .then(code => {
+      const country = code.toLowerCase();
       const supported = window.intlTelInput.getAllCountries().some(item => item.iso2 === country);
       if (!visitorHasInteracted && !phone.value && supported) {
         telephone.setSelectedCountry(country);

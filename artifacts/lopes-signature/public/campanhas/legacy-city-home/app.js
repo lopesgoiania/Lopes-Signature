@@ -1,3 +1,4 @@
+import { lookupVisitorCountry } from '../visitor-country.mjs';
 import { bindCampaignForm } from '../lead-submit.mjs';
 'use strict';
 // Project configurations, not a promise of executed layout or availability.
@@ -45,9 +46,7 @@ async function detectCountry(){
  const controller=new AbortController();
  const timeout=setTimeout(()=>controller.abort(),2500);
  try{
-  const response=await fetch('/api/visitor-country',{signal:controller.signal,credentials:'omit',referrerPolicy:'no-referrer',cache:'no-store'});
-  if(!response.ok)throw new Error('Country lookup unavailable');
-  const country=String((await response.json()).country || '').toLowerCase();
+  const country=(await lookupVisitorCountry({signal:controller.signal})).toLowerCase();
   if(!window.intlTelInput.getAllCountries().some(item=>item.iso2===country))throw new Error('Unsupported country');
   return country;
  }catch{return 'br'}finally{clearTimeout(timeout)}
