@@ -13,24 +13,27 @@ export async function detectVisitorCountry(
   clientIp: unknown,
   countryHint: unknown,
   request = fetch,
-): Promise<{ country: string; source: "ipapi" | "vercel" | "default" }> {
+) {
   const vercelCountry = supportedCountry(countryHint);
   const fallback = vercelCountry
     ? { country: vercelCountry, source: "vercel" as const }
     : { country: "BR", source: "default" as const };
   const ip = typeof clientIp === "string" ? clientIp.split(",")[0]?.trim() : "";
-  if (!ip || !isIP(ip)) return fallback;
+  if (!ip || !isIP(ip)) return { ...fallback, lookup: "no-ip" };
 
   try {
     const response = await request(`https://ipapi.co/${ip}/country/`, {
       headers: { Accept: "text/plain" },
-      signal: AbortSignal.timeout(1500),
+      signal: AbortSignal.timeout(2000),
       redirect: "error",
     });
-    const country = response.ok && supportedCountry(await response.text());
-    return country ? { country, source: "ipapi" } : fallback;
+    if (!response.ok) return { ...fallback, lookup: `http-${response.status}` };
+    const country = supportedCountry(await response.text());
+    return country
+      ? { country, source: "ipapi", lookup: "ok" }
+      : { ...fallback, lookup: "invalid-country" };
   } catch {
-    return fallback;
+    return { ...fallback, lookup: "unavailable" };
   }
 }
 

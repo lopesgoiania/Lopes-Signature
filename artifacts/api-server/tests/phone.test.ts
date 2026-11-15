@@ -32,20 +32,21 @@ test("IPAPI takes priority and failures keep the Vercel or Brazilian default", a
     return new Response("US\n");
   };
   assert.deepEqual(await detectVisitorCountry("8.8.8.8", "PT", lookup), {
-    country: "US", source: "ipapi",
+    country: "US", source: "ipapi", lookup: "ok",
   });
-  for (const response of [
-    () => new Response("", { status: 429 }),
-    () => new Response("XX"),
-    () => { throw new Error("timeout"); },
-  ]) {
+  const failures: [() => Response, string][] = [
+    [() => new Response("", { status: 429 }), "http-429"],
+    [() => new Response("XX"), "invalid-country"],
+    [() => { throw new Error("timeout"); }, "unavailable"],
+  ];
+  for (const [response, lookup] of failures) {
     assert.deepEqual(await detectVisitorCountry("8.8.8.8", "PT", async () => response()), {
-      country: "PT", source: "vercel",
+      country: "PT", source: "vercel", lookup,
     });
   }
   for (const value of [undefined, "XX", "T1", ["US"], ""]) {
     assert.deepEqual(await detectVisitorCountry(undefined, value), {
-      country: "BR", source: "default",
+      country: "BR", source: "default", lookup: "no-ip",
     });
   }
 });

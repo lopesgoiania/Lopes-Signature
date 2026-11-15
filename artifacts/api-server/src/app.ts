@@ -10,11 +10,12 @@ const app = express();
 app.get("/api/healthz", (_req, res) => res.json({ status: "ok" }));
 app.get("/api/visitor-country", async (req, res) => {
   res.set("Cache-Control", "private, no-store, max-age=0");
-  const { country, source } = await detectVisitorCountry(
-    process.env.VERCEL === "1" ? req.get("x-vercel-forwarded-for") : undefined,
+  const { country, source, lookup } = await detectVisitorCountry(
+    req.get("x-vercel-forwarded-for") ?? (process.env.VERCEL === "1" ? req.get("x-forwarded-for") : undefined),
     req.get("x-vercel-ip-country"),
   );
   res.set("X-Signature-Country-Source", source);
+  res.set("Server-Timing", `ipapi;desc="${lookup}"`);
   res.json({ country });
 });
 app.post("/api/page-view", express.json({ limit: "4kb" }), async (req, res) => {
