@@ -93,6 +93,7 @@ export function PhoneField({
         name="phone_display"
         defaultCountry={country}
         international
+        limitMaxLength
         countryCallingCodeEditable={false}
         addInternationalOption={false}
         flags={flags}

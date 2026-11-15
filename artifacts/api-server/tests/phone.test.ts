@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { internationalPhone, visitorCountry } from "../src/lib/phone.js";
+import { detectVisitorCountry, internationalPhone } from "../src/lib/phone.js";
 import app from "../src/app.js";
 
 test("validates international numbers without guessing a missing country", () => {
@@ -24,11 +24,30 @@ test("validates international numbers without guessing a missing country", () =>
     assert.equal(internationalPhone(invalid), null);
   }
 });
-test("country lookup falls back to Brazil for absent or unsupported locations", () => {
-  for (const value of [undefined, "XX", "T1", ["US"], ""])
-    assert.equal(visitorCountry(value), "BR");
-  assert.equal(visitorCountry("us"), "US");
-  assert.equal(visitorCountry("PT"), "PT");
+test("IPAPI takes priority and failures keep the Vercel or Brazilian default", async () => {
+  const lookup: typeof fetch = async (url, options) => {
+    assert.equal(url, "https://ipapi.co/8.8.8.8/country/");
+    assert.equal(options?.redirect, "error");
+    assert.ok(options?.signal);
+    return new Response("US\n");
+  };
+  assert.deepEqual(await detectVisitorCountry("8.8.8.8", "PT", lookup), {
+    country: "US", source: "ipapi",
+  });
+  for (const response of [
+    () => new Response("", { status: 429 }),
+    () => new Response("XX"),
+    () => { throw new Error("timeout"); },
+  ]) {
+    assert.deepEqual(await detectVisitorCountry("8.8.8.8", "PT", async () => response()), {
+      country: "PT", source: "vercel",
+    });
+  }
+  for (const value of [undefined, "XX", "T1", ["US"], ""]) {
+    assert.deepEqual(await detectVisitorCountry(undefined, value), {
+      country: "BR", source: "default",
+    });
+  }
 });
 test("visitor country is database independent and never shared in a cache", async () => {
   const server = app.listen(0);
@@ -45,6 +64,7 @@ test("visitor country is database independent and never shared in a cache", asyn
       });
       assert.equal(response.status, 200);
       assert.deepEqual(await response.json(), { country: expected });
+      assert.equal(response.headers.get("x-signature-country-source"), expected === "BR" ? "default" : "vercel");
       assert.match(response.headers.get("cache-control")!, /private, no-store/);
     }
   } finally {

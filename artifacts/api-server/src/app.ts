@@ -1,4 +1,4 @@
-import { visitorCountry } from "./lib/phone.js";
+import { detectVisitorCountry } from "./lib/phone.js";
 import express from "express";
 import { eventIdPattern, sendMetaEvent, signaturePage } from "./lib/meta.js";
 import catalog from "./routes/signature-catalog.js";
@@ -8,10 +8,14 @@ import blog from "./routes/blog.js";
 // Keep legacy CRM/webhook routes outside this public deployment.
 const app = express();
 app.get("/api/healthz", (_req, res) => res.json({ status: "ok" }));
-app.get("/api/visitor-country", (req, res) => {
+app.get("/api/visitor-country", async (req, res) => {
   res.set("Cache-Control", "private, no-store, max-age=0");
-  res.set("Vary", "X-Vercel-IP-Country");
-  res.json({ country: visitorCountry(req.headers["x-vercel-ip-country"]) });
+  const { country, source } = await detectVisitorCountry(
+    process.env.VERCEL === "1" ? req.get("x-vercel-forwarded-for") : undefined,
+    req.get("x-vercel-ip-country"),
+  );
+  res.set("X-Signature-Country-Source", source);
+  res.json({ country });
 });
 app.post("/api/page-view", express.json({ limit: "4kb" }), async (req, res) => {
   res.set("Cache-Control", "no-store");
