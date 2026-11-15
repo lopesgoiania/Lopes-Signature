@@ -1,5 +1,4 @@
 import { campaignCatalog } from "@/lib/campaign-catalog";
-import { SiteFooter } from "@/components/site-footer";
 import "@/components/property-listing.css";
 import { taxonomyMatches, slugify, type Taxonomy } from "@/lib/catalog";
 import { useQuery } from "@tanstack/react-query";
@@ -186,7 +185,6 @@ export default function CatalogPage({
         />
       )}
 
-      <SiteFooter />
     </div>
   );
 }

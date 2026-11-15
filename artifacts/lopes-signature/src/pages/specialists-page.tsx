@@ -1,4 +1,3 @@
-import { SiteFooter } from "@/components/site-footer";
 import { ResponsiveImage } from '@/components/responsive-image';
 import './specialists-design-preview.css';
 import { useState } from 'react';
@@ -112,7 +111,6 @@ export default function SpecialistsPage() {
 
       </main>
 
-      <SiteFooter />
     </div>
   );
 }

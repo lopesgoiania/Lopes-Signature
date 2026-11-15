@@ -1,7 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-export async function campaignPages(root, dist, origin) {
+export async function campaignPages(root, dist, origin, footer) {
   const manifest = JSON.parse(await readFile(path.join(root, 'campaigns/manifest.json'), 'utf8'));
   const launchIds = JSON.parse(await readFile(path.join(root, '../api-server/src/lib/signature-launches.json'), 'utf8'));
   const routes = [];
@@ -10,6 +10,13 @@ export async function campaignPages(root, dist, origin) {
     const url = new URL(route, origin).href;
     const image = new URL(card?.images?.[0] || `/campanhas/${slug}/assets/fachada.webp`, origin).href;
     let html = await readFile(path.join(root, 'campaigns', slug, 'index.html'), 'utf8');
+    const legacyFooters = [...html.matchAll(/<footer\b[^>]*>([\s\S]*?)<\/footer>/g)];
+    if (legacyFooters.length !== 1) throw new Error('Rodapé de origem inválido: ' + slug);
+    const productNotes = Array.from(legacyFooters[0][1].replace(/<details\b[\s\S]*?<\/details>/g, '').matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/g), match => '<p>' + match[1] + '</p>').join('');
+    const notes = productNotes ? '<aside class="signature-product-notes" aria-label="Informações do empreendimento">' + productNotes + '</aside>' : '';
+    html = html.replace(legacyFooters[0][0], () => notes + footer)
+      .replace(/href="#privacidade"/g, 'href="/politica-de-privacidade"')
+      .replace('</head>', '<link rel="stylesheet" href="/signature-footer.css"><script defer src="/signature-footer-year.js"></script></head>');
     const id = launchIds[propertyId];
     if (!id) throw new Error('Lançamento sem código 100Bug: ' + slug);
     html = html.replace(/<form[^>]*id="lead-form"[^>]*>/, form => form + '<input type="hidden" name="100bug_id_lanc" value="' + id + '">')

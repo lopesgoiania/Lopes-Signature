@@ -14,6 +14,7 @@ import {
 import { ErrorBoundary } from "@/components/error-boundary";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { SiteFooter } from "@/components/site-footer";
 const NotFound = lazy(() => import("@/pages/not-found"));
 const HomePage = lazy(() => import("@/pages/home"));
 const AdminPage = lazy(() => import("@/pages/admin"));
@@ -21,6 +22,7 @@ const AboutPage = lazy(() => import("@/pages/about-page"));
 const JournalPage = lazy(() => import("@/pages/journal-page"));
 const SpecialistsPage = lazy(() => import("@/pages/specialists-page"));
 const ContactPage = lazy(() => import("@/pages/contact-page"));
+const PrivacyPage = lazy(() => import("@/pages/privacy-page"));
 const LandingPage = lazy(() => import("@/pages/landing-page"));
 const BauhausPage = lazy(() => import("@/pages/bauhaus-page"));
 const CatalogPage = lazy(() => import("@/pages/catalog-page"));
@@ -64,6 +66,7 @@ function Router() {
         <Route path="/journal" component={JournalPage} />
         <Route path="/journal/:id" component={JournalPage} />
         <Route path="/contato" component={ContactPage} />
+        <Route path="/politica-de-privacidade" component={PrivacyPage} />
         <Route path="/admin" component={AdminPage} />
         <Route path="/imoveis">
           <CatalogPage
@@ -106,6 +109,11 @@ function Router() {
 function RoutedErrorBoundary({ children }: { children: ReactNode }) {
   const [location] = useLocation();
   return <ErrorBoundary resetKey={location}>{children}</ErrorBoundary>;
+}
+
+function PublicFooter() {
+  const [location] = useLocation();
+  return /^\/admin(?:\/|$)/.test(location) ? null : <SiteFooter />;
 }
 
 function RouteMetadata() {
@@ -165,6 +173,7 @@ function App({
           >
             <Router />
           </Suspense>
+          <PublicFooter />
         </WouterRouter>
         <Toaster />
       </TooltipProvider>

@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import { ArrowRight } from "lucide-react";
 import { useListProperties } from "@workspace/api-client-react";
-import { SiteFooter } from "@/components/site-footer";
 import {
   PublicNav,
   PropertyCard,
@@ -163,9 +162,6 @@ export default function HomePage() {
           />
         </div>
       </main>
-      <div className="hp-home-footer">
-        <SiteFooter />
-      </div>
     </div>
   );
 }

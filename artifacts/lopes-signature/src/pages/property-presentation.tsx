@@ -723,17 +723,6 @@ export function Presentation({
           </div>
         </section>
       </main>
-      <footer className="sp-footer sp-container">
-        <ResponsiveImage
-          src="/images/logo-signature.png"
-          alt="Lopes Signature"
-        />
-        <p>
-          Características, áreas, valores e disponibilidade devem ser
-          confirmados com a equipe.
-        </p>
-        <a href="#sp-title">Voltar ao início</a>
-      </footer>
       {zoom && (
         <Lightbox
           images={zoom === "plan" ? [plan.image] : photos}

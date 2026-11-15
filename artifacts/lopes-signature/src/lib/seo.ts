@@ -57,6 +57,10 @@ export const staticPages: Record<
     description:
       "Entre em contato com a Lopes Signature para conhecer imóveis, consultar plantas e solicitar atendimento em Goiânia.",
   },
+  "/politica-de-privacidade": {
+    title: "Política de Privacidade - Lopes Signature",
+    description: "Saiba como a Lopes Signature trata dados de contato e navegação e como solicitar informações sobre seus dados pessoais.",
+  },
   "/journal": {
     title:
       "Journal: arquitetura e mercado imobiliário de Goiânia | Lopes Signature",

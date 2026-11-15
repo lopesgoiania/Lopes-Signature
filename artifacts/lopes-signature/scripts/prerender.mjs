@@ -2,7 +2,7 @@ import { campaignPages } from "./campaign-pages.mjs";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { render, publicPaths, specialistDirectory } from "../.server/entry-server.js";
+import { render, publicPaths, renderSiteFooter, specialistDirectory } from "../.server/entry-server.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dist = path.join(root, "dist");
@@ -110,7 +110,7 @@ for (const route of [...paths, "/404"]) {
     );
   }
 }
-const campaignRoutes = await campaignPages(root, dist, origin);
+const campaignRoutes = await campaignPages(root, dist, origin, renderSiteFooter());
 for (const route of campaignRoutes) {
   sitemap.push(`<url><loc>${escape(new URL(route, origin).href)}</loc></url>`);
 }

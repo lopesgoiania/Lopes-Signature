@@ -4,8 +4,7 @@
   font-weight: 100 900;
   font-display: swap;
 }
-.hp-body,
-.hp-home-footer {
+.hp-body {
   --hl-paper: #f5f1e9;
   --hl-ink: #23251f;
   --hl-muted: #62645b;
@@ -497,21 +496,6 @@
   font-size: 14px;
   line-height: 1.8;
 }
-.hp-home-footer .signature-footer {
-  font-family:
-    Signature Manrope,
-    Arial,
-    sans-serif;
-  background: #191d17;
-  padding-top: 56px;
-}
-.hp-home-footer .signature-footer h2 {
-  font-size: 14px;
-  font-family: inherit;
-}
-.hp-home-footer .signature-footer-bottom {
-  font-size: 11px;
-}
 @media (max-width: 1000px) {
   .hp-body .hp-container {
     width: calc(100% - 48px);
@@ -662,9 +646,6 @@
   .hp-faq-list summary {
     padding-block: 23px;
     font-size: 14px;
-  }
-  .hp-home-footer .signature-footer {
-    padding-top: 44px;
   }
   .hp-body .property-card h3 {
     font-size: 26px;

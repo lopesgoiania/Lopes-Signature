@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
-import { render, pageSeo, publicPaths } from "../.server/entry-server.js";
+import { render, pageSeo, publicPaths, renderSiteFooter } from "../.server/entry-server.js";
 
 const fixture = {
   properties: [
@@ -40,6 +40,33 @@ const fixture = {
     },
   ],
 };
+test("public pages and campaigns share the legal footer and privacy page", async () => {
+  const expected = renderSiteFooter();
+  const origin = new URL("../dist/", import.meta.url);
+  const year = new Intl.DateTimeFormat("pt-BR", {
+    year: "numeric", timeZone: "America/Sao_Paulo",
+  }).format();
+  assert.match(expected, new RegExp(`data-signature-footer-year="[^"]*">${year}</span>`));
+  assert.match(expected, /Goiânia Negócios Imobiliários · CNPJ 19\.246\.027\/0001-97 · CRECI CJ 30006/);
+  assert.match(expected, /href="\/politica-de-privacidade">Política de Privacidade/);
+  const manifest = JSON.parse(await readFile(new URL("../campaigns/manifest.json", import.meta.url), "utf8"));
+  for (const file of ["index", "imoveis", "politica-de-privacidade", ...manifest.map(page => page.slug)]) {
+    const html = await readFile(new URL(file + ".html", origin), "utf8");
+    assert.equal([...html.matchAll(/<footer\b/g)].length, 1, file);
+    assert.doesNotMatch(html, /Valores e disponibilidade devem ser confirmados com a equipe\./);
+    assert.ok(html.includes('href="/signature-footer.css"'), file);
+    assert.ok(html.includes('src="/signature-footer-year.js"'), file);
+    assert.equal(
+      html.match(/<footer\b[^>]*>[\s\S]*?<\/footer>/)?.[0].replace(/<!-- -->/g, ""),
+      expected, file,
+    );
+  }
+  const detail = await render("/imoveis/imovel-teste", fixture);
+  assert.match(detail.html, /class="signature-footer"/);
+  const privacy = await readFile(new URL("politica-de-privacidade.html", origin), "utf8");
+  assert.match(privacy, /<h1[^>]*>Política de Privacidade<\/h1>/);
+  assert.match(privacy, /rel="canonical" href="https:\/\/www\.lopessignature\.com\.br\/politica-de-privacidade"/);
+});
 test("article is readable in HTML before JavaScript and unsafe HTML is removed", async () => {
   const result = await render("/journal/guia-de-teste", fixture);
   assert.match(result.html, /<h1[^>]*>Guia de teste<\/h1>/);

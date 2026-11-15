@@ -496,16 +496,9 @@ export default function BauhausPage({property}: {property?:any}) {
           </div>
         </section>
       </main>
-      <footer className="bh-footer">
-        <p>Bauhaus · Sousa Andrade</p>
-        <p>Apresentado por Lopes Signature</p>
-        <small>
-          Imagens ilustrativas e perspectivas artísticas do empreendimento.
-          Mobiliário e decoração são sugestões. Características, áreas e
-          disponibilidade devem ser confirmadas com a equipe e nos documentos do
-          empreendimento.
-        </small>
-      </footer>
+      <aside className="signature-product-notes" aria-label="Informações do empreendimento">
+        <p>Bauhaus · Sousa Andrade. Imagens ilustrativas e perspectivas artísticas do empreendimento. Mobiliário e decoração são sugestões. Consulte os documentos do empreendimento para conferir características e áreas.</p>
+      </aside>
       {showDock && (
         <div className="bh-dock">
           <span>

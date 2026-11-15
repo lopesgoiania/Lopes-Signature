@@ -1,7 +1,8 @@
 export { campaignCatalog } from "./lib/campaign-catalog";
 export { default as specialistDirectory } from "../../api-server/src/data/specialists.json";
 import { PassThrough } from "node:stream";
-import { renderToPipeableStream } from "react-dom/server";
+import { renderToPipeableStream, renderToStaticMarkup } from "react-dom/server";
+import { SiteFooter } from "./components/site-footer";
 import { dehydrate } from "@tanstack/react-query";
 import App, { createAppQueryClient } from "./App";
 import { ErrorBoundary } from "./components/error-boundary";
@@ -15,6 +16,9 @@ import { propertyHref, taxonomyHref } from "./lib/catalog-model";
 import { postHref } from "./lib/journal";
 
 export { pageSeo, seoSchemas };
+export function renderSiteFooter() {
+  return renderToStaticMarkup(<SiteFooter />);
+}
 export function publicPaths(data: PublicSnapshot) {
   return [
     ...new Set([

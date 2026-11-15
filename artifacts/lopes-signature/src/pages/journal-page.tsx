@@ -1,4 +1,3 @@
-import { SiteFooter } from "@/components/site-footer";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams, useSearch } from "wouter";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
@@ -321,7 +320,6 @@ export default function JournalPage() {
           </>
         )}
       </main>
-      <SiteFooter />
     </div>
   );
 }
