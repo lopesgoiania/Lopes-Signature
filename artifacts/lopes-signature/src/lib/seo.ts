@@ -33,14 +33,14 @@ export const staticPages: Record<
   { title: string; description: string }
 > = {
   "/": {
-    title: "Imóveis de alto padrão em Goiânia | Lopes Signature",
+    title: "Imóveis de alto padrão em Goiânia - Lopes",
     description:
-      "Explore casas, apartamentos e empreendimentos de alto padrão em Goiânia com a seleção e o atendimento da Lopes Signature.",
+      "Conheça a seleção da Lopes Signature de imóveis de alto padrão em Goiânia. Explore empreendimentos, bairros e conte com atendimento especializado.",
   },
   "/imoveis": {
-    title: "Imóveis em Goiânia: catálogo | Lopes Signature",
+    title: "Catálogo de imóveis em Goiânia - Lopes",
     description:
-      "Compare localização, plantas e características dos imóveis do catálogo Lopes Signature em Goiânia.",
+      "Encontre imóveis em Goiânia no catálogo da Lopes Signature. Use os filtros e compare localização, metragens, plantas e características.",
   },
   "/sobre": {
     title: "Sobre a Lopes Signature em Goiânia",
@@ -69,9 +69,9 @@ export const staticPages: Record<
       "Consulte casas de alto padrão em Goiânia e compare localização, espaços e características no catálogo Lopes Signature.",
   },
   "/apartamentos-luxo-goiania": {
-    title: "Apartamentos de luxo em Goiânia | Lopes Signature",
+    title: "Apartamentos de luxo em Goiânia - Lopes",
     description:
-      "Conheça apartamentos de alto padrão em Goiânia, com plantas, localização e atendimento Lopes Signature.",
+      "Conheça apartamentos de luxo em Goiânia. Compare plantas, metragens e número de suítes e explore opções no Setor Bueno e no Setor Marista.",
   },
   "/coberturas-goiania": {
     title: "Coberturas em Goiânia | Lopes Signature",

@@ -102,8 +102,9 @@ export default function HomePage() {
               </h2>
               <div className="hp-selection-intro">
                 <p>
-                  Compare projetos, plantas e localizações. Comece por uma
-                  seleção do nosso catálogo.
+                  A Lopes Signature reúne imóveis de alto padrão em Goiânia.
+                  Compare plantas, endereços e características antes de agendar
+                  uma visita.
                 </p>
                 <Link href="/imoveis" className="hp-text-link">
                   Explorar todos os imóveis <ArrowRight size={19} />

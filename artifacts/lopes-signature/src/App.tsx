@@ -68,7 +68,7 @@ function Router() {
         <Route path="/imoveis">
           <CatalogPage
             title="Explore o catálogo Lopes Signature"
-            description="Conheça os empreendimentos selecionados: apartamentos e terrenos, com plantas, condições e atendimento Lopes."
+            description="No catálogo de imóveis em Goiânia, filtre por bairro, tipo de imóvel, área mínima e número de suítes. Abra as fichas para comparar plantas, metragens e localização."
           />
         </Route>
         <Route
@@ -86,7 +86,7 @@ function Router() {
           <CatalogPage
             category="apartamento"
             title="Apartamentos de luxo em Goiânia"
-            description="Conheça apartamentos que combinam localização e conforto para o dia a dia."
+            description="Explore apartamentos de luxo em Goiânia no Setor Bueno e no Setor Marista. Compare plantas, metragens e configurações de 3 e 4 suítes."
           />
         </Route>
         <Route path="/coberturas-goiania">

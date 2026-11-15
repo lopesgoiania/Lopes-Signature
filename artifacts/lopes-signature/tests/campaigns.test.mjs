@@ -8,7 +8,7 @@ const root = fileURLToPath(new URL('..', import.meta.url));
 const launchIds = JSON.parse(await readFile(path.join(root, '../api-server/src/lib/signature-launches.json'), 'utf8'));
 const manifest = JSON.parse(await readFile(path.join(root, 'campaigns/manifest.json'), 'utf8'));
 
-for (const {slug, propertyId} of manifest) {
+for (const {slug, propertyId, focusKeywords} of manifest) {
   test(`${slug}: exported page is indexable, self-contained and scoped to its product`, async () => {
     const html = await readFile(path.join(root, 'dist', `${slug}.html`), 'utf8');
     assert.ok(html.includes(`<base href="/campanhas/${slug}/">`));
@@ -18,6 +18,16 @@ for (const {slug, propertyId} of manifest) {
     assert.ok(html.includes('name="100bug_id_lanc" value="' + launchIds[propertyId] + '"'));
     assert.ok(html.includes('src="/signature-tracking.js"'));
     assert.equal((html.match(/<h1\b/g) || []).length, 1);
+    const seoTitle = html.match(/<title>(.*?)<\/title>/s)?.[1];
+    const seoDescription = html.match(/<meta name="description" content="([^"]+)"/)?.[1];
+    const [primary, secondary] = focusKeywords.map(keyword => keyword.toLowerCase());
+    const paragraphs = [...html.matchAll(/<p\b[^>]*>(.*?)<\/p>/gs)]
+      .map(match => match[1].replace(/<br\s*\/?>/gi, " ").replace(/<[^>]+>/g, "").toLowerCase());
+    assert.ok(seoTitle?.toLowerCase().includes(primary));
+    assert.ok(seoTitle.endsWith(" - Lopes") && seoTitle.length <= 60);
+    assert.ok(seoDescription?.toLowerCase().includes(primary));
+    assert.ok(paragraphs.some(paragraph => paragraph.includes(primary)));
+    assert.ok(paragraphs.some(paragraph => paragraph.includes(secondary)));
     const sitemap = await readFile(path.join(root, 'dist/sitemap.xml'), 'utf8');
     assert.ok(sitemap.includes(`https://www.lopessignature.com.br/${slug}</loc>`));
     for (const match of html.matchAll(/(?:src|href)="([^"#]+)"/g)) {

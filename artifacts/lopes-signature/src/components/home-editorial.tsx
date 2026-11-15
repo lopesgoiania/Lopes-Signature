@@ -109,8 +109,8 @@ export function HomeEditorial({
             <em>O endereço também.</em>
           </h2>
           <p>
-            O imóvel precisa fazer sentido para a sua rotina. Olhe para os
-            espaços, mas também para o que existe ao redor.
+            Ao comparar imóveis nos bairros de Goiânia, considere a planta,
+            os deslocamentos e os serviços que fazem parte da sua rotina.
           </p>
         </div>
         {highlight && (
@@ -181,8 +181,8 @@ export function HomeEditorial({
               <em>à visita ao imóvel.</em>
             </h2>
             <p>
-              Conte com a equipe Lopes Signature para esclarecer detalhes dos
-              empreendimentos e organizar os próximos passos da sua escolha.
+              Conte com atendimento imobiliário especializado em Goiânia para
+              esclarecer dúvidas sobre os empreendimentos e organizar sua visita.
             </p>
             <Link href="/especialistas" className="hp-button hp-button-light">
               Conhecer os especialistas <ArrowRight size={20} />
