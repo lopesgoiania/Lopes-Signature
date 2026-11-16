@@ -37,3 +37,7 @@ A home e a navegação foram preservadas; somente a galeria recebe os artigos re
 A leitura conserva sumário, fontes, créditos e rodapé institucional único. A seleção relacionada usa o catálogo real: correspondência de bairro explícito no título/resumo ou a editoria Imóveis & Curadoria, com imóveis acima de R$2 milhões e imagem. Sem correspondência, não renderiza seleção. Não promete disponibilidade nem inventa preço/atributo.
 
 Meta Pixel e Google Tag Manager existentes foram preservados. A presença do código não comprova eventos, consentimento, conversões atribuídas ou configuração de relatórios. Não foram inventados números de tráfego, impressões, cliques ou resultados de SEO; relatórios dependem das contas analíticas e do Search Console configurados pela equipe.
+
+## Correções após os primeiros ensaios
+
+Os três ensaios iniciais foram bloqueados e estão registrados em TESTES-INICIAIS.md. O plano agora restringe também o enum estruturado da seleção à editoria pedida, e o enum de imagens contém somente IDs do acervo daquela execução. O propósito da prévia é derivado da categoria solicitada, em vez do dia da semana. Referências declaradas são reconstruídas dos links efetivamente citados, sem permitir links externos não apurados. Foram removidas as instruções antigas que forçavam notícias institucionais recentes em pautas de arquitetura/lifestyle; estas priorizam repertório e fontes acadêmicas/institucionais pertinentes, sem usar mudanças legais como assunto central. As notas de ensaio não representam novas publicações.

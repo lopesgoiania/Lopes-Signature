@@ -29,11 +29,13 @@ export function editorialPlan(posts: any[], day: string, requested?: string) {
     categories,
     counts,
     purpose:
-      weekday === 1
-        ? "Repertório de arquitetura e experiência de morar"
-        : weekday === 3
-          ? "Inteligência patrimonial educativa"
-          : "Conhecimento local e critérios de aquisição",
+      requested && signatureCategories.includes(requested as any)
+        ? `Ensaio editorial em ${requested}`
+        : weekday === 1
+          ? "Repertório de arquitetura e experiência de morar"
+          : weekday === 3
+            ? "Inteligência patrimonial educativa"
+            : "Conhecimento local e critérios de aquisição",
   };
 }
 export function humanReviewReasons(

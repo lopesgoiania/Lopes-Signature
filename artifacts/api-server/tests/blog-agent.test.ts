@@ -148,8 +148,22 @@ test("full pipeline publishes only after research and approval; failed rebuild d
   configured(async () => {
     const db = fakeClient();
     let calls = 0;
-    const request = async () =>
-      [
+    const request = async (payload: any) => {
+      if (calls === 1)
+        assert.deepEqual(payload.text.format.schema.properties.category.enum, [
+          "Arquitetura & Design",
+        ]);
+      if (calls === 3) {
+        assert.ok(
+          payload.text.format.schema.properties.imageId.enum.includes(
+            editorialMedia[0].id,
+          ),
+        );
+        assert.deepEqual(payload.text.format.schema.properties.category.enum, [
+          "Arquitetura & Design",
+        ]);
+      }
+      return [
         completed("Radar com três pautas"),
         completed(
           JSON.stringify({
@@ -167,7 +181,9 @@ test("full pipeline publishes only after research and approval; failed rebuild d
           "Dossiê factual",
           sources.map((s) => ({ ...s, type: "url_citation" })),
         ),
-        completed(JSON.stringify(article())),
+        completed(
+          JSON.stringify({ ...article(), sourceUrls: [sources[0].url] }),
+        ),
         completed(
           JSON.stringify({
             approved: true,
@@ -180,6 +196,7 @@ test("full pipeline publishes only after research and approval; failed rebuild d
           }),
         ),
       ][calls++];
+    };
     const result = await generateBlog(
       db as any,
       request,
