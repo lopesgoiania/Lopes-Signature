@@ -8,7 +8,7 @@ Segunda, quarta e sexta, às 9h de Brasília (12h UTC), expressão Vercel `0 12 
 
 ## Pesquisa e escrita
 
-Cinco chamadas: radar com pesquisa web; seleção estruturada de pauta; apuração com nova pesquisa; redação com análise visual das candidatas; revisão independente com pesquisa web e imagem da capa. Seleção registra três opções de título, intenção/público e direção de imagem. Redação produz 550–1000 palavras como direção, com validação de 450–1400, sem extensão artificial. Exigem-se três referências, ao menos dois domínios e fonte primária institucional. URLs equivalentes sem rastreamento UTM são reconhecidas sem admitir fontes inventadas. A revisão examina fatos, datas, proposta versus execução, fontes, originalidade, linguagem, adequação e fotografia. Nenhuma nota da IA é garantia de exatidão ou revisão humana.
+Cinco chamadas principais, com uma apuração complementar limitada quando faltarem referências: radar com pesquisa web; seleção estruturada de pauta; apuração com nova pesquisa; redação com análise visual das candidatas; revisão independente com pesquisa web e imagem da capa. Seleção registra três opções de título, intenção/público e direção de imagem. Redação produz 550–1000 palavras como direção, com validação de 450–1400, sem extensão artificial. Exigem-se três referências, ao menos dois domínios e fonte primária institucional. URLs equivalentes sem rastreamento UTM são reconhecidas sem admitir fontes inventadas. A revisão examina fatos, datas, proposta versus execução, fontes, originalidade, linguagem, adequação e fotografia. Nenhuma nota da IA é garantia de exatidão ou revisão humana.
 
 ## Direção de arte
 
@@ -41,3 +41,7 @@ Meta Pixel e Google Tag Manager existentes foram preservados. A presença do có
 ## Correções após os primeiros ensaios
 
 Os três ensaios iniciais foram bloqueados e estão registrados em TESTES-INICIAIS.md. O plano agora restringe também o enum estruturado da seleção à editoria pedida, e o enum de imagens contém somente IDs do acervo daquela execução. O propósito da prévia é derivado da categoria solicitada, em vez do dia da semana. Referências declaradas são reconstruídas dos links efetivamente citados, sem permitir links externos não apurados. Foram removidas as instruções antigas que forçavam notícias institucionais recentes em pautas de arquitetura/lifestyle; estas priorizam repertório e fontes acadêmicas/institucionais pertinentes, sem usar mudanças legais como assunto central. As notas de ensaio não representam novas publicações.
+
+Após os ensaios, corrigiu-se também o reconhecimento do domínio federal `gov.br` (além de seus subdomínios), assim como a elegibilidade de pesquisas acadêmicas originais internacionais. O domínio é apenas um filtro de elegibilidade: a revisão ainda precisa conferir autoria, conteúdo, achados e limites; uma revista ou notícia não se torna fonte primária. A prévia protegida informa o dossiê e as fontes mesmo quando a apuração é insuficiente, permitindo diagnóstico sem publicação.
+
+A viabilidade fotográfica passou a fazer parte do radar: o agente recebe temas e legendas das fotos licenciadas ainda elegíveis antes de propor pautas. Isso evita escolher um bairro sem cobertura visual e depois tentar ilustrá-lo com outro lugar. A busca complementar de mídia continua sujeita à licença e à correspondência factual.
