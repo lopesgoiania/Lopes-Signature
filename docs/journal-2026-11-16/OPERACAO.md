@@ -12,7 +12,7 @@ Cinco chamadas principais, com uma apuração complementar limitada quando falta
 
 ## Direção de arte
 
-Fotografia arquitetônica, materialidade, luz e composição; lugares específicos exigem registros reais. Martelos, chaves, miniaturas, contratos, dinheiro, satélite e mapas técnicos foram excluídos da seleção. A comparação de identidade bloqueia capas das últimas 12 publicações, inclusive cópias locais/Storage/Commons. A redação vê até seis imagens, e a revisão vê a escolhida. Sem imagem pertinente e de qualidade, a geração é bloqueada.
+Fotografia arquitetônica, materialidade, luz e composição; lugares específicos exigem registros reais. Martelos, chaves, miniaturas, contratos, dinheiro, satélite e mapas técnicos foram excluídos da seleção. A comparação de identidade bloqueia capas das últimas 12 publicações, inclusive cópias locais/Storage/Commons. A redação vê até dez imagens, e a revisão vê a escolhida. Sem imagem pertinente e de qualidade, a geração é bloqueada.
 
 O acervo inclui fotografias reais do Commons (licenças compatíveis verificadas na origem) e fotografias de interiores/arquitetura com licença Unsplash, selecionadas individualmente e creditadas. Estas últimas são contexto: nunca representam um imóvel disponível em Goiânia. Os arquivos mantêm fichas de origem; novas mídias locais têm WebP e variantes 640/1200/original. Não foi ativada geração recorrente de imagens por IA. O banner institucional fornecido não integra o acervo de capas de artigos.
 
@@ -44,4 +44,4 @@ Os três ensaios iniciais foram bloqueados e estão registrados em TESTES-INICIA
 
 Após os ensaios, corrigiu-se também o reconhecimento do domínio federal `gov.br` (além de seus subdomínios), assim como a elegibilidade de pesquisas acadêmicas originais internacionais. O domínio é apenas um filtro de elegibilidade: a revisão ainda precisa conferir autoria, conteúdo, achados e limites; uma revista ou notícia não se torna fonte primária. A prévia protegida informa o dossiê e as fontes mesmo quando a apuração é insuficiente, permitindo diagnóstico sem publicação.
 
-A viabilidade fotográfica passou a fazer parte do radar: o agente recebe temas e legendas das fotos licenciadas ainda elegíveis antes de propor pautas. Isso evita escolher um bairro sem cobertura visual e depois tentar ilustrá-lo com outro lugar. A busca complementar de mídia continua sujeita à licença e à correspondência factual.
+A viabilidade fotográfica passou a fazer parte do radar: o agente recebe temas e legendas das fotos licenciadas ainda elegíveis antes de propor pautas. Isso evita escolher um bairro sem cobertura visual e depois tentar ilustrá-lo com outro lugar. O acervo curado é preservado na seleção mostrada à redação, para não ser deslocado pelos primeiros resultados da busca de mídia. A busca complementar de mídia continua sujeita à licença e à correspondência factual.

@@ -471,10 +471,13 @@ export async function generateBlog(
     if (!sufficientEvidence())
       throw new Error("Apuração sem referências independentes e fonte primária suficientes.");
     stage = "seleção de imagens";
+    const discovered = await discover(pitch.imageQuery);
+    // Preserve the licensed collection offered during planning. Search results
+    // must not crowd those relevant photos out of the visual writer's shortlist.
     const candidates = freshCoverCandidates(
-      await discover(pitch.imageQuery),
+      [...editorialMedia, ...discovered],
       existing.data || [],
-    ).slice(0, 6);
+    ).slice(0, 10);
     if (!candidates.length)
       throw new Error(
         "Não há capa inédita entre as últimas 12 publicações e licenciada adequada à pauta.",
