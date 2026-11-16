@@ -18,6 +18,7 @@ import {
   approvedReview,
   validatePitch,
   fitSeoText,
+  sourceIdentity,
 } from "../src/lib/blog-agent.js";
 const sources = [
   { title: "Fonte primária", url: "https://ademigo.com.br/dados" },
@@ -156,7 +157,7 @@ test("full pipeline publishes only after research and approval; failed rebuild d
             title: "Arquitetura e conforto em Goiânia",
             angle:
               "Como a arquitetura e as áreas verdes ajudam a comparar opções residenciais em Goiânia.",
-            category: "Arquitetura e vida",
+            category: "Arquitetura & Design",
             score: 90,
             companyPromotion: false,
             imageQuery: "Parque Vaca Brava",
@@ -185,6 +186,7 @@ test("full pipeline publishes only after research and approval; failed rebuild d
       async () => "failed",
       async () => editorialMedia,
       async (image) => image,
+      { category: "Arquitetura & Design" },
     );
     assert.equal(result.status, "published");
     assert.equal(calls, 5);
@@ -209,7 +211,7 @@ test("review rejection prevents any article write and records a failed run", asy
             title: "Arquitetura e conforto em Goiânia",
             angle:
               "Como a arquitetura e as áreas verdes ajudam a comparar opções residenciais em Goiânia.",
-            category: "Arquitetura e vida",
+            category: "Arquitetura & Design",
             score: 90,
             companyPromotion: false,
             imageQuery: "Parque Vaca Brava",
@@ -312,7 +314,7 @@ test("preview exercises the full operation without claiming a day, saving or pub
           title: "Goiânia e a vida urbana",
           angle:
             "Como os parques de Goiânia ajudam a comparar o entorno dos bairros residenciais.",
-          category: "Goiânia e bairros",
+          category: "Goiânia & Endereços",
           score: 91,
           companyPromotion: false,
           imageQuery: "Parque Vaca Brava",
@@ -345,7 +347,7 @@ test("preview exercises the full operation without claiming a day, saving or pub
       async () => {
         throw new Error("No media upload in preview");
       },
-      { preview: true },
+      { preview: true, category: "Goiânia & Endereços" },
     );
     assert.equal(result.status, "preview");
     assert.equal(calls, 5);
@@ -360,7 +362,7 @@ test("commercial launch angles are discarded before reporting or writing", () =>
           approved: true,
           score: 99,
           companyPromotion: false,
-          category: "Goiânia e bairros",
+          category: "Goiânia & Endereços",
           title: "Primeiras penthouses no Goiânia 2",
           angle:
             "O lançamento de um produto específico apresentado como tendência urbana",
@@ -380,7 +382,7 @@ test("metadata length repair preserves complete words and does not discard a res
   assert.ok(text.length <= 70);
   assert.ok(text.endsWith("…"));
   assert.ok(text.startsWith("Goiânia"));
-  assert.equal(fitSeoText("Goiânia e bairros", 70), "Goiânia e bairros");
+  assert.equal(fitSeoText("Goiânia & Endereços", 70), "Goiânia & Endereços");
 });
 
 test("institutional reporting can explicitly exclude commercial launches in its angle", () => {
@@ -390,7 +392,7 @@ test("institutional reporting can explicitly exclude commercial launches in its 
         approved: true,
         score: 90,
         companyPromotion: false,
-        category: "Goiânia e bairros",
+        category: "Goiânia & Endereços",
         title: "Revitalização do Centro de Goiânia",
         angle:
           "Apurar política urbana com dados públicos, sem lançamentos de construtoras ou imobiliárias.",
@@ -453,5 +455,118 @@ test("visual writing receives actual labeled photographs, not just filenames", (
     JSON.stringify(input).includes(
       "https://www.lopessignature.com.br/images/journal/",
     ),
+  );
+});
+
+test("three weekly slots balance categories and sensitive subjects require a human", async () => {
+  const { editorialPlan, humanReviewReasons } =
+    await import("../src/lib/editorial-policy.js");
+  assert.deepEqual(editorialPlan([], "2026-11-16").categories, [
+    "Arquitetura & Design",
+    "Lifestyle & Experiências",
+  ]);
+  assert.deepEqual(editorialPlan([], "2026-11-18").categories, [
+    "Mercado & Patrimônio",
+  ]);
+  assert.deepEqual(editorialPlan([], "2026-11-20").categories, [
+    "Goiânia & Endereços",
+    "Imóveis & Curadoria",
+  ]);
+  assert.ok(
+    humanReviewReasons({ title: "Planejamento sucessório e ITCD" }).length,
+  );
+  assert.ok(
+    humanReviewReasons({
+      summary: "Alíquotas de imposto e transmissão familiar",
+    }).length,
+  );
+  assert.equal(
+    humanReviewReasons({ title: "Luz natural e materiais na arquitetura" })
+      .length,
+    0,
+  );
+  assert.ok(
+    humanReviewReasons(
+      { title: "Mercado" },
+      {
+        requiresHumanReview: true,
+        riskReason: "Afirmação financeira sensível",
+      },
+    ).length,
+  );
+});
+
+test("a tax article approved by AI is saved as draft without publication or rebuild", async () =>
+  configured(async () => {
+    const db = fakeClient();
+    let count = 0;
+    let rebuilds = 0;
+    const responses = [
+      completed("Radar"),
+      completed(
+        JSON.stringify({
+          approved: true,
+          title: "Arquitetura e patrimônio residencial",
+          angle:
+            "Uma pauta de arquitetura com contexto e documentação verificável em Goiânia",
+          category: "Arquitetura & Design",
+          score: 90,
+          companyPromotion: false,
+          imageQuery: "architecture",
+        }),
+      ),
+      completed(
+        "Dossiê",
+        sources.map((s) => ({ ...s, type: "url_citation" })),
+      ),
+      completed(
+        JSON.stringify({
+          ...article(),
+          title: "ITCD e transmissão de patrimônio residencial",
+        }),
+      ),
+      completed(
+        JSON.stringify({
+          approved: true,
+          luxuryFit: true,
+          primarySourceUrl: sources[0].url,
+          qualityScore: 90,
+          companyPromotion: false,
+          imageRelevant: true,
+          requiresHumanReview: false,
+        }),
+      ),
+    ];
+    const result = await generateBlog(
+      db as any,
+      async () => responses[count++],
+      async () => {
+        rebuilds++;
+        return "requested";
+      },
+      async () => editorialMedia,
+      async (m) => m,
+      { category: "Arquitetura & Design" },
+    );
+    assert.equal(result.status, "needs_review");
+    const saved = db.writes.find((w) => w.table === "blog_posts").row;
+    assert.equal(saved.status, "draft");
+    assert.equal(saved.published, false);
+    assert.equal(saved.published_at, null);
+    assert.equal(rebuilds, 0);
+    assert.equal(
+      saved.sources.find((s: any) => s.kind === "editorial").validationStatus,
+      "awaiting_specialist",
+    );
+  }));
+
+test("source identity removes tracking without confusing different documents", () => {
+  assert.equal(
+    sourceIdentity("https://ibge.gov.br/estudo?utm_source=x#pagina"),
+    "https://ibge.gov.br/estudo",
+  );
+  assert.notEqual(
+    sourceIdentity("https://ibge.gov.br/estudo-a"),
+    sourceIdentity("https://ibge.gov.br/estudo-b"),
   );
 });

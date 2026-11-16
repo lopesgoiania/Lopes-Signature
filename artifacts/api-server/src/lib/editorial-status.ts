@@ -5,7 +5,7 @@ export async function editorialStatus(
   rebuildConfigured = Boolean(process.env.SITE_REBUILD_HOOK_URL),
 ) {
   const automation = {
-    schedule: "Todos os dias, às 9h de Brasília",
+    schedule: "Segundas, quartas e sextas, às 9h de Brasília",
     pipeline: [
       "Pesquisa",
       "Seleção de pauta",

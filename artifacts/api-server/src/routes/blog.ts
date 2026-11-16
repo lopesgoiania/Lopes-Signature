@@ -1,3 +1,4 @@
+import { humanReviewReasons } from "../lib/editorial-policy.js";
 import { editorialMedia } from "../lib/editorial-media.js";
 import {
   cronAuthorized,
@@ -7,7 +8,7 @@ import {
 import { editorialStatus } from "../lib/editorial-status.js";
 import { requestSiteRebuild } from "../lib/site-rebuild.js";
 import { Router, type IRouter } from "express";
-import { randomUUID } from "node:crypto";
+import { randomUUID, createHash } from "node:crypto";
 import { supabase } from "../lib/supabase.js";
 import { requireAdmin } from "../lib/admin-auth.js";
 
@@ -40,7 +41,23 @@ export const mapPost = (row: any) => {
     content: row.content,
     image: row.image || imageMeta?.src || "",
     imageMeta,
-    editorial: provenance.find((s: any) => s.kind === "editorial"),
+    editorial: (() => {
+      const entry = provenance.find((s: any) => s.kind === "editorial");
+      if (!entry) return undefined;
+      const { specialistReview, ...rest } = entry;
+      return {
+        ...rest,
+        ...(specialistReview
+          ? {
+              specialistReview: {
+                name: specialistReview.name,
+                qualification: specialistReview.qualification,
+                reviewedAt: specialistReview.reviewedAt,
+              },
+            }
+          : {}),
+      };
+    })(),
     author: row.author || "Lopes Signature",
     date:
       row.date ||
@@ -236,6 +253,47 @@ router.post("/admin/blog", async (req, res) => {
       }
     }
     const now = new Date().toISOString();
+    const contentHash = createHash("sha256")
+      .update(title + "\n" + summary + "\n" + content)
+      .digest("hex");
+    const editorial = existing?.sources?.find(
+      (s: any) => s.kind === "editorial",
+    );
+    const needsSpecialist =
+      humanReviewReasons({ title, content, summary }).length > 0 ||
+      ["awaiting_specialist", "specialist_reviewed"].includes(
+        editorial?.validationStatus,
+      );
+    const retainedApproval =
+      editorial?.specialistReview?.contentHash === contentHash;
+    const declaredReview =
+      body.specialistConfirmed === true &&
+      text(body.specialistName, 150).length >= 5 &&
+      text(body.specialistRegistration, 150).length >= 3;
+    if (
+      status === "published" &&
+      needsSpecialist &&
+      !retainedApproval &&
+      !declaredReview
+    ) {
+      res.status(422).json({
+        message:
+          "Esta matéria exige revisão humana especializada. Informe o profissional, sua qualificação e confirme a aprovação desta versão antes de publicar.",
+      });
+      return;
+    }
+    const specialistReview =
+      status === "published" && needsSpecialist && declaredReview
+        ? {
+            name: text(body.specialistName, 150),
+            qualification: text(body.specialistRegistration, 150),
+            confirmedBy: res.locals.adminEmail,
+            reviewedAt: now,
+            contentHash,
+          }
+        : retainedApproval
+          ? editorial.specialistReview
+          : undefined;
     const row = {
       id: existing?.id || `post-${randomUUID()}`,
       slug,
@@ -255,16 +313,43 @@ router.post("/admin/blog", async (req, res) => {
       seo_title: text(body.seoTitle, 200),
       seo_description: text(body.seoDescription, 500),
       sources: [
+        ...(needsSpecialist && !editorial
+          ? [
+              {
+                kind: "editorial",
+                title: "Registro de revisão especializada",
+                url: "https://www.lopessignature.com.br/journal/" + slug,
+                validationStatus: specialistReview
+                  ? "specialist_reviewed"
+                  : "awaiting_specialist",
+                specialistReview,
+              },
+            ]
+          : []),
         ...sources.map((s: any) => ({
           title: text(s.title, 300),
           url: text(s.url, 2000),
         })),
         ...(Array.isArray(existing?.sources)
-          ? existing.sources.filter(
-              (s: any) =>
-                s.kind === "editorial" ||
-                (s.kind === "image" && s.media?.src === image),
-            )
+          ? existing.sources
+              .filter(
+                (s: any) =>
+                  s.kind === "editorial" ||
+                  (s.kind === "image" && s.media?.src === image),
+              )
+              .map((s: any) =>
+                s.kind === "editorial"
+                  ? {
+                      ...s,
+                      specialistReview,
+                      validationStatus: specialistReview
+                        ? "specialist_reviewed"
+                        : needsSpecialist
+                          ? "awaiting_specialist"
+                          : s.validationStatus,
+                    }
+                  : s,
+              )
           : []),
       ],
       read_time: `${Math.max(1, Math.ceil(content.split(/\s+/).length / 220))} min de leitura`,
@@ -316,17 +401,19 @@ async function generate(_req: any, res: any) {
   }
 }
 router.post("/admin/blog/generate", generate);
-router.post("/admin/blog/preview", async (_req, res) => {
+router.post("/admin/blog/preview", async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
   try {
-    res.json(await previewBlog());
+    res.json(
+      await previewBlog(
+        typeof req.body?.category === "string" ? req.body.category : undefined,
+      ),
+    );
   } catch (error) {
-    res
-      .status(503)
-      .json({
-        message:
-          error instanceof Error ? error.message : "Falha na prévia editorial.",
-      });
+    res.status(503).json({
+      message:
+        error instanceof Error ? error.message : "Falha na prévia editorial.",
+    });
   }
 });
 router.post("/admin/blog/rebuild", async (_req, res) => {

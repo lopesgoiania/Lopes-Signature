@@ -59,13 +59,13 @@ export const staticPages: Record<
   },
   "/politica-de-privacidade": {
     title: "Política de Privacidade - Lopes Signature",
-    description: "Saiba como a Lopes Signature trata dados de contato e navegação e como solicitar informações sobre seus dados pessoais.",
+    description:
+      "Saiba como a Lopes Signature trata dados de contato e navegação e como solicitar informações sobre seus dados pessoais.",
   },
   "/journal": {
-    title:
-      "Journal: arquitetura e mercado imobiliário de Goiânia | Lopes Signature",
+    title: "Signature Journal | Arquitetura e patrimônio em Goiânia",
     description:
-      "Leituras sobre arquitetura, bairros e mercado imobiliário de Goiânia. Conheça o Journal Lopes Signature.",
+      "Arquitetura, endereços, patrimônio e a arte de viver bem em Goiânia. Conheça as leituras e a curadoria do Signature Journal.",
   },
   "/casas-alto-padrao-goiania": {
     title: "Casas de alto padrão em Goiânia | Lopes Signature",

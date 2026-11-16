@@ -34,6 +34,7 @@ export function createRequireAdmin(client = supabase) {
         res.status(403).json({ message: "Acesso restrito à gestão." });
         return;
       }
+      res.locals.adminEmail = data.user.email;
       next();
     } catch {
       res.status(503).json({ message: "Não foi possível verificar o acesso." });

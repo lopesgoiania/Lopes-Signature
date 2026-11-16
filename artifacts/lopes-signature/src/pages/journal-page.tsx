@@ -2,9 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useParams, useSearch } from "wouter";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import { PublicNav } from "@/components/signature-ui";
+import { JournalProperties } from "@/components/journal-properties";
 import { ArticleBody } from "@/components/article-body";
 import {
-  JournalGallery,
   JournalCard,
   JournalPhoto,
   JournalMeta,
@@ -159,6 +159,7 @@ export default function JournalPage() {
                 </div>
               </div>
             </article>
+            <JournalProperties post={post} />
             <section className="jr-contact">
               <div>
                 <h2>
@@ -191,20 +192,32 @@ export default function JournalPage() {
           </>
         ) : (
           <>
-            <header className="jr-masthead">
-              <h1>
-                Um olhar sobre a cidade.
-                <br />
-                <em>Uma perspectiva sobre o viver.</em>
-              </h1>
-              <div>
-                <p>
-                  Goiânia, arquitetura e os movimentos que transformam o mercado
-                  imobiliário. Leituras do Journal Signature para escolher com
-                  mais repertório.
-                </p>
+            <header className="jr-brand-banner">
+              <a
+                href="#acervo"
+                aria-label="Signature Journal — leia os artigos"
+              >
+                <picture>
+                  <source
+                    media="(min-width: 768px)"
+                    srcSet="/images/journal/banner-signature-journal.webp"
+                  />
+                  <img
+                    src="/images/journal/banner-signature-journal-900.webp"
+                    width="1774"
+                    height="887"
+                    alt="Signature Journal. Arquitetura, patrimônio e mercado. Perspectivas sobre viver bem em Goiânia."
+                    fetchPriority="high"
+                  />
+                </picture>
+              </a>
+              <div className="jr-mobile-masthead">
+                <h1>
+                  Signature <em>Journal</em>
+                </h1>
+                <p>Arquitetura. Patrimônio. A arte de viver bem.</p>
                 <a href="#acervo">
-                  Explore nossas leituras <ArrowRight size={17} />
+                  Leia os artigos <ArrowRight size={18} />
                 </a>
               </div>
             </header>
@@ -223,11 +236,36 @@ export default function JournalPage() {
                     className="jr-latest"
                     aria-labelledby="jr-latest-title"
                   >
-                    <div className="jr-section-title">
-                      <h2 id="jr-latest-title">Leituras recentes</h2>
-                      <span>O último olhar, em destaque.</span>
+                    <div className="jr-front">
+                      <div className="jr-front-intro">
+                        <h2 id="jr-latest-title">
+                          Um olhar sobre
+                          <br />
+                          <em>o viver bem.</em>
+                        </h2>
+                        <p>
+                          Arquitetura, endereços e escolhas que atravessam o
+                          tempo. Repertório para a vida e para o patrimônio, com
+                          curadoria Signature.
+                        </p>
+                        <a href="#acervo">
+                          Explore as leituras <ArrowRight size={18} />
+                        </a>
+                      </div>
+                      <article className="jr-cover-story">
+                        <Link href={postHref(all[0])}>
+                          <JournalPhoto post={all[0]} />
+                          <div className="jr-cover-copy">
+                            <span>{all[0].category}</span>
+                            <h3>{all[0].title}</h3>
+                            <p>{all[0].summary}</p>
+                            <span className="jr-feature-read">
+                              Ler matéria <ArrowRight size={18} />
+                            </span>
+                          </div>
+                        </Link>
+                      </article>
                     </div>
-                    <JournalGallery posts={all} priority />
                   </section>
                 )}
                 <section id="acervo" className="jr-archive">
@@ -261,9 +299,14 @@ export default function JournalPage() {
                     </nav>
                   )}
                   <div className="jr-archive-grid">
-                    {pagePosts.map((p) => (
-                      <JournalCard key={p.id} post={p} />
-                    ))}
+                    {pagePosts
+                      .filter(
+                        (p) =>
+                          !(page === 1 && !category && p.id === all[0]?.id),
+                      )
+                      .map((p) => (
+                        <JournalCard key={p.id} post={p} />
+                      ))}
                   </div>
                   {!filtered.length && (
                     <p>

@@ -8,12 +8,25 @@ export type Post = {
   image?: string;
   imageMeta?: {
     src: string;
+    srcSet?: string;
+    width?: number;
+    height?: number;
     alt: string;
     caption: string;
     credit: string;
     license: string;
     licenseUrl: string;
     sourceUrl: string;
+  };
+  editorial?: {
+    validationStatus?: string;
+    reviewReasons?: string[];
+    coverRationale?: string;
+    specialistReview?: {
+      name: string;
+      qualification: string;
+      reviewedAt: string;
+    };
   };
   date?: string;
   readTime?: string;

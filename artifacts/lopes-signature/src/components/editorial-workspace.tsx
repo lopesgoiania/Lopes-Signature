@@ -5,7 +5,12 @@ import { postHref, type Post } from "@/lib/journal";
 import { ArticleBody } from "./article-body";
 import "@/pages/journal-page.css";
 
-type Draft = Partial<Post> & { status: string };
+type Draft = Partial<Post> & {
+  status: string;
+  specialistName?: string;
+  specialistRegistration?: string;
+  specialistConfirmed?: boolean;
+};
 const empty = (): Draft => ({
   title: "",
   summary: "",
@@ -126,11 +131,13 @@ export function EditorialWorkspace() {
     try {
       const result = await catalogRequest("admin/blog/generate", {});
       setMessage(
-        result.status === "skipped"
-          ? result.message
-          : result.rebuild === "requested"
-            ? "Artigo publicado no banco. Atualização das páginas solicitada."
-            : "Artigo salvo, mas a atualização das páginas falhou. Use Atualizar site para repetir.",
+        result.status === "needs_review"
+          ? "Rascunho preparado. Esta matéria exige revisão humana especializada antes da publicação."
+          : result.status === "skipped"
+            ? result.message
+            : result.rebuild === "requested"
+              ? "Artigo publicado no banco. Atualização das páginas solicitada."
+              : "Artigo salvo, mas a atualização das páginas falhou. Use Atualizar site para repetir.",
       );
       await Promise.all([query.refetch(), readiness.refetch()]);
     } catch (e) {
@@ -169,8 +176,9 @@ export function EditorialWorkspace() {
         <div>
           <h1 className="serif text-4xl">Journal Signature</h1>
           <p className="mt-3 text-sm text-muted-foreground">
-            Pesquisa e publicação sobre Goiânia e o mercado de alto padrão. Um
-            artigo por dia, às 9h (Brasília).
+            Pesquisa e publicação sobre arquitetura, endereços e patrimônio em
+            Goiânia. Três edições por semana: segunda, quarta e sexta, às 9h
+            (Brasília).
           </p>
         </div>
         <button
@@ -187,7 +195,8 @@ export function EditorialWorkspace() {
         <h2 className="serif text-2xl">Agente editorial</h2>
         <p className="text-sm">
           Pesquisa pautas, apura fatos, escolhe uma imagem licenciada, produz e
-          revisa o artigo antes de publicar. Um artigo por dia, incluindo
+          revisa o artigo antes de publicar. Três edições semanais, com
+          planejamento por editorias. A trava diária também se aplica às
           gerações manuais.
         </p>
         {readiness.isLoading && (
@@ -434,6 +443,51 @@ export function EditorialWorkspace() {
             <option value="archived">Arquivado</option>
           </select>
         </label>
+        <fieldset className="space-y-3 border border-border p-5">
+          <legend className="px-2 text-sm">Revisão especializada</legend>
+          <p className="text-sm leading-6">
+            Conteúdos jurídicos, tributários ou financeiros sensíveis só podem
+            ser publicados após aprovação humana. Preencha quando essa revisão
+            for necessária; esta declaração ficará registrada junto da versão
+            aprovada.
+          </p>
+          {draft.editorial?.validationStatus === "awaiting_specialist" && (
+            <p role="status" className="text-sm font-semibold">
+              Aguardando revisão humana especializada.
+            </p>
+          )}
+          <label className="block text-sm">
+            Profissional responsável
+            <input
+              className="admin-input mt-2"
+              value={draft.specialistName || ""}
+              onChange={(e) => field("specialistName", e.target.value)}
+            />
+          </label>
+          <label className="block text-sm">
+            Qualificação ou registro profissional
+            <input
+              className="admin-input mt-2"
+              value={draft.specialistRegistration || ""}
+              onChange={(e) => field("specialistRegistration", e.target.value)}
+            />
+          </label>
+          <label className="flex gap-3 text-sm leading-6">
+            <input
+              type="checkbox"
+              checked={draft.specialistConfirmed || false}
+              onChange={(e) => {
+                setDraft((d) => ({
+                  ...d,
+                  specialistConfirmed: e.target.checked,
+                }));
+                setDirty(true);
+              }}
+            />
+            Confirmo que o profissional identificado revisou e aprovou esta
+            versão.
+          </label>
+        </fieldset>
         <p className="text-sm text-muted-foreground">
           Revise fontes, números, datas e informações comerciais antes de
           publicar. Rascunhos e artigos arquivados não aparecem na API pública.

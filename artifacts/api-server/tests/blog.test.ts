@@ -112,3 +112,25 @@ test("editorial authorization rejects anonymous and non-admin sessions", async (
     await new Promise<void>((resolve) => server.close(() => resolve()));
   }
 });
+
+test("public metadata omits the administrator identity and approval hash", () => {
+  const post = mapPost({
+    id: "private-review",
+    title: "Título",
+    sources: [
+      {
+        kind: "editorial",
+        specialistReview: {
+          name: "Profissional",
+          qualification: "Registro profissional",
+          reviewedAt: "2026-11-16",
+          confirmedBy: "private@example.test",
+          contentHash: "private-hash",
+        },
+      },
+    ],
+  });
+  assert.ok(!JSON.stringify(post).includes("private@example.test"));
+  assert.ok(!JSON.stringify(post).includes("private-hash"));
+  assert.equal(post.editorial.specialistReview.name, "Profissional");
+});

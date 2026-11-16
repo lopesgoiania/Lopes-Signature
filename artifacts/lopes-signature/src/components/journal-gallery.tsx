@@ -10,7 +10,7 @@ export const recentPosts = (posts: Post[]) =>
       (Date.parse(b.publishedAt || "") || 0) -
       (Date.parse(a.publishedAt || "") || 0),
   );
-export function postMedia(post: Post) {
+export function postMedia(post: Post): Post["imageMeta"] | undefined {
   return (
     post.imageMeta ||
     media.find((m) => m.src === post.image) ||
@@ -39,8 +39,10 @@ export function JournalPhoto({
     <ResponsiveImage
       src={post.image || image?.src}
       alt={image?.alt || post.title}
-      width={1600}
-      height={1067}
+      srcSet={image?.srcSet}
+      sizes="(max-width: 767px) 100vw, (max-width: 1100px) 50vw, 900px"
+      width={image?.width || 1600}
+      height={image?.height || 1067}
       loading={priority ? "eager" : "lazy"}
       fetchPriority={priority ? "high" : "auto"}
       className="jr-photo"

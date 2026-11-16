@@ -2,6 +2,11 @@ import library from "../../../lopes-signature/src/lib/journal-media.json" with {
 import { supabase } from "./supabase.js";
 export type EditorialMedia = (typeof library)[number];
 export const editorialMedia = library;
+export const premiumMedia = (media: EditorialMedia) =>
+  media.src !== "/images/journal/goiania.jpg" &&
+  !/martelo|miniatura|satélite|satellite|gavel|house keys|contrato|dinheiro|mapa técnico/i.test(
+    `${media.alt} ${media.caption} ${media.topic}`,
+  );
 const plain = (s: string) =>
   s
     .replace(/<[^>]*>/g, "")
@@ -84,9 +89,9 @@ export async function discoverEditorialMedia(
     return [
       ...(result.ok ? commonsMedia(await result.json()).slice(0, 8) : []),
       ...editorialMedia,
-    ];
+    ].filter(premiumMedia);
   } catch {
-    return editorialMedia;
+    return editorialMedia.filter(premiumMedia);
   }
 }
 export async function storeEditorialMedia(
