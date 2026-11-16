@@ -1,4 +1,5 @@
 import test from "node:test";
+import { humanReviewReasons } from "../src/lib/editorial-policy.js";
 import assert from "node:assert/strict";
 import {
   editorialMedia,
@@ -630,3 +631,7 @@ test("one correction requires a second full review and cannot publish a rejected
       assert.equal(db.writes.filter((w) => w.table === "blog_posts").length, approveRevision ? 1 : 0);
     }
   }));
+
+test("investor-return language is routed to human review even when the AI overlooks it", () => {
+  assert.ok(humanReviewReasons({ title: "Endereços", content: "O bairro oferece retorno ao investidor." }, { requiresHumanReview: false }).length > 0);
+});

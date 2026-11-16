@@ -44,7 +44,7 @@ export function humanReviewReasons(
 ) {
   const reasons: string[] = [];
   if (
-    /\b(itcd|itbi|iptu|jurídic\w*|tribut\w*|imposto\w*|alíquota\w*|sucessóri\w*|herança\w*|inventário\w*|isenç\w*|financiamento\w*|rentabilidade|retorno financeiro|recomendação de investimento)\b/iu.test(
+    /\b(itcd|itbi|iptu|jurídic\w*|tribut\w*|imposto\w*|alíquota\w*|sucessóri\w*|herança\w*|inventário\w*|isenç\w*|financiamento\w*|rentabilidade|retorno financeiro|retornos?(?:\s+\S+){0,3}\s+(?:investidor|investimento|capital)|recomendação de investimento)\b/iu.test(
       `${article.title} ${article.summary || ""} ${article.content}`,
     )
   )
