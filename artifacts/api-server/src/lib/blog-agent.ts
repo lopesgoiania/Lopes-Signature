@@ -91,10 +91,20 @@ export function isPrimarySource(url: string) {
   try {
     const host = new URL(url).hostname.toLowerCase().replace(/^www\./, "");
     return (
+      host === "gov.br" ||
       host.endsWith(".gov.br") ||
       host.endsWith(".edu.br") ||
+      host.endsWith(".edu") ||
+      host.endsWith(".ac.uk") ||
       [
         "scielo.br",
+        // Original international research is eligible evidence too. The
+        // independent editor must still verify authorship, findings and limits.
+        "ncbi.nlm.nih.gov",
+        "kci.go.kr",
+        "sciencedirect.com",
+        "tandfonline.com",
+        "journals.sagepub.com",
         "ufg.br",
         "usp.br",
         "unb.br",

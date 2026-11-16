@@ -587,3 +587,12 @@ test("source identity removes tracking without confusing different documents", (
     sourceIdentity("https://ibge.gov.br/estudo-b"),
   );
 });
+
+test("official gov.br and original international research are eligible without admitting magazines", () => {
+  assert.equal(isPrimarySource("https://www.gov.br/iphan/pt-br/patrimonio"), true);
+  assert.equal(isPrimarySource("https://pmc.ncbi.nlm.nih.gov/articles/PMC11637840/"), true);
+  assert.equal(isPrimarySource("https://www.sciencedirect.com/science/article/pii/S2095263525000780"), true);
+  assert.equal(isPrimarySource("https://architecture.mit.edu/research"), true);
+  assert.equal(isPrimarySource("https://wallpaper.com/architecture/residential/example"), false);
+  assert.equal(isPrimarySource("https://ncbi.nlm.nih.gov.example.com/paper"), false);
+});
