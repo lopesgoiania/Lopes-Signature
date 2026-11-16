@@ -34,6 +34,8 @@ export function commonsMedia(data: any): EditorialMedia[] {
       src = i?.url;
     if (
       !i ||
+      !/\.(?:jpe?g|png|webp)(?:\?|$)/i.test(String(src)) ||
+      (i.mime && !/^image\/(?:jpeg|png|webp)$/.test(i.mime)) ||
       i.width < 1200 ||
       i.height > i.width ||
       i.size > 8 * 1024 * 1024 ||
@@ -71,7 +73,7 @@ export async function discoverEditorialMedia(
     gsrnamespace: "6",
     gsrlimit: "12",
     prop: "imageinfo",
-    iiprop: "url|size|extmetadata",
+    iiprop: "url|size|mime|extmetadata",
     iiurlwidth: "1600",
     format: "json",
   });

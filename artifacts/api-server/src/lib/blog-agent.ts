@@ -157,10 +157,12 @@ async function ask(payload: any) {
     }),
     signal: AbortSignal.timeout(45_000),
   });
-  if (!response.ok)
-    throw new Error(
-      `OpenAI indisponível (HTTP ${response.status}). Confira chave, saldo e modelo.`,
-    );
+  if (!response.ok) {
+    const detail: any = await response.json().catch(() => ({}));
+    const code = String(detail.error?.code || detail.error?.type || "request_failed")
+      .replace(/[^a-zA-Z0-9_.-]/g, "").slice(0, 80);
+    throw new Error(`OpenAI interrompeu a geração (HTTP ${response.status}; ${code}).`);
+  }
   return response.json();
 }
 const articleSchema = {

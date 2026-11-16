@@ -642,3 +642,16 @@ test("federal-university repositories qualify and only the local editoria mandat
   assert.equal(validateArticle(international, sources, []).length, 3);
   assert.throws(() => validateArticle({ ...international, category: "Goiânia & Endereços" }, sources, []), /foco local/);
 });
+
+test("Commons candidates exclude bitmap formats the visual API cannot read", () => {
+  const page = (ext: string, mime: string) => ({ query: { pages: { x: {
+    pageid: 10, title: `File:Residence.${ext}`, imageinfo: [{
+      url: `https://upload.wikimedia.org/Residence.${ext}`, mime,
+      width: 1600, height: 900, size: 100000,
+      extmetadata: { LicenseShortName: { value: "CC BY-SA 4.0" } },
+    }],
+  } } } });
+  assert.equal(commonsMedia(page("jpg", "image/jpeg")).length, 1);
+  assert.equal(commonsMedia(page("tif", "image/tiff")).length, 0);
+  assert.equal(commonsMedia(page("gif", "image/gif")).length, 0);
+});
