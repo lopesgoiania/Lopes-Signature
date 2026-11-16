@@ -95,6 +95,7 @@ export function isPrimarySource(url: string) {
       host === "gov.br" ||
       host.endsWith(".gov.br") ||
       host.endsWith(".edu.br") ||
+      /(?:^|\.)uf[a-z]{1,8}\.br$/.test(host) ||
       host.endsWith(".edu") ||
       host.endsWith(".ac.uk") ||
       [
@@ -231,13 +232,14 @@ export function validateArticle(
     )
       throw new Error(`Campo editorial inválido: ${key}.`);
   }
+  const prose = article.content.replace(/\]\([^)]+\)/g, "]");
   if (
-    !/goi[aâ]nia/i.test(article.content) ||
+    (/goi[aâ]nia/i.test(article.category) && !/goi[aâ]nia/i.test(prose)) ||
     !/^## /m.test(article.content) ||
     /<[^>]+>/.test(article.content)
   )
     throw new Error(
-      "O artigo precisa de foco local, seções e Markdown sem HTML.",
+      "O artigo precisa de seções e Markdown sem HTML; a editoria de Goiânia exige foco local.",
     );
   const wordCount = article.content.trim().split(/\s+/).length;
   if (wordCount < 450 || wordCount > 1400)

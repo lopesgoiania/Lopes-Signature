@@ -635,3 +635,10 @@ test("one correction requires a second full review and cannot publish a rejected
 test("investor-return language is routed to human review even when the AI overlooks it", () => {
   assert.ok(humanReviewReasons({ title: "Endereços", content: "O bairro oferece retorno ao investidor." }, { requiresHumanReview: false }).length > 0);
 });
+
+test("federal-university repositories qualify and only the local editoria mandates local reporting", () => {
+  assert.equal(isPrimarySource("https://repositorio.ufjf.br/jspui/handle/ufjf/19890"), true);
+  const international = { ...article(), category: "Arquitetura & Design", content: article().content.replace(/Goiânia/g, "residências") };
+  assert.equal(validateArticle(international, sources, []).length, 3);
+  assert.throws(() => validateArticle({ ...international, category: "Goiânia & Endereços" }, sources, []), /foco local/);
+});
