@@ -4,6 +4,8 @@ import {
   editorialMedia,
   commonsMedia,
   permittedMediaHost,
+  freshCoverCandidates,
+  coverVisualInput,
 } from "../src/lib/editorial-media.js";
 import {
   cronAuthorized,
@@ -395,6 +397,61 @@ test("institutional reporting can explicitly exclude commercial launches in its 
         imageQuery: "Centro Goiânia",
       },
       [],
+    ),
+  );
+});
+
+test("covers cannot repeat recent photos through local, Commons or storage aliases", () => {
+  const local = editorialMedia[0];
+  const alias = {
+    ...local,
+    id: "another-id",
+    src:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/" +
+      encodeURIComponent(local.sourceUrl.split("File:")[1]) +
+      "/1600px-" +
+      encodeURIComponent(local.sourceUrl.split("File:")[1]),
+  };
+  const recent = [
+    {
+      image: local.src,
+      published_at: "2026-11-16",
+      sources: [{ kind: "image", media: local }],
+    },
+  ];
+  assert.equal(
+    freshCoverCandidates([local, alias, editorialMedia[1]], recent).length,
+    1,
+  );
+  assert.equal(
+    freshCoverCandidates([local], [{ ...recent[0], status: "draft" }]).length,
+    1,
+  );
+  assert.equal(freshCoverCandidates([local], recent, 0).length, 1);
+  const stored = {
+    ...local,
+    id: "commons-123",
+    src: "https://storage.example/journal/2026-11-16-commons-123.jpg",
+  };
+  assert.equal(
+    freshCoverCandidates(
+      [stored],
+      [{ image: stored.src, published_at: "2026-11-16" }],
+    ).length,
+    0,
+  );
+});
+test("visual writing receives actual labeled photographs, not just filenames", () => {
+  const input = coverVisualInput("Choose a subject-relevant cover", [
+    editorialMedia[0],
+  ]);
+  assert.equal(
+    input[0].content.filter((c) => c.type === "input_image").length,
+    1,
+  );
+  assert.ok(
+    JSON.stringify(input).includes(
+      "https://www.lopessignature.com.br/images/journal/",
     ),
   );
 });

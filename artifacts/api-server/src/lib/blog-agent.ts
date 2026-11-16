@@ -3,6 +3,8 @@ import {
   discoverEditorialMedia,
   storeEditorialMedia,
   imageProvenance,
+  freshCoverCandidates,
+  coverVisualInput,
   type EditorialMedia,
 } from "./editorial-media.js";
 import { timingSafeEqual } from "node:crypto";
@@ -334,7 +336,9 @@ export async function generateBlog(
   try {
     const existing = await client
       .from("blog_posts")
-      .select("id,title,summary,slug,category")
+      .select(
+        "id,title,summary,slug,category,image,sources,published,status,published_at,created_at",
+      )
       .order("created_at", { ascending: false })
       .limit(100);
     if (existing.error)
@@ -357,7 +361,7 @@ export async function generateBlog(
     stage = "seleção da pauta";
     const selection = await request({
       instructions: policy,
-      input: `Selecione a melhor pauta, com critério de relevância local, novidade, utilidade, qualidade das fontes e variedade diante do histórico. Rejeite propaganda de empresas e títulos genéricos. Retorne approved=false se nenhuma merecer publicação. score de 0 a 100, mínimo 80. category deve ser uma destas editorias: ${JSON.stringify(editorialCategories)}. angle deve explicar como apurar e o que o leitor aprenderá. imageQuery deve ser uma busca de fotografia contextual de Goiânia (ex.: Parque Flamboyant), sem nomes de empreendimentos. Radar (dados): ${radarText}. Histórico (dados): ${history}`,
+      input: `Selecione a melhor pauta, com critério de relevância local, novidade, utilidade, qualidade das fontes e variedade diante do histórico. Rejeite propaganda de empresas e títulos genéricos. Retorne approved=false se nenhuma merecer publicação. score de 0 a 100, mínimo 80. category deve ser uma destas editorias: ${JSON.stringify(editorialCategories)}. angle deve explicar como apurar e o que o leitor aprenderá. imageQuery deve ser uma busca curta e específica do assunto visual em Wikimedia Commons, preferencialmente em inglês para temas conceituais. Para geografia, use o lugar exato em português. Patrimônio e tributação pedem documentos, chaves, avaliação ou arquitetura residencial; urbanismo pede malha urbana, vista aérea ou desenho urbano; parques pedem o parque correspondente. Não use uma paisagem de parque como ilustração genérica de qualquer assunto. Sem nomes de empreendimentos. Radar (dados): ${radarText}. Histórico (dados): ${history}`,
       text: jsonSchema("editorial_pitch", {
         approved: { type: "boolean" },
         title: { type: "string" },
@@ -392,13 +396,21 @@ export async function generateBlog(
         "Apuração sem referências independentes e fonte primária suficientes.",
       );
     stage = "seleção de imagens";
-    const candidates = await discover(pitch.imageQuery);
+    const candidates = freshCoverCandidates(
+      await discover(pitch.imageQuery),
+      existing.data || [],
+    ).slice(0, 6);
     if (!candidates.length)
-      throw new Error("Não há imagem licenciada adequada à pauta.");
+      throw new Error(
+        "Não há capa inédita entre as últimas 12 publicações e licenciada adequada à pauta.",
+      );
     stage = "redação e SEO";
     const writing = await request({
       instructions: policy,
-      input: `Produza um artigo original de 750 a 1100 palavras, a partir apenas do dossiê. Comece com uma abertura concreta de Goiânia e desenvolva a análise em 4 a 6 seções ##. Dê respostas específicas e diferencie fatos de análise. Não repita título, não use H1/HTML nem imagens Markdown nesta etapa. Links de fontes nas afirmações respectivas; sourceUrls contém as URLs exatas usadas, mínimo três e uma institucional. Insira um ou dois links internos úteis apenas entre /imoveis, /journal, /sobre e /contato; não invente outros. Não cite lançamentos, imobiliárias ou corretores. category: ${pitch.category}. SEO title até 70 e description entre 60 e 180 caracteres. imageId identifica uma capa do acervo, inlineImageId uma segunda imagem pertinente e diferente ou string vazia quando não ajudar a leitura. keywords: 3 a 6 termos específicos, não repetir artificialmente no texto. Se não sustentar a qualidade, approved=false. Pauta: ${JSON.stringify(pitch)}. Dossiê (dados): ${dossier}. Fontes (dados): ${JSON.stringify(sources)}. Acervo com licenças (dados): ${JSON.stringify(candidates)}.`,
+      input: coverVisualInput(
+        `Produza um artigo original de 750 a 1100 palavras, a partir apenas do dossiê. Comece com uma abertura concreta de Goiânia e desenvolva a análise em 4 a 6 seções ##. Dê respostas específicas e diferencie fatos de análise. Não repita título, não use H1/HTML nem imagens Markdown nesta etapa. Links de fontes nas afirmações respectivas; sourceUrls contém as URLs exatas usadas, mínimo três e uma institucional. Insira um ou dois links internos úteis apenas entre /imoveis, /journal, /sobre e /contato; não invente outros. Não cite lançamentos, imobiliárias ou corretores. category: ${pitch.category}. SEO title até 70 e description entre 60 e 180 caracteres. Examine as fotografias anexadas como diretor de arte: escolha uma capa que traduza o fato central, com boa composição horizontal, e não apenas uma imagem bonita da cidade. Se nenhuma corresponder ao assunto, approved=false. Nunca atribua a Goiânia uma foto de outro lugar; imagens conceituais devem ser descritas como tal. imageId identifica uma capa do acervo, inlineImageId uma segunda imagem pertinente e diferente ou string vazia quando não ajudar a leitura. keywords: 3 a 6 termos específicos, não repetir artificialmente no texto. Se não sustentar a qualidade, approved=false. Pauta: ${JSON.stringify(pitch)}. Dossiê (dados): ${dossier}. Fontes (dados): ${JSON.stringify(sources)}. Acervo com licenças (dados): ${JSON.stringify(candidates)}.`,
+        candidates,
+      ),
       text: {
         format: {
           type: "json_schema",
@@ -425,7 +437,10 @@ export async function generateBlog(
       instructions: policy,
       tools: [{ type: "web_search" }],
       tool_choice: "required",
-      input: `Abra e confira diretamente as fontes originais via pesquisa web; não confie apenas no dossiê gerado. Em legislação, confira o texto sancionado e vetos, distinguindo proposta, aprovação e vigência. Não aceite benefícios tributários presentes só em projetos anteriores. Rejeite qualquer afirmação sem suporte ou superada pelo documento primário mais recente; não dê nota alta pela simples presença de links. Revise como editor independente: sustente cada número, data, preço e afirmação factual no dossiê, sem aceitar mera plausibilidade. Rejeite falta de fonte primária, propaganda, lançamento de terceiro, conteúdo sobre corretores/imobiliárias, texto genérico, título inflado, repetição de pauta e fotografia que não corresponda ao assunto. Diferencie dado antigo e novidade, proposta e obra entregue, análise e fato. Avalie nota qualityScore (0-100), originalidade, clareza, valor local e utilidade; mínimo 85. companyPromotion deve ser false. imageRelevant só é true se a legenda factual da capa for pertinente e não simular registro atual do fato. luxuryFit avalia interesse do leitor de alto padrão, não se o texto repete R$ 2 milhões. primarySourceUrl deve ser uma URL institucional efetivamente usada. As únicas URLs elegíveis para esse campo são: ${JSON.stringify(used.filter((s) => isPrimarySource(s.url)).map((s) => s.url))}. AutImob e outros veículos nunca são elegíveis como fonte primária, mesmo quando entrevistam diretamente uma empresa. Se a fonte institucional não sustenta o fato central, rejeite; não aprove apenas por uma referência de contexto. Artigo (dados): ${JSON.stringify(article)}. Dossiê: ${dossier}. Fontes: ${JSON.stringify(used)}. Capa: ${JSON.stringify(cover)}. Foto interna: ${JSON.stringify(inline)}. Histórico: ${history}`,
+      input: coverVisualInput(
+        `Abra e confira diretamente as fontes originais via pesquisa web; não confie apenas no dossiê gerado. Em legislação, confira o texto sancionado e vetos, distinguindo proposta, aprovação e vigência. Não aceite benefícios tributários presentes só em projetos anteriores. Rejeite qualquer afirmação sem suporte ou superada pelo documento primário mais recente; não dê nota alta pela simples presença de links. Revise como editor independente: sustente cada número, data, preço e afirmação factual no dossiê, sem aceitar mera plausibilidade. Rejeite falta de fonte primária, propaganda, lançamento de terceiro, conteúdo sobre corretores/imobiliárias, texto genérico, título inflado, repetição de pauta e fotografia que não corresponda ao assunto. Diferencie dado antigo e novidade, proposta e obra entregue, análise e fato. Avalie nota qualityScore (0-100), originalidade, clareza, valor local e utilidade; mínimo 85. companyPromotion deve ser false. imageRelevant só é true se a legenda factual da capa for pertinente e não simular registro atual do fato. luxuryFit avalia interesse do leitor de alto padrão, não se o texto repete R$ 2 milhões. primarySourceUrl deve ser uma URL institucional efetivamente usada. As únicas URLs elegíveis para esse campo são: ${JSON.stringify(used.filter((s) => isPrimarySource(s.url)).map((s) => s.url))}. AutImob e outros veículos nunca são elegíveis como fonte primária, mesmo quando entrevistam diretamente uma empresa. Se a fonte institucional não sustenta o fato central, rejeite; não aprove apenas por uma referência de contexto. Artigo (dados): ${JSON.stringify(article)}. Dossiê: ${dossier}. Fontes: ${JSON.stringify(used)}. Capa: ${JSON.stringify(cover)}. Foto interna: ${JSON.stringify(inline)}. Histórico: ${history}`,
+        [cover],
+      ),
       text: jsonSchema("editorial_review", {
         approved: { type: "boolean" },
         reason: { type: "string" },
@@ -479,7 +494,7 @@ export async function generateBlog(
       kind: "editorial",
       title: "Registro editorial Signature",
       url: "https://lopessignature.com.br/journal/" + slug,
-      pipelineVersion: 2,
+      pipelineVersion: 3,
       selectedAngle: pitch.angle,
       pitchScore: pitch.score,
       qualityScore: verdict.qualityScore,

@@ -51,3 +51,9 @@ A rota administrativa `POST /api/admin/blog/preview` testa as cinco chamadas rea
 Testes cobrem acesso, idempotência, bloqueio editorial, licenças/hosts de mídia, prévia sem gravação, ordenação da capa, paginação e HTML/SEO. Fotografias foram verificadas por metadados de licença e origem. Evidência visual local está em `.impeccable/review/journal-20261107`.
 
 O acervo de90 matérias usado para testar uma página intermediária é uma fixture local, não conteúdo público. O navegador integrado não aplicou o override de viewport; para390px usou-se iframe real de390px, medido sem transbordamento, e capturas do quadro. A revisão independente aprovou a galeria e a correção de paginação no escopo inspecionado; não certificou o backend nem a região inferior do artigo em celular.
+
+## Atualização de capas — 16/11/2026
+
+O histórico passou a incluir a identidade e a origem das capas. A operação exclui as imagens usadas nas últimas 12 publicações, comparando também cópias locais, arquivos no Storage e a origem Commons para evitar que um novo endereço burle o bloqueio. A busca aceita conceitos relacionados à pauta em vez de acrescentar Goiânia obrigatoriamente. As opções incluem descrição factual do arquivo, não só seu nome. A redação recebe até seis fotografias reais como entrada visual; a revisão recebe também a capa escolhida. A pertinência ao fato central e a composição horizontal são critérios explícitos. Sem candidata nova e adequada, a operação registra falha em vez de repetir uma capa.
+
+As capas repetidas de 12 e 16 de novembro foram substituídas por uma imagem de satélite de Goiânia (INPE/CC BY-SA 2.0) e uma fotografia conceitual de patrimônio imobiliário (advokatsmart.no/CC BY 2.0), respectivamente, com créditos próprios. Títulos, textos e datas de publicação foram preservados. As duas fotografias estão no acervo para reutilização futura fora da janela de repetição.
