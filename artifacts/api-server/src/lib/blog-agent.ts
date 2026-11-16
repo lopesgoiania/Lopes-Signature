@@ -425,24 +425,38 @@ export async function generateBlog(
     if (!plan.categories.includes(pitch.category))
       throw new Error("A pauta não atende à editoria planejada desta edição.");
     stage = "apuração";
-    const evidence = await request({
+    let evidence = await request({
       instructions: policy,
-      input: `Apure especificamente esta pauta: ${JSON.stringify(pitch)}. Pesquise os documentos primários e confirme os principais fatos em veículos diferentes. Busque pelo menos três referências de dois domínios e uma fonte primária institucional. Produza um dossiê com fatos, URL exata, data de publicação, período dos dados, limites e divergências. Não use informação sem origem. Se a pauta não se sustentar, declare a insuficiência. Data de hoje: ${key}.`,
+      input: `Apure especificamente esta pauta: ${JSON.stringify(pitch)}. Pesquise os documentos primários e confirme os principais fatos em veículos diferentes. Busque pelo menos três referências de dois domínios e uma fonte primária institucional. Produza um dossiê com fatos, URL exata, data de publicação, período dos dados, limites e divergências. Não use informação sem origem. Se a pauta não se sustentar, declare a insuficiência. Referências encontradas no radar, para abrir e conferir (dados): ${JSON.stringify(researchSources(radar))}. Data de hoje: ${key}.`,
       tools: [{ type: "web_search" }],
       tool_choice: "required",
       max_output_tokens: 4500,
     });
-    const dossier = responseText(evidence),
+    let dossier = responseText(evidence),
       sources = researchSources(evidence).slice(0, 20);
-    if (
-      sources.length < 3 ||
-      new Set(sources.map((s) => new URL(s.url).hostname.replace(/^www\./, "")))
-        .size < 2 ||
-      !sources.some((s) => isPrimarySource(s.url))
-    )
-      throw new Error(
-        "Apuração sem referências independentes e fonte primária suficientes.",
-      );
+    const sufficientEvidence = () =>
+      sources.length >= 3 &&
+      new Set(sources.map((s) => new URL(s.url).hostname.replace(/^www\./, ""))).size >= 2 &&
+      sources.some((s) => isPrimarySource(s.url));
+    if (!sufficientEvidence()) {
+      // A single search can stop after one useful result. Give research one
+      // bounded follow-up, retaining cited evidence rather than inventing URLs.
+      evidence = await request({
+        instructions: policy,
+        input: `Complete a apuração, sem redigir o artigo. Pauta: ${JSON.stringify(pitch)}. Evidência já encontrada (dados): ${dossier}. URLs já verificadas: ${JSON.stringify(sources)}. Ainda precisamos de três fontes citadas de pelo menos dois domínios, incluindo pesquisa original ou instituição responsável pelo fato central. Abra documentos relevantes, confronte os achados e cite explicitamente as páginas consultadas no resultado. Não substitua lacunas por inferências. Indique limites e datas. Referências do radar para conferir: ${JSON.stringify(researchSources(radar))}.`,
+        tools: [{ type: "web_search" }],
+        tool_choice: "required",
+        max_output_tokens: 4500,
+      });
+      dossier += "\n\nApuração complementar:\n" + responseText(evidence);
+      sources = [...new Map([...sources, ...researchSources(evidence)].map((s) => [s.url, s])).values()].slice(0, 30);
+    }
+    if (options.preview) {
+      diagnostics.dossier = dossier;
+      diagnostics.researchedSources = sources;
+    }
+    if (!sufficientEvidence())
+      throw new Error("Apuração sem referências independentes e fonte primária suficientes.");
     stage = "seleção de imagens";
     const candidates = freshCoverCandidates(
       await discover(pitch.imageQuery),
@@ -511,7 +525,7 @@ export async function generateBlog(
       tools: [{ type: "web_search" }],
       tool_choice: "required",
       input: coverVisualInput(
-        `Marque requiresHumanReview=true para conteúdo jurídico, tributário ou financeiro sensível e explique riskReason. A aprovação editorial não substitui revisão humana especializada. Julgue também a força estética: rejeite clichês, martelos, miniaturas, chaves, mapas técnicos e imagens de satélite. Abra e confira diretamente as fontes originais via pesquisa web; não confie apenas no dossiê gerado. Em legislação, confira o texto sancionado e vetos, distinguindo proposta, aprovação e vigência. Não aceite benefícios tributários presentes só em projetos anteriores. Rejeite qualquer afirmação sem suporte ou superada pelo documento primário mais recente; não dê nota alta pela simples presença de links. Revise como editor independente: sustente cada número, data, preço e afirmação factual no dossiê, sem aceitar mera plausibilidade. Rejeite falta de fonte primária, propaganda, lançamento de terceiro, conteúdo sobre corretores/imobiliárias, texto genérico, título inflado, repetição de pauta e fotografia que não corresponda ao assunto. Diferencie dado antigo e novidade, proposta e obra entregue, análise e fato. Avalie nota qualityScore (0-100), originalidade, clareza, valor local e utilidade; mínimo 85. companyPromotion deve ser false. imageRelevant só é true se a legenda factual da capa for pertinente e não simular registro atual do fato. luxuryFit avalia interesse do leitor de alto padrão, não se o texto repete R$ 2 milhões. primarySourceUrl deve ser uma URL institucional efetivamente usada. As únicas URLs elegíveis para esse campo são: ${JSON.stringify(used.filter((s) => isPrimarySource(s.url)).map((s) => s.url))}. AutImob e outros veículos nunca são elegíveis como fonte primária, mesmo quando entrevistam diretamente uma empresa. Se a fonte institucional não sustenta o fato central, rejeite; não aprove apenas por uma referência de contexto. Artigo (dados): ${JSON.stringify(article)}. Dossiê: ${dossier}. Fontes: ${JSON.stringify(used)}. Capa: ${JSON.stringify(cover)}. Foto interna: ${JSON.stringify(inline)}. Histórico: ${history}`,
+        `Você está avaliando um artigo JÁ ESCRITO: o campo content do objeto Artigo abaixo é o texto narrativo final em Markdown; title, summary, seoTitle e seoDescription são seus campos de publicação. Não solicite que o artigo seja produzido nem avalie apenas o dossiê. Leia integralmente content e dê um veredicto sobre esse texto concreto, apontando trechos e afirmações específicas se reprovar. Marque requiresHumanReview=true para conteúdo jurídico, tributário ou financeiro sensível e explique riskReason. A aprovação editorial não substitui revisão humana especializada. Julgue também a força estética: rejeite clichês, martelos, miniaturas, chaves, mapas técnicos e imagens de satélite. Abra e confira diretamente as fontes originais via pesquisa web; não confie apenas no dossiê gerado. Em legislação, confira o texto sancionado e vetos, distinguindo proposta, aprovação e vigência. Não aceite benefícios tributários presentes só em projetos anteriores. Rejeite qualquer afirmação sem suporte ou superada pelo documento primário mais recente; não dê nota alta pela simples presença de links. Revise como editor independente: sustente cada número, data, preço e afirmação factual no dossiê, sem aceitar mera plausibilidade. Rejeite falta de fonte primária, propaganda, lançamento de terceiro, conteúdo sobre corretores/imobiliárias, texto genérico, título inflado, repetição de pauta e fotografia que não corresponda ao assunto. Diferencie dado antigo e novidade, proposta e obra entregue, análise e fato. Avalie nota qualityScore (0-100), originalidade, clareza, valor local e utilidade; mínimo 85. companyPromotion deve ser false. imageRelevant só é true se a legenda factual da capa for pertinente e não simular registro atual do fato. luxuryFit avalia interesse do leitor de alto padrão, não se o texto repete R$ 2 milhões. primarySourceUrl deve ser uma URL institucional efetivamente usada. As únicas URLs elegíveis para esse campo são: ${JSON.stringify(used.filter((s) => isPrimarySource(s.url)).map((s) => s.url))}. AutImob e outros veículos nunca são elegíveis como fonte primária, mesmo quando entrevistam diretamente uma empresa. Se a fonte institucional não sustenta o fato central, rejeite; não aprove apenas por uma referência de contexto. Artigo (dados): ${JSON.stringify(article)}. Dossiê: ${dossier}. Fontes: ${JSON.stringify(used)}. Capa: ${JSON.stringify(cover)}. Foto interna: ${JSON.stringify(inline)}. Histórico: ${history}`,
         [cover],
       ),
       text: jsonSchema("editorial_review", {
