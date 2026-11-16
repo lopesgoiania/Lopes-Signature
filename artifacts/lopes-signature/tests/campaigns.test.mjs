@@ -29,14 +29,15 @@ test('country detection uses the browser IP and falls back on IPAPI rate limits'
   assert.deepEqual(calls, ['https://ipapi.co/country/', '/api/visitor-country']);
 });
 
-for (const {slug, propertyId, focusKeywords} of manifest) {
+for (const {slug, propertyId, focusKeywords, leadMode} of manifest) {
   test(`${slug}: exported page is indexable, self-contained and scoped to its product`, async () => {
     const html = await readFile(path.join(root, 'dist', `${slug}.html`), 'utf8');
     assert.ok(html.includes(`<base href="/campanhas/${slug}/">`));
     assert.ok(html.includes(`rel="canonical" href="https://www.lopessignature.com.br/${slug}"`));
     assert.match(html, /name="robots" content="index,follow/);
     assert.doesNotMatch(html, /noindex|Prévia|prévia|captação inativa|href="#/);
-    assert.ok(html.includes('name="100bug_id_lanc" value="' + launchIds[propertyId] + '"'));
+    if (leadMode === 'general') assert.ok(!html.includes('name="100bug_id_lanc"'));
+    else assert.ok(html.includes('name="100bug_id_lanc" value="' + launchIds[propertyId] + '"'));
     assert.ok(html.includes('src="/signature-tracking.js"'));
     assert.equal((html.match(/<h1\b/g) || []).length, 1);
     const seoTitle = html.match(/<title>(.*?)<\/title>/s)?.[1];
@@ -58,7 +59,7 @@ for (const {slug, propertyId, focusKeywords} of manifest) {
       await access(path.resolve(root, 'public/campanhas', slug, value));
     }
     const payload = campaignLead({name:'Teste',email:'teste@example.com',phone:'+5562999999999'}, slug, '?utm_campaign=city&gclid=click&secret=discard');
-    assert.equal(payload.propertyId, propertyId);
+    assert.equal(payload.propertyId, leadMode === "general" ? "" : propertyId);
     assert.equal(payload.phone, '+5562999999999');
     assert.match(payload.note, /utm_campaign: city/);
     assert.match(payload.note, /gclid: click/);
@@ -109,8 +110,8 @@ test('public galleries contain exactly the campaign products with unique cards',
   const fixtures = [...new Set(manifest.map(c => c.propertyId))].map(id => ({id,title:id,images:[],area:10}));
   const legacy = {id:'unfocused-product',title:'Other product'};
   const cards = campaignCatalog([...fixtures,legacy]);
-  assert.equal(cards.length,8);
-  assert.equal(new Set(cards.map(c=>c.id)).size,8);
+  assert.equal(cards.length,manifest.length);
+  assert.equal(new Set(cards.map(c=>c.id)).size,manifest.length);
   assert.equal(cards.find(c=>c.landingPath==='/royal-city-park').id,'city-park-royal');
   assert.deepEqual(cards.map(c=>c.landingPath),manifest.map(c=>`/${c.slug}`));
   assert.ok(!cards.some(c=>c.id===legacy.id));
@@ -128,11 +129,23 @@ test('commercial and residential leads share the real record but retain their di
     assert.match(payload.note,/Interesse: Lote/);
   }
 });
-test('home and catalog exports expose only the eight campaign cards',async()=>{
+test('home and catalog exports expose only the campaign cards',async()=>{
   for (const page of ['index.html','imoveis.html']) {
     const html=await readFile(path.join(root,'dist',page),'utf8');
-    assert.equal((html.match(/data-testid="card-property-/g)||[]).length,8);
+    assert.equal((html.match(/data-testid="card-property-/g)||[]).length,manifest.length);
     assert.doesNotMatch(html,/data-testid="card-property-(?:epic-city-home|atmos-city-design|blanc-casa-design)"/);
     for (const campaign of manifest) assert.ok(html.includes(`href="/${campaign.slug}"`));
   }
+});
+
+test('Raro is visible without a historical record and uses identified general contact',async()=>{
+  const {campaignCatalog}=await import('../.server/entry-server.js');
+  const cards=campaignCatalog([]);
+  assert.equal(cards.length,1);
+  assert.equal(cards[0].title,'Raro Vaca Brava');
+  assert.equal(cards[0].area,296.61);
+  const payload=campaignLead(contact,'raro-vaca-brava','?utm_campaign=raro');
+  assert.equal(payload.propertyId,'');
+  assert.equal(payload.source,'pagina-contato');
+  assert.match(payload.note,/Empreendimento de interesse: Raro Vaca Brava/);
 });

@@ -1,25 +1,37 @@
 [
   {
     "slug": "city-park-majestic",
-    "focusKeywords": ["City Park Majestic", "apartamentos de 274 m² no Setor Bueno"],
+    "focusKeywords": [
+      "City Park Majestic",
+      "apartamentos de 274 m² no Setor Bueno"
+    ],
     "title": "City Park Majestic",
     "propertyId": "city-park-majestic"
   },
   {
     "slug": "royal-city-park",
-    "focusKeywords": ["Royal City Park", "apartamentos com piscina privativa no Vaca Brava"],
+    "focusKeywords": [
+      "Royal City Park",
+      "apartamentos com piscina privativa no Vaca Brava"
+    ],
     "title": "Royal City Park",
     "propertyId": "city-park-royal"
   },
   {
     "slug": "city-park-palace",
-    "focusKeywords": ["City Park Palace", "apartamentos na orla do Vaca Brava"],
+    "focusKeywords": [
+      "City Park Palace",
+      "apartamentos na orla do Vaca Brava"
+    ],
     "title": "City Park Palace",
     "propertyId": "city-park-palace"
   },
   {
     "slug": "citage-sante-comercial",
-    "focusKeywords": ["Citàge Santé Comercial", "lotes comerciais na GO-020"],
+    "focusKeywords": [
+      "Citàge Santé Comercial",
+      "lotes comerciais na GO-020"
+    ],
     "title": "Citàge Santé Comercial",
     "propertyId": "citage-sante",
     "card": {
@@ -36,7 +48,10 @@
   },
   {
     "slug": "legacy-city-home",
-    "focusKeywords": ["Legacy City Home", "apartamentos de 3 e 4 suítes no Setor Marista"],
+    "focusKeywords": [
+      "Legacy City Home",
+      "apartamentos de 3 e 4 suítes no Setor Marista"
+    ],
     "title": "Legacy City Home",
     "propertyId": "legacy-city-home",
     "card": {
@@ -52,7 +67,10 @@
   },
   {
     "slug": "citage-sante-residencial",
-    "focusKeywords": ["Citàge Santé Residencial", "lotes residenciais na GO-020"],
+    "focusKeywords": [
+      "Citàge Santé Residencial",
+      "lotes residenciais na GO-020"
+    ],
     "title": "Citàge Santé Residencial",
     "propertyId": "citage-sante",
     "card": {
@@ -69,7 +87,10 @@
   },
   {
     "slug": "city-way",
-    "focusKeywords": ["City Way", "studios no Setor Bueno"],
+    "focusKeywords": [
+      "City Way",
+      "studios no Setor Bueno"
+    ],
     "title": "City Way",
     "propertyId": "city-way",
     "card": {
@@ -85,7 +106,10 @@
   },
   {
     "slug": "city-23-by-pininfarina",
-    "focusKeywords": ["City 23 by Pininfarina", "apartamentos em frente à Praça T-23"],
+    "focusKeywords": [
+      "City 23 by Pininfarina",
+      "apartamentos em frente à Praça T-23"
+    ],
     "title": "City 23 by Pininfarina",
     "propertyId": "city-23",
     "card": {
@@ -96,6 +120,32 @@
         "/campanhas/city-23-by-pininfarina/assets/fachada.webp"
       ],
       "parking": 0
+    }
+  },
+  {
+    "slug": "raro-vaca-brava",
+    "title": "Raro Vaca Brava",
+    "propertyId": "raro-vaca-brava",
+    "standalone": true,
+    "leadMode": "general",
+    "focusKeywords": [
+      "Raro Vaca Brava",
+      "apartamentos no Setor Bueno"
+    ],
+    "card": {
+      "area": 296.61,
+      "price": 3114405,
+      "suites": 3,
+      "parking": 3,
+      "images": [
+        "/campanhas/raro-vaca-brava/assets/facade.webp"
+      ],
+      "category": "Apartamentos",
+      "city": "Goiânia",
+      "location": "Goiânia",
+      "neighborhood": "Setor Bueno",
+      "condition": "",
+      "delivery": ""
     }
   }
 ]

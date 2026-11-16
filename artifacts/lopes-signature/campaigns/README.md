@@ -26,3 +26,9 @@ O manifesto contém oito páginas. As galerias da home e do catálogo usam `camp
 As páginas adicionadas são Citàge Santé Comercial, Citàge Santé Residencial, Legacy City Home, City Way e City 23 by Pininfarina, importadas de `site/dist` nas respectivas pastas em `Projeto-Sites-Lopes/empreendimentos`, sem modificar os originais. As duas campanhas Citàge têm cards próprios e apontam ao cadastro real `citage-sante`; observações de contato registram a campanha e o interesse separadamente. City 23 corresponde ao cadastro `city-23`.
 
 Os valores e características em `card` reproduzem a unidade de referência apresentada na landing page, sem modificar o cadastro geral nem combinar ofertas de unidades distintas. Atualize os dois em conjunto quando houver nova tabela comercial.
+
+## Raro Vaca Brava — novembro de 2026
+
+Página importada de `RARO VACA BRAVA/site/public`, preservando o projeto original. Publicação em `/raro-vaca-brava`, com plantas e valores aprovados nos materiais de origem de 09/11/2026. O card usa a unidade 600 (296,61 m², 3 suítes, 3 vagas, R$ 3.114.405).
+
+Não existe cadastro público nem código 100Bug verificado para este produto. O manifesto marca `standalone: true` para gerar o card sem inventar um registro de banco e `leadMode: general` para usar o fluxo existente de atendimento geral. O contato preserva empreendimento, unidade, URL e campanha na observação. Não utiliza o código de outro empreendimento, e o backend mantém sua validação normal e a confirmação de encaminhamento ao CRM. O vínculo específico ao Raro depende do cadastro e do código correto; não foi fabricado um ID.

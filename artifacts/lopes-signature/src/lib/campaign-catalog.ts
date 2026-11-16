@@ -3,7 +3,10 @@ import campaigns from "../../campaigns/manifest.json";
 /** Curate public galleries without deleting historical catalog records. */
 export function campaignCatalog(properties: any[]): any[] {
   return campaigns.flatMap((campaign) => {
-    const property = properties.find((p) => p.id === campaign.propertyId);
+    const property = properties.find((p) => p.id === campaign.propertyId) ||
+      ("standalone" in campaign && campaign.standalone
+        ? { id: campaign.propertyId, title: campaign.title, ...campaign.card }
+        : undefined);
     if (!property) return [];
     return [
       {

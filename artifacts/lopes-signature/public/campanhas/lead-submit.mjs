@@ -8,6 +8,8 @@ const properties = Object.freeze({
   'legacy-city-home': 'legacy-city-home',
   'city-way': 'city-way',
   'city-23-by-pininfarina': 'city-23',
+  // No verified Raro launch ID yet: use the existing general contact flow.
+  'raro-vaca-brava': '',
 });
 const campaignFields = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_id', 'utm_term', 'utm_content', 'gclid', 'gbraid', 'wbraid', 'fbclid', 'msclkid'];
 const pending = new WeakSet();
@@ -20,8 +22,10 @@ export function campaignLead(payload, slug, search = globalThis.location?.search
   return {
     name: payload.name, email: payload.email, phone: payload.phone || payload.phone_e164,
     propertyId: properties[slug],
+    ...(slug === "raro-vaca-brava" ? { source: "pagina-contato" } : {}),
     note: [
       `Landing page: /${slug}`,
+      slug === "raro-vaca-brava" ? "Empreendimento de interesse: Raro Vaca Brava" : "",
       `País do telefone: ${payload.country || payload.phone_country || ''}`,
       payload.plan ? `Planta: ${payload.plan}` : '',
       payload.interest ? `Interesse: ${payload.interest}` : '',

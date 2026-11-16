@@ -5,7 +5,7 @@ export async function campaignPages(root, dist, origin, footer) {
   const manifest = JSON.parse(await readFile(path.join(root, 'campaigns/manifest.json'), 'utf8'));
   const launchIds = JSON.parse(await readFile(path.join(root, '../api-server/src/lib/signature-launches.json'), 'utf8'));
   const routes = [];
-  for (const { slug, propertyId, card } of manifest) {
+  for (const { slug, propertyId, card, leadMode } of manifest) {
     const route = `/${slug}`;
     const url = new URL(route, origin).href;
     const image = new URL(card?.images?.[0] || `/campanhas/${slug}/assets/fachada.webp`, origin).href;
@@ -18,8 +18,8 @@ export async function campaignPages(root, dist, origin, footer) {
       .replace(/href="#privacidade"/g, 'href="/politica-de-privacidade"')
       .replace('</head>', '<link rel="stylesheet" href="/signature-footer.css"><script defer src="/signature-footer-year.js"></script></head>');
     const id = launchIds[propertyId];
-    if (!id) throw new Error('Lançamento sem código 100Bug: ' + slug);
-    html = html.replace(/<form[^>]*id="lead-form"[^>]*>/, form => form + '<input type="hidden" name="100bug_id_lanc" value="' + id + '">')
+    if (!id && leadMode !== 'general') throw new Error('Lançamento sem código 100Bug: ' + slug);
+    html = html.replace(/<form[^>]*id="lead-form"[^>]*>/, form => id ? form + '<input type="hidden" name="100bug_id_lanc" value="' + id + '">' : form)
       .replace('</head>', '<script defer src="/signature-tracking.js"></script></head>');
     const title = html.match(/<title>(.*?)<\/title>/s)[1];
     const description = html.match(/<meta name="description" content="([^"]*)"/)[1];
