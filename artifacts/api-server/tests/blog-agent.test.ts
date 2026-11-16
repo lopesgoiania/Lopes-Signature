@@ -596,3 +596,37 @@ test("official gov.br and original international research are eligible without a
   assert.equal(isPrimarySource("https://wallpaper.com/architecture/residential/example"), false);
   assert.equal(isPrimarySource("https://ncbi.nlm.nih.gov.example.com/paper"), false);
 });
+
+test("one correction requires a second full review and cannot publish a rejected revision", async () =>
+  configured(async () => {
+    for (const approveRevision of [true, false]) {
+      const db = fakeClient();
+      const verdict = {
+        approved: false, luxuryFit: true, reason: "Qualifique a aplicação do estudo ao contexto residencial.",
+        primarySourceUrl: sources[0].url, qualityScore: 80,
+        companyPromotion: false, imageRelevant: true,
+      };
+      const responses = [
+        completed("Radar"),
+        completed(JSON.stringify({ approved: true, title: article().title,
+          angle: "Critérios de conforto e materialidade para comparar espaços residenciais com rigor.",
+          category: "Arquitetura & Design", score: 90, companyPromotion: false, imageQuery: "interiors" })),
+        completed("Dossiê", sources.map((s) => ({ ...s, type: "url_citation" }))),
+        completed(JSON.stringify(article())), completed(JSON.stringify(verdict)),
+        completed(JSON.stringify(article())),
+        completed(JSON.stringify({ ...verdict, approved: approveRevision,
+          qualityScore: approveRevision ? 90 : 80 })),
+      ];
+      let calls = 0;
+      const request = async (payload: any) => {
+        if (calls === 5) assert.match(payload.input[0].content[0].text, /REVISÃO SOLICITADA/);
+        return responses[calls++];
+      };
+      const run = () => generateBlog(db as any, request, async () => "requested",
+        async () => editorialMedia, async (image) => image);
+      if (approveRevision) assert.equal((await run()).status, "published");
+      else await assert.rejects(run(), /Revisão bloqueou/);
+      assert.equal(calls, 7);
+      assert.equal(db.writes.filter((w) => w.table === "blog_posts").length, approveRevision ? 1 : 0);
+    }
+  }));

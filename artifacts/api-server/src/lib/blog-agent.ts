@@ -381,6 +381,7 @@ export async function generateBlog(
         "O artigo de hoje já foi gerado ou a operação editorial está em andamento.",
     };
   const runId = claim.data;
+  const startedAt = Date.now();
   let stage = "pesquisa";
   const diagnostics: Record<string, any> = {};
   try {
@@ -483,93 +484,102 @@ export async function generateBlog(
       throw new Error(
         "Não há capa inédita entre as últimas 12 publicações e licenciada adequada à pauta.",
       );
-    stage = "redação e SEO";
-    const writing = await request({
-      instructions: policy,
-      input: coverVisualInput(
-        `Produza um artigo original de 550 a 1000 palavras, sem alongar artificialmente, a partir apenas do dossiê. Comece com uma abertura concreta de Goiânia e desenvolva a análise em 4 a 6 seções ##. Dê respostas específicas e diferencie fatos de análise. Não repita título, não use H1/HTML nem imagens Markdown nesta etapa. Use links Markdown explícitos [Nome da fonte](URL_EXATA_DO_DOSSIE) nas afirmações respectivas. Cite ao menos três fontes distintas do dossiê, incluindo uma primária; não deixe URLs apenas em texto solto ou notas sem link. sourceUrls contém somente as URLs efetivamente citadas. Insira um ou dois links internos úteis apenas entre /imoveis, /journal, /sobre e /contato; não invente outros. Não cite lançamentos, imobiliárias ou corretores. category: ${pitch.category}. SEO title até 70 e description entre 60 e 180 caracteres. Examine as fotografias anexadas como diretor de arte: escolha uma capa que traduza o fato central, com boa composição horizontal, e não apenas uma imagem bonita da cidade. Se nenhuma corresponder ao assunto, approved=false. Nunca atribua a Goiânia uma foto de outro lugar; imagens conceituais devem ser descritas como tal. coverRationale explica a pertinência e a qualidade estética da capa. imageId identifica uma capa do acervo, inlineImageId uma segunda imagem pertinente e diferente ou string vazia quando não ajudar a leitura. keywords: 3 a 6 termos específicos, não repetir artificialmente no texto. Se não sustentar a qualidade, approved=false. Pauta: ${JSON.stringify(pitch)}. Dossiê (dados): ${dossier}. Fontes (dados): ${JSON.stringify(sources)}. Acervo com licenças (dados): ${JSON.stringify(candidates)}.`,
-        candidates,
-      ),
-      text: {
-        format: {
-          type: "json_schema",
-          name: "signature_article",
-          strict: true,
-          schema: {
-            ...articleSchema,
-            properties: {
-              ...articleSchema.properties,
-              category: { type: "string", enum: [pitch.category] },
-              imageId: {
-                type: "string",
-                enum: ["", ...candidates.map((m) => m.id)],
-              },
-              inlineImageId: {
-                type: "string",
-                enum: ["", ...candidates.map((m) => m.id)],
+    let article: any, verdict: any;
+    let used: { title: string; url: string }[] = [];
+    let cover: EditorialMedia | undefined, inline: EditorialMedia | undefined;
+    // One editorial correction is allowed; it never skips another full review.
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const feedback = attempt === 0 ? "" :
+        `REVISÃO SOLICITADA. Reescreva o artigo para corrigir cada problema específico apontado pelo editor. Não invente fatos nem novas fontes: elimine ou qualifique o que não puder sustentar no dossiê. Reavalie a capa dentro do mesmo acervo quando necessário. A nota mínima e todas as validações permanecem. Parecer (dados): ${JSON.stringify(verdict)}. Versão anterior (dados): ${JSON.stringify(article)}.`;
+      stage = "redação e SEO";
+      const writing = await request({
+        instructions: policy,
+        input: coverVisualInput(
+          `${feedback} Produza um artigo original de 550 a 1000 palavras, sem alongar artificialmente, a partir apenas do dossiê. Comece com uma abertura concreta pertinente à pauta; conecte a Goiânia apenas quando as fontes sustentarem essa relação e desenvolva a análise em 4 a 6 seções ##. Dê respostas específicas e diferencie fatos de análise. Não repita título, não use H1/HTML nem imagens Markdown nesta etapa. Use links Markdown explícitos [Nome da fonte](URL_EXATA_DO_DOSSIE) nas afirmações respectivas. Cite ao menos três fontes distintas do dossiê, incluindo uma primária; não deixe URLs apenas em texto solto ou notas sem link. sourceUrls contém somente as URLs efetivamente citadas. Insira um ou dois links internos úteis apenas entre /imoveis, /journal, /sobre e /contato; não invente outros. Não cite lançamentos, imobiliárias ou corretores. category: ${pitch.category}. SEO title até 70 e description entre 60 e 180 caracteres. Examine as fotografias anexadas como diretor de arte: escolha uma capa que traduza o fato central, com boa composição horizontal, e não apenas uma imagem bonita da cidade. Se nenhuma corresponder ao assunto, approved=false. Nunca atribua a Goiânia uma foto de outro lugar; imagens conceituais devem ser descritas como tal. coverRationale explica a pertinência e a qualidade estética da capa. imageId identifica uma capa do acervo, inlineImageId uma segunda imagem pertinente e diferente ou string vazia quando não ajudar a leitura. keywords: 3 a 6 termos específicos, não repetir artificialmente no texto. Se não sustentar a qualidade, approved=false. Pauta: ${JSON.stringify(pitch)}. Dossiê (dados): ${dossier}. Fontes (dados): ${JSON.stringify(sources)}. Acervo com licenças (dados): ${JSON.stringify(candidates)}.`,
+          candidates,
+        ),
+        text: {
+          format: {
+            type: "json_schema",
+            name: "signature_article",
+            strict: true,
+            schema: {
+              ...articleSchema,
+              properties: {
+                ...articleSchema.properties,
+                category: { type: "string", enum: [pitch.category] },
+                imageId: {
+                  type: "string",
+                  enum: ["", ...candidates.map((m) => m.id)],
+                },
+                inlineImageId: {
+                  type: "string",
+                  enum: ["", ...candidates.map((m) => m.id)],
+                },
               },
             },
           },
         },
-      },
-      max_output_tokens: 6500,
-    });
-    const article = JSON.parse(responseText(writing));
-    const contentLinks = [
-      ...String(article.content || "").matchAll(/\]\(([^)]+)\)/g),
-    ].map((m) => sourceIdentity(m[1]));
-    // References describe what is actually cited, not an independently invented list.
-    article.sourceUrls = sources
-      .filter((s) => contentLinks.includes(sourceIdentity(s.url)))
-      .map((s) => s.url);
-    article.seoTitle = fitSeoText(article.seoTitle, 70);
-    article.seoDescription = fitSeoText(article.seoDescription, 180);
-    if (options.preview) {
-      diagnostics.draft = article;
-      diagnostics.researchedSources = sources;
-    }
-    const used = validateArticle(article, sources, existing.data || []);
-    if (used.length < 3)
-      throw new Error("O artigo não sustentou três referências de apuração.");
-    const cover = candidates.find((m) => m.id === article.imageId),
+        max_output_tokens: 6500,
+      });
+      article = JSON.parse(responseText(writing));
+      const contentLinks = [
+        ...String(article.content || "").matchAll(/\]\(([^)]+)\)/g),
+      ].map((m) => sourceIdentity(m[1]));
+      // References describe what is actually cited, not an independently invented list.
+      article.sourceUrls = sources
+        .filter((s) => contentLinks.includes(sourceIdentity(s.url)))
+        .map((s) => s.url);
+      article.seoTitle = fitSeoText(article.seoTitle, 70);
+      article.seoDescription = fitSeoText(article.seoDescription, 180);
+      if (options.preview) {
+        diagnostics.draft = article;
+        diagnostics.researchedSources = sources;
+      }
+      used = validateArticle(article, sources, existing.data || []);
+      if (used.length < 3)
+        throw new Error("O artigo não sustentou três referências de apuração.");
+      cover = candidates.find((m) => m.id === article.imageId);
       inline = candidates.find(
-        (m) => m.id === article.inlineImageId && m.id !== article.imageId,
-      );
+          (m) => m.id === article.inlineImageId && m.id !== article.imageId,
+        );
+      if (!cover) throw new Error("A capa não corresponde ao acervo licenciado.");
+      stage = "revisão editorial";
+      const review = await request({
+        instructions: policy,
+        tools: [{ type: "web_search" }],
+        tool_choice: "required",
+        input: coverVisualInput(
+          `Você está avaliando um artigo JÁ ESCRITO: o campo content do objeto Artigo abaixo é o texto narrativo final em Markdown; title, summary, seoTitle e seoDescription são seus campos de publicação. Não solicite que o artigo seja produzido nem avalie apenas o dossiê. Aplique o briefing com precisão: ensaios de arquitetura e experiência de morar podem usar pesquisas internacionais e imagens conceituais identificadas. Não exija estudo empírico especificamente sobre imóveis de luxo ou exemplos de Goiânia se o artigo não afirma resultados medidos nesses contextos; exija que limites e aplicação editorial sejam claros. Uma fotografia internacional não é inadequada só por sua origem quando a legenda informa expressamente o lugar e que não representa imóvel do catálogo; rejeite se o texto a atribuir falsamente a um lugar ou se ela não traduzir o assunto. A legenda de procedência fornecida será exibida na página. Não premie linguagem bonita acima de fatos, mas não confunda ensaio fundamentado com notícia local. Se rejeitar, reason precisa apontar afirmações textuais específicas e explicar o conflito com a fonte ou requisito concreto, para permitir correção; evite avaliações vagas sem exemplo. Leia integralmente content e dê um veredicto sobre esse texto concreto, apontando trechos e afirmações específicas se reprovar. Marque requiresHumanReview=true para conteúdo jurídico, tributário ou financeiro sensível e explique riskReason. A aprovação editorial não substitui revisão humana especializada. Julgue também a força estética: rejeite clichês, martelos, miniaturas, chaves, mapas técnicos e imagens de satélite. Abra e confira diretamente as fontes originais via pesquisa web; não confie apenas no dossiê gerado. Em legislação, confira o texto sancionado e vetos, distinguindo proposta, aprovação e vigência. Não aceite benefícios tributários presentes só em projetos anteriores. Rejeite qualquer afirmação sem suporte ou superada pelo documento primário mais recente; não dê nota alta pela simples presença de links. Revise como editor independente: sustente cada número, data, preço e afirmação factual no dossiê, sem aceitar mera plausibilidade. Rejeite falta de fonte primária, propaganda, lançamento de terceiro, conteúdo sobre corretores/imobiliárias, texto genérico, título inflado, repetição de pauta e fotografia que não corresponda ao assunto. Diferencie dado antigo e novidade, proposta e obra entregue, análise e fato. Avalie nota qualityScore (0-100), originalidade, clareza, valor local e utilidade; mínimo 85. companyPromotion deve ser false. imageRelevant só é true se a legenda factual da capa for pertinente e não simular registro atual do fato. luxuryFit avalia interesse do leitor de alto padrão, não se o texto repete R$ 2 milhões. primarySourceUrl deve ser uma URL institucional efetivamente usada. As únicas URLs elegíveis para esse campo são: ${JSON.stringify(used.filter((s) => isPrimarySource(s.url)).map((s) => s.url))}. AutImob e outros veículos nunca são elegíveis como fonte primária, mesmo quando entrevistam diretamente uma empresa. Se a fonte institucional não sustenta o fato central, rejeite; não aprove apenas por uma referência de contexto. Artigo (dados): ${JSON.stringify(article)}. Dossiê: ${dossier}. Fontes: ${JSON.stringify(used)}. Capa: ${JSON.stringify(cover)}. Foto interna: ${JSON.stringify(inline)}. Histórico: ${history}`,
+          [cover],
+        ),
+        text: jsonSchema("editorial_review", {
+          approved: { type: "boolean" },
+          reason: { type: "string" },
+          primarySourceUrl: { type: "string" },
+          luxuryFit: { type: "boolean" },
+          qualityScore: { type: "integer" },
+          companyPromotion: { type: "boolean" },
+          imageRelevant: { type: "boolean" },
+          requiresHumanReview: { type: "boolean" },
+          riskReason: { type: "string" },
+        }),
+        max_output_tokens: 1500,
+      });
+      verdict = JSON.parse(responseText(review));
+      diagnostics.review = verdict;
+      const passed = approvedReview(verdict, used) &&
+        verdict.qualityScore >= 85 && verdict.companyPromotion === false &&
+        verdict.imageRelevant === true;
+      if (passed) break;
+      const canRevise = attempt === 0 && Date.now() - startedAt < 120_000 &&
+        verdict.qualityScore >= 70 && verdict.companyPromotion === false &&
+        used.some((source) => isPrimarySource(source.url));
+      if (!canRevise)
+        throw new Error("Revisão bloqueou a publicação: " + String(verdict.reason).slice(0, 300));
+      diagnostics.initialReview = verdict;
+    }
     if (!cover) throw new Error("A capa não corresponde ao acervo licenciado.");
-    stage = "revisão editorial";
-    const review = await request({
-      instructions: policy,
-      tools: [{ type: "web_search" }],
-      tool_choice: "required",
-      input: coverVisualInput(
-        `Você está avaliando um artigo JÁ ESCRITO: o campo content do objeto Artigo abaixo é o texto narrativo final em Markdown; title, summary, seoTitle e seoDescription são seus campos de publicação. Não solicite que o artigo seja produzido nem avalie apenas o dossiê. Aplique o briefing com precisão: ensaios de arquitetura e experiência de morar podem usar pesquisas internacionais e imagens conceituais identificadas. Não exija estudo empírico especificamente sobre imóveis de luxo ou exemplos de Goiânia se o artigo não afirma resultados medidos nesses contextos; exija que limites e aplicação editorial sejam claros. Uma fotografia internacional não é inadequada só por sua origem quando a legenda informa expressamente o lugar e que não representa imóvel do catálogo; rejeite se o texto a atribuir falsamente a um lugar ou se ela não traduzir o assunto. A legenda de procedência fornecida será exibida na página. Não premie linguagem bonita acima de fatos, mas não confunda ensaio fundamentado com notícia local. Se rejeitar, reason precisa apontar afirmações textuais específicas e explicar o conflito com a fonte ou requisito concreto, para permitir correção; evite avaliações vagas sem exemplo. Leia integralmente content e dê um veredicto sobre esse texto concreto, apontando trechos e afirmações específicas se reprovar. Marque requiresHumanReview=true para conteúdo jurídico, tributário ou financeiro sensível e explique riskReason. A aprovação editorial não substitui revisão humana especializada. Julgue também a força estética: rejeite clichês, martelos, miniaturas, chaves, mapas técnicos e imagens de satélite. Abra e confira diretamente as fontes originais via pesquisa web; não confie apenas no dossiê gerado. Em legislação, confira o texto sancionado e vetos, distinguindo proposta, aprovação e vigência. Não aceite benefícios tributários presentes só em projetos anteriores. Rejeite qualquer afirmação sem suporte ou superada pelo documento primário mais recente; não dê nota alta pela simples presença de links. Revise como editor independente: sustente cada número, data, preço e afirmação factual no dossiê, sem aceitar mera plausibilidade. Rejeite falta de fonte primária, propaganda, lançamento de terceiro, conteúdo sobre corretores/imobiliárias, texto genérico, título inflado, repetição de pauta e fotografia que não corresponda ao assunto. Diferencie dado antigo e novidade, proposta e obra entregue, análise e fato. Avalie nota qualityScore (0-100), originalidade, clareza, valor local e utilidade; mínimo 85. companyPromotion deve ser false. imageRelevant só é true se a legenda factual da capa for pertinente e não simular registro atual do fato. luxuryFit avalia interesse do leitor de alto padrão, não se o texto repete R$ 2 milhões. primarySourceUrl deve ser uma URL institucional efetivamente usada. As únicas URLs elegíveis para esse campo são: ${JSON.stringify(used.filter((s) => isPrimarySource(s.url)).map((s) => s.url))}. AutImob e outros veículos nunca são elegíveis como fonte primária, mesmo quando entrevistam diretamente uma empresa. Se a fonte institucional não sustenta o fato central, rejeite; não aprove apenas por uma referência de contexto. Artigo (dados): ${JSON.stringify(article)}. Dossiê: ${dossier}. Fontes: ${JSON.stringify(used)}. Capa: ${JSON.stringify(cover)}. Foto interna: ${JSON.stringify(inline)}. Histórico: ${history}`,
-        [cover],
-      ),
-      text: jsonSchema("editorial_review", {
-        approved: { type: "boolean" },
-        reason: { type: "string" },
-        primarySourceUrl: { type: "string" },
-        luxuryFit: { type: "boolean" },
-        qualityScore: { type: "integer" },
-        companyPromotion: { type: "boolean" },
-        imageRelevant: { type: "boolean" },
-        requiresHumanReview: { type: "boolean" },
-        riskReason: { type: "string" },
-      }),
-      max_output_tokens: 1500,
-    });
-    const verdict = JSON.parse(responseText(review));
-    diagnostics.review = verdict;
-    if (
-      !approvedReview(verdict, used) ||
-      verdict.qualityScore < 85 ||
-      verdict.companyPromotion !== false ||
-      verdict.imageRelevant !== true
-    )
-      throw new Error(
-        "Revisão bloqueou a publicação: " +
-          String(verdict.reason).slice(0, 300),
-      );
     const reviewReasons = humanReviewReasons(article, verdict);
     const needsHumanReview = reviewReasons.length > 0;
     if (options.preview)
@@ -625,6 +635,7 @@ export async function generateBlog(
       pitchScore: pitch.score,
       qualityScore: verdict.qualityScore,
       keywords: article.keywords,
+      revisionCount: diagnostics.initialReview ? 1 : 0,
       reviewedAt: now,
       primarySourceUrl: verdict.primarySourceUrl,
     };
