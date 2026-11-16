@@ -527,6 +527,9 @@ export async function generateBlog(
         max_output_tokens: 6500,
       });
       article = JSON.parse(responseText(writing));
+      const paragraphs = String(article.content || "").trim().split("\n");
+      if (paragraphs[0]?.replace(/^#{1,6}\s+/, "").trim() === String(article.title || "").trim())
+        article.content = paragraphs.slice(1).join("\n").trim();
       const contentLinks = [
         ...String(article.content || "").matchAll(/\]\(([^)]+)\)/g),
       ].map((m) => sourceIdentity(m[1]));
