@@ -6,6 +6,7 @@ import {
 } from "./editorial-policy.js";
 import {
   editorialMedia,
+  premiumMedia,
   discoverEditorialMedia,
   storeEditorialMedia,
   imageProvenance,
@@ -401,7 +402,7 @@ export async function generateBlog(
           ?.selectedAngle,
       })),
     );
-    const availablePhotography = freshCoverCandidates(editorialMedia, existing.data || []).map(
+    const availablePhotography = freshCoverCandidates(editorialMedia.filter(premiumMedia), existing.data || []).map(
       ({ id, caption, topic }) => ({ id, caption, topic }),
     );
     const plan = editorialPlan(existing.data || [], key, options.category);
@@ -475,7 +476,7 @@ export async function generateBlog(
     // Preserve the licensed collection offered during planning. Search results
     // must not crowd those relevant photos out of the visual writer's shortlist.
     const candidates = freshCoverCandidates(
-      [...editorialMedia, ...discovered],
+      [...editorialMedia.filter(premiumMedia), ...discovered.filter(premiumMedia)],
       existing.data || [],
     ).slice(0, 10);
     if (!candidates.length)
